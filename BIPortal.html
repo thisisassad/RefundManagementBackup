@@ -309,13 +309,20 @@
     .bulk-actions {
       position: fixed;
       bottom: 2rem;
-      right: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1000;
       background-color: white;
       padding: 1rem;
       border-radius: 0.5rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       border: 1px solid rgba(0, 0, 0, 0.1);
+      max-width: 90%;
+      width: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
     }
 
     .bulk-actions .btn {
@@ -325,13 +332,122 @@
     /* Toast notifications - IMPROVED */
     .toast-container {
       position: fixed;
-      top: 1rem;
+      bottom: 1rem;
       right: 1rem;
       z-index: 1050;
+      max-width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      pointer-events: none; /* Allow clicking through the container */
+      transition: all 0.3s ease;
+      margin-bottom: 40px; /* Add space for pagination */
+    }
+    
+    @media (max-width: 768px) {
+      .toast-container {
+        margin-bottom: 60px; /* More space on mobile */
+      }
     }
     
     .toast {
       min-width: 250px;
+      max-width: 350px;
+      margin-bottom: 0.75rem;
+      pointer-events: auto; /* Make individual toasts clickable */
+      opacity: 0.95;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .toast:hover {
+      opacity: 1;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .toast.bg-success {
+      background-color: #d1e7dd !important;
+      color: #0f5132 !important;
+      border-left: 4px solid #198754;
+    }
+    
+    .toast.bg-danger {
+      background-color: #f8d7da !important;
+      color: #842029 !important;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .toast.bg-warning {
+      background-color: #fff3cd !important;
+      color: #664d03 !important;
+      border-left: 4px solid #ffc107;
+    }
+    
+    .toast.bg-info {
+      background-color: #cff4fc !important;
+      color: #055160 !important;
+      border-left: 4px solid #0dcaf0;
+    }
+    
+    .toast .toast-header {
+      border-bottom: none;
+      padding: 0.5rem 0.75rem;
+      background-color: transparent !important;
+      color: inherit !important;
+      font-weight: 600;
+    }
+    
+    .toast .toast-body {
+      padding: 0.5rem 0.75rem 0.75rem;
+      word-break: break-word;
+    }
+    
+    .toast .btn-close {
+      font-size: 0.75rem;
+      opacity: 0.5;
+      filter: none;
+    }
+    
+    .toast .btn-close:hover {
+      opacity: 0.75;
+    }
+    
+    /* Toast animations */
+    @keyframes toast-in-right {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    
+    @keyframes toast-in-left {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .toast.showing {
+      animation: toast-in-right 0.3s ease;
+    }
+    
+    .toast.hiding {
+      animation: toast-in-right 0.3s ease reverse;
+    }
+    
+    /* Responsive toast adjustments */
+    @media (max-width: 576px) {
+      .toast-container {
+        bottom: 0;
+        right: 0;
+        left: 0;
+        max-width: 100%;
+        padding: 0.5rem;
+      }
+      
+      .toast {
+        min-width: 100%;
+        max-width: 100%;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 0.5rem;
+      }
     }
 
     /* Connection status - IMPROVED POSITION */
@@ -356,7 +472,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -364,15 +480,60 @@
       display: none;
       opacity: 0;
       transition: opacity 0.3s ease;
+      backdrop-filter: blur(2px);
     }
 
     .progress-content {
       background-color: white;
-      padding: 2rem;
-      border-radius: 0.5rem;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
       text-align: center;
-      min-width: 300px;
+      min-width: 250px;
+      max-width: 90%;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-content .spinner-border {
+      width: 2.5rem;
+      height: 2.5rem;
+      color: #0d6efd;
+    }
+
+    .progress-content h5 {
+      margin-top: 1rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .progress-content .progress {
+      height: 0.5rem;
+      border-radius: 1rem;
+      background-color: #e9ecef;
+      margin-top: 0.5rem;
+    }
+
+    .progress-content .progress-bar {
+      background-color: #0d6efd;
+      border-radius: 1rem;
+    }
+
+    /* Progress indicator for small screens */
+    @media (max-width: 576px) {
+      .progress-content {
+        padding: 1.25rem;
+        min-width: 200px;
+      }
+      
+      .progress-content .spinner-border {
+        width: 2rem;
+        height: 2rem;
+      }
+      
+      .progress-content h5 {
+        font-size: 1rem;
+      }
     }
     
     /* Filter section - IMPROVED */
@@ -632,6 +793,26 @@
       width: 60%;
       word-break: break-word;
     }
+
+    /* Progress bar at the bottom of the screen */
+    .bottom-progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background-color: #f8f9fa;
+      z-index: 1040;
+      overflow: hidden;
+      display: none;
+    }
+    
+    .bottom-progress-bar .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background-color: #0d6efd;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -641,7 +822,20 @@
   <div class="container-fluid" style="margin-top: 1.5rem; padding-left: 1.5rem; padding-right: 1.5rem; max-width: 1600px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="fw-bold mb-0">BI Team Portal</h2>
-      <div id="headerErrorContainer" class="d-flex align-items-center"></div>
+      <div class="d-flex align-items-center">
+        <!-- Add refresh controls -->
+        <div class="refresh-controls d-flex align-items-center me-3">
+          <button id="manualRefreshBtn" class="btn btn-sm btn-outline-primary me-2">
+            <i class="fas fa-sync-alt me-1"></i> Refresh
+          </button>
+          <div class="small text-muted">
+            Last updated: <span id="lastRefreshTime">-</span>
+            <span id="refreshIndicator" style="display:none;" class="spinner-border spinner-border-sm ms-2" role="status"></span>
+          </div>
+        </div>
+        <div id="refreshErrorContainer" class="alert alert-warning py-1 px-2 mb-0" style="display:none; font-size: 0.8rem;"></div>
+        <div id="headerErrorContainer" class="d-flex align-items-center"></div>
+      </div>
     </div>
     
     <!-- Status Scorecard -->
@@ -921,17 +1115,19 @@
     </div>
 
     <!-- Connection Status Indicator -->
-    <div id="connectionStatus" class="position-fixed bottom-0 start-0 m-3" style="z-index: 1070; display: none;">
-      <div class="alert alert-warning d-flex align-items-center p-2 mb-0" role="alert">
+    <div id="connectionStatus" class="position-fixed start-0 m-3" style="z-index: 1070; display: none; bottom: 10px; max-width: 300px; transition: all 0.3s ease;">
+      <div class="alert alert-warning d-flex align-items-center p-2 mb-0 shadow-sm rounded-pill" role="alert">
         <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
           <span class="visually-hidden">Checking connection...</span>
         </div>
-        <div>Checking connection...</div>
+        <div class="small">Checking connection...</div>
       </div>
     </div>
     
     <!-- Toast Container -->
-    <div class="toast-container"></div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1050; max-width: 350px; max-height: 80vh; overflow-y: auto;">
+      <!-- Toasts will be dynamically added here -->
+    </div>
 
     <!-- Progress Overlay -->
     <div class="progress-overlay" id="progressOverlay">
@@ -1032,7 +1228,7 @@
         })
         .then(() => {
           // Setup background refresh after initial data load is complete
-          setupBackgroundRefresh();
+          setupSmartRefresh();
         })
         .catch(error => {
           console.error('Initialization or data loading failed:', error);
@@ -1143,6 +1339,7 @@
       let isOnline = navigator.onLine;
       let pingCount = 0;
       let failedPings = 0;
+      let connectionToastId = null;
       
       // Update connection status indicator
       function updateConnectionStatus(status, message) {
@@ -1151,23 +1348,49 @@
         if (status === 'checking') {
           connectionStatus.style.display = 'block';
           connectionStatus.innerHTML = `
-            <div class="alert alert-warning d-flex align-items-center p-2" role="alert">
+            <div class="alert alert-warning d-flex align-items-center p-2 shadow-sm rounded-pill" role="alert">
               <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
                 <span class="visually-hidden">Checking connection...</span>
               </div>
-              <div>Checking connection...</div>
+              <div class="small">Checking connection...</div>
             </div>
           `;
+          
+          // Adjust toast container position if needed
+          adjustToastContainerPosition();
         } else if (status === 'online') {
-          connectionStatus.style.display = 'none';
+          // Fade out the connection status
+          connectionStatus.style.opacity = '0';
+          setTimeout(() => {
+            connectionStatus.style.display = 'none';
+            connectionStatus.style.opacity = '1';
+            
+            // Readjust toast container position
+            adjustToastContainerPosition();
+          }, 300);
         } else if (status === 'offline') {
           connectionStatus.style.display = 'block';
           connectionStatus.innerHTML = `
-            <div class="alert alert-danger d-flex align-items-center p-2" role="alert">
+            <div class="alert alert-danger d-flex align-items-center p-2 shadow-sm" role="alert">
               <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-              <div>${message || 'Connection lost'}</div>
+              <div class="small">${message || 'Connection lost'}</div>
             </div>
           `;
+          
+          // Adjust toast container position
+          adjustToastContainerPosition();
+        }
+      }
+      
+      // Adjust toast container position based on connection status visibility
+      function adjustToastContainerPosition() {
+        const toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) return;
+        
+        if (connectionStatus && connectionStatus.style.display !== 'none') {
+          toastContainer.style.bottom = '60px';
+        } else {
+          toastContainer.style.bottom = '0';
         }
       }
       
@@ -1185,7 +1408,21 @@
             
             // If we were previously showing an offline message, show reconnected message
             if (!isOnline) {
-              showToast('Connection restored', 'success');
+              // Remove any existing connection toast
+              if (connectionToastId) {
+                const oldToast = document.getElementById(connectionToastId);
+                if (oldToast && oldToast.parentNode) {
+                  oldToast.parentNode.removeChild(oldToast);
+                }
+                connectionToastId = null;
+              }
+              
+              // Show new toast
+              const toast = showToast('Connection restored', 'success');
+              if (toast) {
+                connectionToastId = 'connection-toast-' + Date.now();
+                toast.id = connectionToastId;
+              }
               isOnline = true;
             }
           })
@@ -1199,7 +1436,20 @@
               
               // Only show the toast on the first failure
               if (failedPings === 2) {
-                showToast('Connection to server lost. Please check your internet connection.', 'danger');
+                // Remove any existing connection toast
+                if (connectionToastId) {
+                  const oldToast = document.getElementById(connectionToastId);
+                  if (oldToast && oldToast.parentNode) {
+                    oldToast.parentNode.removeChild(oldToast);
+                  }
+                }
+                
+                // Show new toast
+                const toast = showToast('Connection to server lost. Please check your internet connection.', 'danger');
+                if (toast) {
+                  connectionToastId = 'connection-toast-' + Date.now();
+                  toast.id = connectionToastId;
+                }
               }
             }
           })
@@ -1222,7 +1472,21 @@
         console.log('Browser reports offline status');
         isOnline = false;
         updateConnectionStatus('offline', 'Your device is offline');
-        showToast('Your device is offline. Please check your internet connection.', 'warning');
+        
+        // Remove any existing connection toast
+        if (connectionToastId) {
+          const oldToast = document.getElementById(connectionToastId);
+          if (oldToast && oldToast.parentNode) {
+            oldToast.parentNode.removeChild(oldToast);
+          }
+        }
+        
+        // Show new toast
+        const toast = showToast('Your device is offline. Please check your internet connection.', 'warning');
+        if (toast) {
+          connectionToastId = 'connection-toast-' + Date.now();
+          toast.id = connectionToastId;
+        }
       });
       
       // Clean up on page unload
@@ -1500,7 +1764,9 @@
     // Load dashboard data
     function loadDashboardData(retryCount = 0, maxRetries = 3, delay = 3000) {
       console.log(`Loading dashboard data (attempt ${retryCount + 1}/${maxRetries + 1})`);
-      showProgress('Loading dashboard data...');
+      
+      // Use the bottom progress bar for less intrusive loading indication
+      showBottomProgressBar();
       
       // Generate cache buster to avoid browser or server caching
       const cacheBuster = new Date().getTime();
@@ -1521,6 +1787,7 @@
         setTimeout(() => {
           if (!navigator.onLine) {
             clearTimeout(timeoutId);
+            hideBottomProgressBar();
             handleError('Device is offline. Please check your internet connection.', true, 
                       () => loadDashboardData(0, maxRetries, delay));
             return;
@@ -1531,6 +1798,7 @@
       google.script.run
         .withSuccessHandler(function(result) {
           clearTimeout(timeoutId);
+          hideBottomProgressBar();
           
           // Better data validation
           if (!result) {
@@ -1586,6 +1854,7 @@
         })
         .withFailureHandler(function(error) {
           clearTimeout(timeoutId);
+          hideBottomProgressBar();
           console.error(`Server error when loading dashboard data (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
           
           if (retryCount < maxRetries) {
@@ -1620,6 +1889,12 @@
 
         // Track last successful data load time
         window.lastSuccessfulDataLoad = new Date().toISOString();
+        
+        // Update the last refresh time display
+        const lastRefreshElement = document.getElementById('lastRefreshTime');
+        if (lastRefreshElement) {
+          lastRefreshElement.textContent = new Date().toLocaleTimeString();
+        }
 
         // Store the data for background refresh comparison
         window.lastTableData = result;
@@ -1817,7 +2092,7 @@
             // Initialize background refresh if not already set up
             if (!window.backgroundRefreshInitialized) {
               window.backgroundRefreshInitialized = true;
-              setupBackgroundRefresh();
+              setupSmartRefresh();
             }
           } catch (finalError) {
             console.error('Error finalizing table update:', finalError);
@@ -1885,11 +2160,16 @@
         });
       }
 
-      // Date filter change
-      document.getElementById('dateFilter').addEventListener('change', function(e) {
-        if (e.target.value === 'custom') {
-          new bootstrap.Modal(document.getElementById('dateRangeModal')).show();
+      // Date filter change handler
+      document.getElementById('dateFilter').addEventListener('change', function() {
+        const value = this.value;
+        
+        if (value === 'custom') {
+          // Show date range modal for custom date selection
+          const dateRangeModal = new bootstrap.Modal(document.getElementById('dateRangeModal'));
+          dateRangeModal.show();
         } else {
+          // Apply other date filters immediately
           applyFilters();
         }
       });
@@ -1944,106 +2224,221 @@
       });
     }
     
-    // NEW FUNCTION: Setup background refresh mechanism
-    function setupBackgroundRefresh() {
-      console.log('Setting up background refresh mechanism');
+    // NEW FUNCTION: Setup smart refresh mechanism with adaptive intervals
+    function setupSmartRefresh() {
+      console.log('Setting up smart refresh mechanism');
       
-      // Initialize variables to track user interaction
-      window.userInteracting = false;
-      window.lastInteractionTime = new Date().getTime();
-      window.backgroundRefreshInterval = 30000; // 30 seconds between refreshes
-      window.lastTableData = null; // Store last data for comparison
+      // Initial configuration
+      let baseInterval = 60000; // 1 minute base interval
+      let currentInterval = baseInterval;
+      let maxInterval = 300000; // 5 minutes maximum
+      let refreshTimer;
+      let lastRefreshTime = new Date();
+      let consecutiveErrors = 0;
       
-      // Start the background refresh cycle
-      scheduleNextBackgroundRefresh();
-      
-      // Add global event listeners to track user interaction
-      document.addEventListener('mousemove', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('keydown', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('scroll', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('touchstart', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-    }
-    
-    // Reset user interaction timer
-    function resetUserInteractionTimer() {
-      window.lastInteractionTime = new Date().getTime();
-      
-      // Consider user not interacting after 2 seconds of inactivity
-      setTimeout(function() {
-        const now = new Date().getTime();
-        if (now - window.lastInteractionTime >= 2000) {
-          window.userInteracting = false;
-        }
-      }, 2000);
-    }
-    
-    // Schedule next background refresh
-    function scheduleNextBackgroundRefresh() {
-      setTimeout(function() {
-        performBackgroundRefresh();
-      }, window.backgroundRefreshInterval);
-    }
-    
-    // Perform background refresh
-    function performBackgroundRefresh() {
-      // Skip refresh if user is actively interacting with the page
-      if (window.userInteracting) {
-        console.log('Skipping background refresh - user is interacting with the page');
-        scheduleNextBackgroundRefresh();
-        return;
+      // Function to refresh dashboard data
+      function refreshDashboardData(forceRefresh = false) {
+        // Show subtle refresh indicator if it exists
+        const refreshIndicator = document.getElementById('refreshIndicator');
+        if (refreshIndicator) refreshIndicator.style.display = 'inline-block';
+        
+        // Update last refresh attempt time
+        lastRefreshTime = new Date();
+        updateLastRefreshTime();
+        
+        // Generate a unique timestamp to avoid caching
+        const timestamp = new Date().getTime();
+        
+        console.log(`Initiating ${forceRefresh ? 'force' : 'regular'} refresh with timestamp: ${timestamp}`);
+        
+        // Call server function to get data
+        google.script.run
+          .withSuccessHandler(function(data) {
+            // Handle successful data refresh
+            console.log('Smart refresh data received:', data ? 'valid data object' : 'null data', data);
+            
+            try {
+              // Validate data with more detailed logging
+              if (!data) {
+                console.error('Null data received during smart refresh');
+                showToast('Error refreshing data: No data received', 'danger');
+                scheduleNextRefresh();
+                return;
+              }
+              
+              // Check if data has error property
+              if (data.error) {
+                console.error('Server returned error:', data.error);
+                showToast('Error refreshing data: ' + data.error, 'danger');
+                scheduleNextRefresh();
+                return;
+              }
+              
+              if (!data.requests) {
+                console.error('Data missing requests property:', data);
+                showToast('Error refreshing data: Invalid data format', 'danger');
+                scheduleNextRefresh();
+                return;
+              }
+              
+              if (!Array.isArray(data.requests)) {
+                console.error('Requests is not an array:', typeof data.requests);
+                showToast('Error refreshing data: Invalid requests format', 'danger');
+                scheduleNextRefresh();
+                return;
+              }
+              
+              if (!data.statusCounts || typeof data.statusCounts !== 'object') {
+                console.error('Invalid statusCounts:', data.statusCounts);
+                showToast('Error refreshing data: Invalid status counts', 'danger');
+                scheduleNextRefresh();
+                return;
+              }
+              
+              console.log(`Received ${data.requests.length} requests with status counts:`, data.statusCounts);
+              
+              // When force refreshing, always update the table
+              if (forceRefresh) {
+                console.log('Force refresh requested, updating table regardless of changes');
+                updateTableQuietly(data);
+                showToast('Data refreshed successfully', 'success');
+              } else {
+                // Compare with current data to see if update is needed
+                if (shouldUpdateTable(data)) {
+                  console.log('Data has changed, updating table quietly');
+                  updateTableQuietly(data);
+                } else {
+                  console.log('No data changes detected, skipping update');
+                }
+              }
+              
+              // Reset error counter and interval after success
+              consecutiveErrors = 0;
+              currentInterval = baseInterval;
+            } catch (error) {
+              console.error('Error processing refresh data:', error);
+              showToast('Error processing refresh data: ' + error.message, 'danger');
+            } finally {
+              // Hide refresh indicator
+              if (refreshIndicator) refreshIndicator.style.display = 'none';
+              
+              // Schedule next refresh
+              scheduleNextRefresh();
+            }
+          })
+          .withFailureHandler(function(error) {
+            // Handle refresh failure
+            console.error('Dashboard refresh failed:', error);
+            consecutiveErrors++;
+            
+            // Implement exponential backoff
+            if (consecutiveErrors > 1) {
+              currentInterval = Math.min(currentInterval * 1.5, maxInterval);
+              console.log(`Increasing refresh interval to ${currentInterval/1000} seconds due to errors`);
+            }
+            
+            // Hide refresh indicator and show error
+            if (refreshIndicator) refreshIndicator.style.display = 'none';
+            showRefreshError(error);
+            showToast('Error refreshing data: ' + (error.message || error), 'danger');
+            
+            // Schedule next refresh
+            scheduleNextRefresh();
+          })
+          .getBIDashboardData(timestamp, forceRefresh);
       }
       
-      console.log('Performing background refresh');
+      // Schedule next refresh based on current interval
+      function scheduleNextRefresh() {
+        clearTimeout(refreshTimer);
+        
+        // Only schedule if page is visible
+        if (document.visibilityState !== 'hidden') {
+          refreshTimer = setTimeout(refreshDashboardData, currentInterval);
+          console.log(`Next refresh scheduled in ${currentInterval/1000} seconds`);
+        }
+      }
       
-      // Generate a unique timestamp to avoid caching
-      const timestamp = new Date().getTime();
+      // Update the last refresh time display
+      function updateLastRefreshTime() {
+        const lastRefreshElement = document.getElementById('lastRefreshTime');
+        if (lastRefreshElement) {
+          lastRefreshElement.textContent = lastRefreshTime.toLocaleTimeString();
+        }
+      }
       
-      // Perform a quiet data fetch without showing loading indicators
-      google.script.run
-        .withSuccessHandler(function(result) {
-          console.log('Background refresh data received');
-          
-          // Validate data
-          if (!result || !result.requests || !Array.isArray(result.requests) || 
-              !result.statusCounts || typeof result.statusCounts !== 'object') {
-            console.error('Invalid data received during background refresh');
-            scheduleNextBackgroundRefresh();
-            return;
-          }
-          
-          // Compare with current data to see if update is needed
-          if (shouldUpdateTable(result)) {
-            console.log('Data has changed, updating table quietly');
-            updateTableQuietly(result);
+      // Show refresh error message
+      function showRefreshError(error) {
+        const errorContainer = document.getElementById('refreshErrorContainer');
+        if (errorContainer) {
+          errorContainer.textContent = `Refresh error: ${error}. Will retry in ${Math.round(currentInterval/1000)} seconds.`;
+          errorContainer.style.display = 'block';
+          setTimeout(() => {
+            errorContainer.style.display = 'none';
+          }, 5000);
+        } else {
+          // If no dedicated error container, use toast
+          showToast(`Refresh failed. Will retry in ${Math.round(currentInterval/1000)} seconds.`, 'warning', 5000);
+        }
+      }
+      
+      // Handle page visibility changes
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+          // Page became visible - refresh immediately if it's been a while
+          const timeSinceLastRefresh = new Date() - lastRefreshTime;
+          if (timeSinceLastRefresh > baseInterval) {
+            console.log('Page became visible after inactivity, refreshing immediately');
+            clearTimeout(refreshTimer);
+            refreshDashboardData();
           } else {
-            console.log('No data changes detected, skipping update');
+            // Otherwise just ensure the timer is running
+            console.log('Page became visible, ensuring refresh timer is active');
+            scheduleNextRefresh();
           }
-          
-          // Schedule next refresh regardless of outcome
-          scheduleNextBackgroundRefresh();
-        })
-        .withFailureHandler(function(error) {
-          console.error('Background refresh failed:', error);
-          // Still schedule next attempt
-          scheduleNextBackgroundRefresh();
-        })
-        .getBIDashboardData(timestamp);
+        } else {
+          // Page hidden - clear the timer to save resources
+          console.log('Page hidden, pausing refresh timer');
+          clearTimeout(refreshTimer);
+        }
+      });
+      
+      // Add manual refresh button handler if it exists
+      const refreshButton = document.getElementById('manualRefreshBtn');
+      if (refreshButton) {
+        refreshButton.addEventListener('click', function() {
+          console.log('Manual refresh requested');
+          // Clear existing timer and refresh immediately
+          clearTimeout(refreshTimer);
+          // Reset interval on manual refresh
+          currentInterval = baseInterval;
+          // Force refresh to bypass cache and always update UI
+          refreshDashboardData(true);
+        });
+      }
+      
+      // Start initial refresh
+      refreshDashboardData();
+      
+      // Return control functions for external access
+      return {
+        refresh: refreshDashboardData,
+        setInterval: function(newInterval) {
+          if (newInterval >= 30000 && newInterval <= 600000) {
+            baseInterval = newInterval;
+            currentInterval = newInterval;
+            console.log(`Refresh interval set to ${newInterval/1000} seconds`);
+            scheduleNextRefresh();
+          }
+        }
+      };
     }
+    
+    // Remove the old functions that are no longer needed
+    // function setupBackgroundRefresh() { ... } - Removed
+    // function resetUserInteractionTimer() { ... } - Removed
+    // function scheduleNextBackgroundRefresh() { ... } - Removed
+    // function performBackgroundRefresh() { ... } - Removed
     
     // Check if table should be updated based on data comparison
     function shouldUpdateTable(newData) {
@@ -2090,6 +2485,11 @@
     // Update table without showing loading indicators
     function updateTableQuietly(result) {
       try {
+        console.log('Updating table quietly with data:', {
+          requestCount: result.requests.length,
+          statusCounts: result.statusCounts
+        });
+        
         // Store the new data
         window.lastTableData = result;
         
@@ -2117,14 +2517,22 @@
         // Process the requests
         result.requests.forEach((request) => {
           try {
+            // Ensure all values are properly formatted
+            const requestId = String(request.request_id || '');
+            const timestamp = String(request.timestamp_string || '');
+            const courseName = String(request.course_name || '');
+            const refundType = String(request.refund_type || '');
+            const refundAmount = isNaN(request.refund_amount) ? 0 : Number(request.refund_amount);
+            const status = String(request.current_bi_status || 'Pending');
+            
             requestsTable.row.add([
-              `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
-              request.request_id,
-              formatDate(request.timestamp_string) || '',
-              request.course_name || '',
-              request.refund_type || '',
-              formatCurrency(request.refund_amount || 0),
-              getStatusBadge(request.current_bi_status || 'Pending'),
+              `<input type="checkbox" class="form-check-input request-checkbox" data-id="${requestId}">`,
+              requestId,
+              timestamp,
+              courseName,
+              refundType,
+              formatCurrency(refundAmount),
+              getStatusBadge(status),
               getActionButtons(request)
             ]);
           } catch (rowError) {
@@ -2137,8 +2545,15 @@
         requestsTable.page(currentPage).draw('page');
         
         console.log('Table updated quietly in the background');
+        
+        // Update the last refresh time display
+        const lastRefreshElement = document.getElementById('lastRefreshTime');
+        if (lastRefreshElement) {
+          lastRefreshElement.textContent = new Date().toLocaleTimeString();
+        }
       } catch (error) {
         console.error('Error during quiet table update:', error);
+        showToast('Error updating table: ' + error.message, 'danger');
       }
     }
 
@@ -2157,6 +2572,7 @@
     function updateBulkActionsVisibility() {
       const bulkActionsBar = document.getElementById('bulkActionsBar');
       const selectedItemsCount = document.getElementById('selectedItemsCount');
+      const toastContainer = document.querySelector('.toast-container');
       
       if (selectedRequests.size > 0) {
         bulkActionsBar.style.display = 'block';
@@ -2166,6 +2582,11 @@
           bulkActionsBar.style.transform = 'translateY(0)';
         }, 10);
         selectedItemsCount.textContent = selectedRequests.size;
+        
+        // Adjust toast container position if bulk actions are visible
+        if (toastContainer) {
+          toastContainer.style.bottom = '80px';
+        }
       } else {
         // Animate out
         bulkActionsBar.style.opacity = '0';
@@ -2173,6 +2594,16 @@
         // Hide after animation completes
         setTimeout(() => {
           bulkActionsBar.style.display = 'none';
+          
+          // Reset toast container position if connection status is not visible
+          if (toastContainer) {
+            const connectionStatus = document.getElementById('connectionStatus');
+            if (!connectionStatus || connectionStatus.style.display === 'none') {
+              toastContainer.style.bottom = '0';
+            } else {
+              toastContainer.style.bottom = '60px';
+            }
+          }
         }, 300);
       }
     }
@@ -2900,43 +3331,142 @@
 
     // Improved toast notification function
     function showToast(message, type = 'info', duration = 5000) {
-      const toastContainer = document.querySelector('.toast-container');
+      // Get or create toast container
+      let toastContainer = document.querySelector('.toast-container');
       if (!toastContainer) {
-        // Create toast container if it doesn't exist
-        const newContainer = document.createElement('div');
-        newContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        newContainer.style.zIndex = '1050';
-        document.body.appendChild(newContainer);
-        toastContainer = newContainer;
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        toastContainer.style.zIndex = '1050';
+        toastContainer.style.maxWidth = '350px';
+        toastContainer.style.maxHeight = '80vh';
+        toastContainer.style.overflowY = 'auto';
+        toastContainer.style.marginBottom = '40px'; /* Add space for pagination */
+        document.body.appendChild(toastContainer);
       }
       
+      // Check for duplicate messages to prevent spam
+      const existingToasts = toastContainer.querySelectorAll('.toast');
+      for (let i = 0; i < existingToasts.length; i++) {
+        const existingToast = existingToasts[i];
+        const existingMessage = existingToast.querySelector('.toast-body')?.textContent?.trim();
+        const existingType = existingToast.classList.contains(`bg-${type}`);
+        
+        // If this is a duplicate message of the same type, don't create a new toast
+        if (existingMessage === message && existingType) {
+          console.log('Preventing duplicate toast:', message);
+          
+          // Reset the autohide timer by hiding and reshowing
+          const bsToast = bootstrap.Toast.getInstance(existingToast);
+          if (bsToast) {
+            bsToast.hide();
+            setTimeout(() => {
+              bsToast.show();
+            }, 100);
+          }
+          
+          return existingToast;
+        }
+      }
+      
+      // Limit maximum number of toasts to 3
+      if (existingToasts.length >= 3) {
+        // Remove the oldest toast
+        const oldestToast = existingToasts[0];
+        if (oldestToast && oldestToast.parentNode) {
+          oldestToast.classList.add('hiding');
+          setTimeout(() => {
+            if (oldestToast.parentNode) {
+              oldestToast.parentNode.removeChild(oldestToast);
+            }
+          }, 300);
+        }
+      }
+      
+      // Create toast element with unique ID
+      const toastId = 'toast-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
       const toast = document.createElement('div');
-      toast.className = `toast bg-${type} text-white`;
+      toast.id = toastId;
+      toast.className = `toast bg-${type} showing`;
       toast.setAttribute('role', 'alert');
       toast.setAttribute('aria-live', 'assertive');
       toast.setAttribute('aria-atomic', 'true');
       
+      // Create toast content
+      const iconMap = {
+        'success': 'fas fa-check-circle',
+        'danger': 'fas fa-exclamation-circle',
+        'warning': 'fas fa-exclamation-triangle',
+        'info': 'fas fa-info-circle'
+      };
+      
+      const icon = iconMap[type] || iconMap.info;
+      
       toast.innerHTML = `
-        <div class="toast-header bg-${type} text-white">
+        <div class="toast-header">
+          <i class="${icon} me-2"></i>
           <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">
           ${message}
         </div>
       `;
       
+      // Add toast to container
       toastContainer.appendChild(toast);
+      
+      // Initialize Bootstrap toast
       const bsToast = new bootstrap.Toast(toast, {
         autohide: true,
         delay: duration
       });
+      
+      // Show the toast
       bsToast.show();
+      
+      // Add animation class
+      setTimeout(() => {
+        toast.classList.remove('showing');
+      }, 300);
       
       // Remove toast from DOM after it's hidden
       toast.addEventListener('hidden.bs.toast', function() {
-        toast.remove();
+        toast.classList.add('hiding');
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
       });
+      
+      // Check if we need to adjust container position to avoid overlapping with other fixed elements
+      const connectionStatus = document.getElementById('connectionStatus');
+      const bulkActionsBar = document.getElementById('bulkActionsBar');
+      const paginationElement = document.querySelector('.dataTables_paginate');
+      
+      // Base position
+      let bottomPosition = 0;
+      
+      // Check for pagination
+      if (paginationElement && window.innerWidth < 768) {
+        bottomPosition = Math.max(bottomPosition, 60); // More space on mobile
+      } else if (paginationElement) {
+        bottomPosition = Math.max(bottomPosition, 40); // Standard space
+      }
+      
+      // Check for bulk actions bar
+      if (bulkActionsBar && bulkActionsBar.style.display !== 'none') {
+        bottomPosition = Math.max(bottomPosition, 80);
+      } 
+      // Check for connection status
+      else if (connectionStatus && connectionStatus.style.display !== 'none') {
+        bottomPosition = Math.max(bottomPosition, 60);
+      }
+      
+      // Apply the position
+      toastContainer.style.bottom = bottomPosition + 'px';
+      
+      return toast;
     }
 
     function showProgress(message) {
@@ -3002,6 +3532,12 @@
       
       console.log('Processed error - type:', errorType, 'count:', errorCount);
       
+      // Remove any existing error notifications to avoid duplication
+      const existingError = document.getElementById('errorNotification');
+      if (existingError) {
+        existingError.remove();
+      }
+      
       // Try auto-recovery for certain error types or frequency patterns
       if (errorType === 'network' || errorType === 'timeout') {
         console.log('Network or timeout error detected, checking connectivity...');
@@ -3048,99 +3584,58 @@
                 loadDashboardData(0, 5, 1000);
               }
             }, retryDelay);
-            
-            // Still show error notification, but it will auto-recover
-            showRetryButton = true;
           }
         }
       }
       
-      // For frequent errors, add diagnostic information and recommend refresh
+      // For frequent errors, show a more persistent error notification instead of multiple toasts
       if (errorCount >= 3) {
-        // Collect diagnostic information
-        const diagnostics = {
-          userAgent: navigator.userAgent,
-          viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-          isOnline: navigator.onLine,
-          timeLastSuccess: window.lastSuccessfulDataLoad || 'unknown',
-          tableInitialized: typeof requestsTable !== 'undefined' && requestsTable !== null,
-          errorFrequency: `${errorCount} errors in the last 10 seconds`
-        };
-        
-        console.log('Multiple errors detected, collecting diagnostics:', diagnostics);
-        
-        // Show a more serious error notification recommending page refresh
-        errorMessage = `Multiple errors detected (${errorCount} in quick succession). Try refreshing the page.`;
-        
-        // Add refresh button to error
-        const refreshButton = document.createElement('button');
-        refreshButton.className = 'btn btn-sm btn-danger ms-2';
-        refreshButton.innerHTML = '<i class="fas fa-sync"></i> Refresh Page';
-        refreshButton.onclick = () => window.location.reload();
-        
-        // If retryFunction exists, modify it to refresh the page on critical errors
-        if (typeof retryFunction === 'function') {
-          const originalRetry = retryFunction;
-          retryFunction = function() {
-            errorCount = 0; // Reset error count
-            originalRetry();
-          };
-        } else {
-          // Set a default retry function to refresh the page
-          retryFunction = () => window.location.reload();
-        }
-        
-        showRetryButton = true;
-      }
-      
-      // For critical errors, show a more prominent notification
-      if (showRetryButton && retryFunction) {
         // Create a fixed error notification at the top of the content area
         const errorContainer = document.createElement('div');
         errorContainer.id = 'errorNotification';
-        errorContainer.className = 'alert alert-danger alert-dismissible fade show mb-0';
+        errorContainer.className = 'alert alert-danger alert-dismissible fade show mb-3 mx-3';
         errorContainer.setAttribute('role', 'alert');
+        errorContainer.style.position = 'fixed';
+        errorContainer.style.bottom = '10px';
+        errorContainer.style.left = '10px';
+        errorContainer.style.right = '10px';
+        errorContainer.style.zIndex = '1060';
+        errorContainer.style.maxWidth = '600px';
+        errorContainer.style.margin = '0 auto';
+        errorContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        
         errorContainer.innerHTML = `
           <div class="d-flex align-items-center">
-            <i class="fas fa-exclamation-circle me-2"></i>
+            <i class="fas fa-exclamation-circle me-2 text-danger"></i>
             <span><strong>Error:</strong> ${errorMessage}</span>
-            <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="errorRetryButton">
-              <i class="fas fa-sync-alt me-1"></i> Retry
-            </button>
-            ${errorCount >= 3 ? '<button type="button" class="btn btn-sm btn-danger ms-2" id="errorRefreshButton"><i class="fas fa-sync"></i> Refresh Page</button>' : ''}
+            <div class="ms-auto">
+              ${showRetryButton && retryFunction ? 
+                `<button type="button" class="btn btn-sm btn-outline-danger me-2" id="errorRetryButton">
+                  <i class="fas fa-sync-alt me-1"></i> Retry
+                </button>` : ''}
+              ${errorCount >= 3 ? 
+                `<button type="button" class="btn btn-sm btn-danger" id="errorRefreshButton">
+                  <i class="fas fa-sync"></i> Refresh Page
+                </button>` : ''}
+            </div>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         
-        // Remove any existing error notifications
-        const existingError = document.getElementById('errorNotification');
-        if (existingError) {
-          existingError.remove();
-        }
-        
-        // Insert inline with the header
-        const headerErrorContainer = document.getElementById('headerErrorContainer');
-        if (headerErrorContainer) {
-          headerErrorContainer.appendChild(errorContainer);
-        } else {
-          // Fallback to the old method if header container not found
-          const contentArea = document.querySelector('.content-area') || document.querySelector('main');
-          if (contentArea) {
-            contentArea.insertBefore(errorContainer, contentArea.firstChild);
-          } else {
-            // Fallback to body if content area not found
-            document.body.insertBefore(errorContainer, document.body.firstChild);
-          }
-        }
+        // Insert the error notification
+        document.body.appendChild(errorContainer);
         
         // Add retry button event listener
-        document.getElementById('errorRetryButton').addEventListener('click', function() {
-          errorContainer.remove();
-          errorCount = 0; // Reset error count on manual retry
-          if (typeof retryFunction === 'function') {
-            retryFunction();
-          }
-        });
+        const retryButton = document.getElementById('errorRetryButton');
+        if (retryButton) {
+          retryButton.addEventListener('click', function() {
+            errorContainer.remove();
+            errorCount = 0; // Reset error count on manual retry
+            if (typeof retryFunction === 'function') {
+              retryFunction();
+            }
+          });
+        }
         
         // Add refresh button event listener if present
         const refreshButton = document.getElementById('errorRefreshButton');
@@ -3149,6 +3644,18 @@
             window.location.reload();
           });
         }
+        
+        // Auto-dismiss after 30 seconds
+        setTimeout(() => {
+          if (errorContainer.parentNode) {
+            errorContainer.classList.remove('show');
+            setTimeout(() => {
+              if (errorContainer.parentNode) {
+                errorContainer.parentNode.removeChild(errorContainer);
+              }
+            }, 300);
+          }
+        }, 30000);
       } else {
         // For non-critical errors, show a toast notification
         showToast(errorMessage, 'danger', 7000); // Show for longer (7 seconds) to ensure user sees it
@@ -3172,13 +3679,17 @@
       
       connectionStatus.style.display = 'block';
       connectionStatus.innerHTML = `
-        <div class="alert alert-danger d-flex align-items-center p-2 mb-0" role="alert">
-          <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
-            <span class="visually-hidden">Checking connection...</span>
-          </div>
-          <div>Checking connection...</div>
+        <div class="alert alert-danger d-flex align-items-center p-2 mb-0 shadow-sm" role="alert">
+          <i class="fas fa-wifi me-2 text-danger"></i>
+          <div class="small">Your device appears to be offline</div>
         </div>
       `;
+      
+      // Adjust toast container position
+      const toastContainer = document.querySelector('.toast-container');
+      if (toastContainer) {
+        toastContainer.style.bottom = '60px';
+      }
     }
 
     function debounce(func, wait) {
@@ -3532,21 +4043,34 @@
 
     // Apply filters function
     function applyFilters() {
+      console.log('Applying filters');
       const statusFilter = document.getElementById('statusFilter').value;
       const dateFilter = document.getElementById('dateFilter').value;
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       
+      console.log(`Filters - Status: ${statusFilter}, Date: ${dateFilter}, Search: ${searchTerm}`);
+      
+      // Clear any existing custom filters
+      $.fn.dataTable.ext.search.pop();
+      
       // Apply search filter directly to DataTable
-      requestsTable.search(searchTerm).draw();
+      requestsTable.search(searchTerm);
       
       // Custom filtering for status and date
       $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
         let showRow = true;
         
-        // Status filter
+        // Status filter - improved to handle status text extraction more reliably
         if (statusFilter) {
-          const status = $(data[6]).text(); // Extract status from badge HTML
-          showRow = showRow && status === statusFilter;
+          // Get the status from the row data (column 6)
+          const statusHtml = data[6];
+          
+          // Create a temporary div to parse the HTML and extract text
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = statusHtml;
+          const status = tempDiv.textContent.trim();
+          
+          showRow = showRow && status.includes(statusFilter);
         }
         
         // Date filter
@@ -3583,17 +4107,13 @@
       // Redraw table with filters applied
       requestsTable.draw();
       
-      // Remove the custom filter after drawing
-      $.fn.dataTable.ext.search.pop();
-      
       // Update stat cards based on filtered data
       updateStatCardsFromTable();
     }
 
-    // New function to update stat cards based on filtered table data
+    // Completely rewritten function to update stat cards based on filtered table data
     function updateStatCardsFromTable() {
-      // Get all visible rows after filtering
-      const visibleRows = requestsTable.rows({search: 'applied'}).nodes();
+      console.log('Updating stat cards from filtered table data');
       
       // Initialize counters
       let pendingCount = 0;
@@ -3601,21 +4121,38 @@
       let completedCount = 0;
       let rejectedCount = 0;
       
-      // Count statuses from visible rows
-      visibleRows.forEach(row => {
-        const statusCell = row.cells[6]; // Status is in the 7th column (index 6)
-        const statusText = $(statusCell).text().trim();
+      // Use DataTables API to get filtered rows data
+      const filteredData = requestsTable.rows({search: 'applied'}).data();
+      
+      // Log the number of filtered rows for debugging
+      console.log(`Found ${filteredData.length} filtered rows`);
+      
+      // Process each filtered row
+      filteredData.each(function(rowData) {
+        // Get the status from the row data
+        // The status is in column 6 (index 6)
+        const statusHtml = rowData[6];
         
-        if (statusText === 'Pending') {
+        // Create a temporary div to parse the HTML and extract text
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = statusHtml;
+        const statusText = tempDiv.textContent.trim();
+        
+        console.log(`Row status: ${statusText}`);
+        
+        // Count by status
+        if (statusText.includes('Pending')) {
           pendingCount++;
-        } else if (statusText === 'In Progress') {
+        } else if (statusText.includes('In Progress')) {
           inProgressCount++;
-        } else if (statusText === 'Completed') {
+        } else if (statusText.includes('Completed')) {
           completedCount++;
-        } else if (statusText === 'Rejected') {
+        } else if (statusText.includes('Rejected')) {
           rejectedCount++;
         }
       });
+      
+      console.log(`Counts - Pending: ${pendingCount}, In Progress: ${inProgressCount}, Completed: ${completedCount}, Rejected: ${rejectedCount}`);
       
       // Update the stat cards
       document.getElementById('pendingCount').textContent = pendingCount;
@@ -3642,26 +4179,45 @@
       // Set end date to end of day
       endDate.setHours(23, 59, 59, 999);
       
-      // Apply custom date filter
-      $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+      // Store the filter function for reuse
+      const dateFilterFn = function(settings, data, dataIndex) {
         const requestDate = new Date(data[2]);
         return requestDate >= startDate && requestDate <= endDate;
-      });
+      };
+      
+      // Apply custom date filter
+      $.fn.dataTable.ext.search.push(dateFilterFn);
       
       // Redraw table with filter applied
       requestsTable.draw();
       
-      // Remove the custom filter after drawing
-      $.fn.dataTable.ext.search.pop();
-      
       // Update stat cards based on filtered data
       updateStatCardsFromTable();
+      
+      // Remove the custom filter after drawing
+      $.fn.dataTable.ext.search.pop();
       
       // Update date filter display
       document.getElementById('dateFilter').value = 'custom';
       
-      // Hide the modal
-      bootstrap.Modal.getInstance(document.getElementById('dateRangeModal')).hide();
+      // COMPLETELY REWRITTEN MODAL CLOSING LOGIC
+      // First, get the modal element
+      const dateRangeModal = document.getElementById('dateRangeModal');
+      
+      // Use jQuery to properly close the modal
+      $(dateRangeModal).modal('hide');
+      
+      // Force cleanup of any remaining modal artifacts
+      setTimeout(() => {
+        // Remove all modal backdrops
+        $('.modal-backdrop').remove();
+        
+        // Remove modal-open class and inline styles from body
+        $('body').removeClass('modal-open').css('padding-right', '');
+        
+        // Make sure the modal is hidden
+        $(dateRangeModal).hide();
+      }, 100);
       
       // Show confirmation toast
       showToast(`Date filter applied: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 'success');
@@ -3697,452 +4253,48 @@
       new bootstrap.Modal(document.getElementById('updateStatusModal')).show();
     }
 
-    // NEW FUNCTION: Setup background refresh mechanism
-    function setupBackgroundRefresh() {
-      console.log('Setting up background refresh mechanism');
+    // Add this to your JavaScript
+    function showBottomProgressBar(percent = -1) {
+      const progressBar = document.getElementById('bottomProgressBar');
+      const progressBarInner = document.getElementById('bottomProgressBarInner');
       
-      // Initialize variables to track user interaction
-      window.userInteracting = false;
-      window.lastInteractionTime = new Date().getTime();
-      window.backgroundRefreshInterval = 30000; // 30 seconds between refreshes
-      window.lastTableData = null; // Store last data for comparison
+      if (!progressBar || !progressBarInner) return;
       
-      // Start the background refresh cycle
-      scheduleNextBackgroundRefresh();
+      progressBar.style.display = 'block';
       
-      // Add global event listeners to track user interaction
-      document.addEventListener('mousemove', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('keydown', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('scroll', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-      
-      document.addEventListener('touchstart', function() {
-        window.userInteracting = true;
-        resetUserInteractionTimer();
-      }, { passive: true });
-    }
-    
-    // Reset user interaction timer
-    function resetUserInteractionTimer() {
-      window.lastInteractionTime = new Date().getTime();
-      
-      // Consider user not interacting after 2 seconds of inactivity
-      setTimeout(function() {
-        const now = new Date().getTime();
-        if (now - window.lastInteractionTime >= 2000) {
-          window.userInteracting = false;
-        }
-      }, 2000);
-    }
-    
-    // Schedule next background refresh
-    function scheduleNextBackgroundRefresh() {
-      setTimeout(function() {
-        performBackgroundRefresh();
-      }, window.backgroundRefreshInterval);
-    }
-    
-    // Perform background refresh
-    function performBackgroundRefresh() {
-      // Skip refresh if user is actively interacting with the page
-      if (window.userInteracting) {
-        console.log('Skipping background refresh - user is interacting with the page');
-        scheduleNextBackgroundRefresh();
-        return;
-      }
-      
-      console.log('Performing background refresh');
-      
-      // Generate a unique timestamp to avoid caching
-      const timestamp = new Date().getTime();
-      
-      // Perform a quiet data fetch without showing loading indicators
-      google.script.run
-        .withSuccessHandler(function(result) {
-          console.log('Background refresh data received');
-          
-          // Validate data
-          if (!result || !result.requests || !Array.isArray(result.requests) || 
-              !result.statusCounts || typeof result.statusCounts !== 'object') {
-            console.error('Invalid data received during background refresh');
-            scheduleNextBackgroundRefresh();
-            return;
-          }
-          
-          // Compare with current data to see if update is needed
-          if (shouldUpdateTable(result)) {
-            console.log('Data has changed, updating table quietly');
-            updateTableQuietly(result);
-          } else {
-            console.log('No data changes detected, skipping update');
-          }
-          
-          // Schedule next refresh regardless of outcome
-          scheduleNextBackgroundRefresh();
-        })
-        .withFailureHandler(function(error) {
-          console.error('Background refresh failed:', error);
-          // Still schedule next attempt
-          scheduleNextBackgroundRefresh();
-        })
-        .getBIDashboardData(timestamp);
-    }
-    
-    // Check if table should be updated based on data comparison
-    function shouldUpdateTable(newData) {
-      // If we don't have previous data, we should update
-      if (!window.lastTableData) {
-        window.lastTableData = newData;
-        return true;
-      }
-      
-      // Compare request counts
-      if (newData.requests.length !== window.lastTableData.requests.length) {
-        window.lastTableData = newData;
-        return true;
-      }
-      
-      // Compare status counts
-      const oldCounts = window.lastTableData.statusCounts;
-      const newCounts = newData.statusCounts;
-      
-      if (oldCounts.pending !== newCounts.pending ||
-          oldCounts.inProgress !== newCounts.inProgress ||
-          oldCounts.completed !== newCounts.completed ||
-          oldCounts.rejected !== newCounts.rejected) {
-        window.lastTableData = newData;
-        return true;
-      }
-      
-      // Compare request statuses (sample a few requests for efficiency)
-      const sampleSize = Math.min(10, newData.requests.length);
-      for (let i = 0; i < sampleSize; i++) {
-        const newRequest = newData.requests[i];
-        const oldRequest = window.lastTableData.requests.find(r => r.request_id === newRequest.request_id);
-        
-        if (!oldRequest || oldRequest.current_bi_status !== newRequest.current_bi_status) {
-          window.lastTableData = newData;
-          return true;
-        }
-      }
-      
-      // No significant changes detected
-      return false;
-    }
-    
-    // Update table without showing loading indicators
-    function updateTableQuietly(result) {
-      try {
-        // Store the new data
-        window.lastTableData = result;
-        
-        // Update status counts
-        const counts = result.statusCounts;
-        document.getElementById('pendingCount').textContent = counts.pending || 0;
-        document.getElementById('progressCount').textContent = counts.inProgress || 0;
-        document.getElementById('completedCount').textContent = counts.completed || 0;
-        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
-        
-        // Make sure DataTable is initialized
-        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
-          console.warn('DataTable not properly initialized during quiet update');
-          return;
-        }
-        
-        // Save current state for restoration
-        let currentPage = requestsTable.page();
-        let currentSearch = requestsTable.search();
-        let currentOrder = requestsTable.order();
-        
-        // Clear and reload data
-        requestsTable.clear();
-        
-        // Process the requests
-        result.requests.forEach((request) => {
-          try {
-            requestsTable.row.add([
-              `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
-              request.request_id,
-              formatDate(request.timestamp_string) || '',
-              request.course_name || '',
-              request.refund_type || '',
-              formatCurrency(request.refund_amount || 0),
-              getStatusBadge(request.current_bi_status || 'Pending'),
-              getActionButtons(request)
-            ]);
-          } catch (rowError) {
-            console.error(`Error adding row for request ${request.request_id}:`, rowError);
-          }
-        });
-        
-        // Redraw with preserved state
-        requestsTable.search(currentSearch).order(currentOrder).draw(false);
-        requestsTable.page(currentPage).draw('page');
-        
-        console.log('Table updated quietly in the background');
-      } catch (error) {
-        console.error('Error during quiet table update:', error);
-      }
-    }
-    
-    // Handle dashboard data
-    function handleDashboardData(result) {
-      console.log('Raw dashboard data received:', result);
-      
-      try {
-        if (!result) {
-          console.error('No data received from server (result is null or undefined)');
-          throw new Error('No data received from server');
-        }
-
-        // Track last successful data load time
-        window.lastSuccessfulDataLoad = new Date().toISOString();
-
-        // Store the data for background refresh comparison
-        window.lastTableData = result;
-
-        // Log the data type and structure for debugging
-        console.log('Result type:', typeof result);
-        console.log('Result has requests property:', result.hasOwnProperty('requests'));
-        console.log('Result has statusCounts property:', result.hasOwnProperty('statusCounts'));
-        
-        if (!result.requests || !Array.isArray(result.requests)) {
-          console.error('Invalid requests data:', result.requests);
-          console.error('Requests type:', typeof result.requests);
-          throw new Error('Invalid requests data structure');
-        }
-
-        if (!result.statusCounts || typeof result.statusCounts !== 'object') {
-          console.error('Invalid status counts:', result.statusCounts);
-          console.error('StatusCounts type:', typeof result.statusCounts);
-          throw new Error('Invalid status counts structure');
-        }
-
-        // Store original status counts for filter reset
-        window.originalStatusCounts = { ...result.statusCounts };
-        console.log('Original status counts stored:', window.originalStatusCounts);
-
-        // Update status counts with validation
-        const counts = result.statusCounts;
-        document.getElementById('pendingCount').textContent = counts.pending || 0;
-        document.getElementById('progressCount').textContent = counts.inProgress || 0;
-        document.getElementById('completedCount').textContent = counts.completed || 0;
-        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
-
-        console.log('Status counts updated successfully');
-
-        // First validate the DataTable is properly initialized
-        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
-          console.warn('DataTable not properly initialized, attempting re-initialization');
-          try {
-            if ($.fn.DataTable.isDataTable('#requestsTable')) {
-              $('#requestsTable').DataTable().destroy();
-            }
-            initializeDataTable();
-          } catch (tableError) {
-            console.error('Failed to re-initialize DataTable:', tableError);
-            // Fall back to basic rendering
-            showFallbackTable();
-            renderFallbackTable(result.requests);
-            return;
-          }
-        }
-
-        // Save current state for restoration
-        let currentPage = 0;
-        let currentSearch = '';
-        let currentOrder = [];
-        
-        try {
-          // Get current state before clearing
-          currentPage = requestsTable.page();
-          currentSearch = requestsTable.search();
-          currentOrder = requestsTable.order();
-          console.log('Saved table state:', { page: currentPage, search: currentSearch, order: currentOrder });
-        } catch (stateError) {
-          console.warn('Error saving table state:', stateError);
-        }
-
-        try {
-          // Clear existing table data - use this safer pattern
-          requestsTable.clear();
-          console.log('Table cleared, adding new data');
-        } catch (clearError) {
-          console.error('Error clearing table:', clearError);
-          
-          // Attempt recovery by destroying and reinitializing
-          try {
-            $('#requestsTable').DataTable().destroy();
-            initializeDataTable();
-            requestsTable = $('#requestsTable').DataTable();
-          } catch (reinitError) {
-            console.error('Failed to recover table:', reinitError);
-            showFallbackTable();
-            renderFallbackTable(result.requests);
-            return;
-          }
-        }
-
-        console.log('Number of requests to process:', result.requests.length);
-        
-        // Perform additional data validation
-        const validRequests = result.requests.filter(request => {
-          if (!request || typeof request !== 'object') {
-            console.warn('Skipping invalid request (not an object):', request);
-            return false;
-          }
-          
-          if (!request.request_id) {
-            console.warn('Skipping request with missing ID:', request);
-            return false;
-          }
-          
-          return true;
-        });
-        
-        console.log(`Validated ${validRequests.length} of ${result.requests.length} requests`);
-
-        // Add data in smaller batches to prevent UI freezing with large datasets
-        const BATCH_SIZE = 50;
-        let processedCount = 0;
-        
-        function addBatch() {
-          const batch = validRequests.slice(processedCount, processedCount + BATCH_SIZE);
-          
-          if (batch.length === 0) {
-            // All batches processed, finalize table
-            finishTableUpdate();
-            return;
-          }
-          
-          // Process this batch
-          batch.forEach((request) => {
-            try {
-              requestsTable.row.add([
-                `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
-                request.request_id,
-                formatDate(request.timestamp_string) || '',
-                request.course_name || '',
-                request.refund_type || '',
-                formatCurrency(request.refund_amount || 0),
-                getStatusBadge(request.current_bi_status || 'Pending'),
-                getActionButtons(request)
-              ]);
-            } catch (rowError) {
-              console.error(`Error adding row for request ${request.request_id}:`, rowError);
-            }
-          });
-          
-          processedCount += batch.length;
-          
-          // Update progress information if many records
-          if (validRequests.length > 100) {
-            const percent = Math.round((processedCount / validRequests.length) * 100);
-            document.getElementById('progressMessage').textContent = 
-              `Loading data... ${processedCount}/${validRequests.length} (${percent}%)`;
-            document.getElementById('progressBar').style.width = `${percent}%`;
-          }
-          
-          // Process next batch or finish
-          if (processedCount < validRequests.length) {
-            setTimeout(addBatch, 0); // Use setTimeout to avoid blocking UI
-          } else {
-            finishTableUpdate();
-          }
-        }
-        
-        // Function to finalize table updates
-        function finishTableUpdate() {
-          try {
-            console.log('Drawing table with new data');
-            
-            // Try to restore previous state
-            try {
-              // Only restore if we have valid values
-              if (currentPage !== undefined && !isNaN(currentPage)) {
-                requestsTable.search(currentSearch || '');
-                if (currentOrder && currentOrder.length > 0) {
-                  requestsTable.order(currentOrder);
-                }
-                // Draw with a simple first-pass
-                requestsTable.draw(false);
-                // Then restore pagination in a separate step
-                requestsTable.page(currentPage).draw('page');
-              } else {
-                requestsTable.draw();
-              }
-            } catch (restoreError) {
-              console.warn('Error restoring table state:', restoreError);
-              // Fall back to simple draw
-              requestsTable.draw();
-            }
-            
-            hideProgress();
-            console.log('Dashboard data load complete');
-            
-            // Remove any existing error notifications since we succeeded
-            const errorNotification = document.getElementById('errorNotification');
-            if (errorNotification) {
-              errorNotification.remove();
-            }
-            
-            showToast('Data loaded successfully', 'success');
-            
-            // Reset error count on successful load
-            errorCount = 0;
-            
-            // Initialize background refresh if not already set up
-            if (!window.backgroundRefreshInitialized) {
-              window.backgroundRefreshInitialized = true;
-              setupBackgroundRefresh();
-            }
-          } catch (finalError) {
-            console.error('Error finalizing table update:', finalError);
-            hideProgress();
-            handleError('Error drawing table: ' + finalError.message);
-          }
-        }
-        
-        // Start processing in batches
-        addBatch();
-      } catch (error) {
-        console.error('Error processing dashboard data:', error);
-        handleLoadError(error);
-      }
-    }
-
-    // Handle load error specifically for dashboard data
-    function handleLoadError(error) {
-      console.error('Error loading dashboard data:', error);
-      hideProgress();
-      
-      // Create a more detailed error message
-      let errorMessage = 'Error loading dashboard data';
-      let errorDetails = '';
-      
-      if (typeof error === 'string') {
-        errorDetails = error;
-      } else if (error && error.message) {
-        errorDetails = error.message;
-      } else if (error && error.toString) {
-        errorDetails = error.toString();
+      if (percent >= 0 && percent <= 100) {
+        // Set to specific percentage
+        progressBarInner.style.width = percent + '%';
       } else {
-        errorDetails = 'Unknown error';
+        // Indeterminate progress - animate
+        progressBarInner.style.width = '0%';
+        setTimeout(() => {
+          progressBarInner.style.transition = 'width 2s ease-in-out';
+          progressBarInner.style.width = '90%';
+        }, 50);
       }
+    }
+    
+    function hideBottomProgressBar() {
+      const progressBar = document.getElementById('bottomProgressBar');
+      const progressBarInner = document.getElementById('bottomProgressBarInner');
       
-      // Use the general handleError function with a retry button
-      handleError(`${errorMessage}: ${errorDetails}`, true, () => loadDashboardData(0, 3, 3000));
+      if (!progressBar || !progressBarInner) return;
+      
+      // Complete the progress bar before hiding
+      progressBarInner.style.transition = 'width 0.3s ease';
+      progressBarInner.style.width = '100%';
+      
+      setTimeout(() => {
+        progressBar.style.display = 'none';
+        progressBarInner.style.width = '0%';
+      }, 300);
     }
   </script>
+
+  <!-- Add this right before the closing body tag -->
+  <div class="bottom-progress-bar" id="bottomProgressBar">
+    <div class="progress-bar-inner" id="bottomProgressBarInner"></div>
+  </div>
 </body>
 </html> 

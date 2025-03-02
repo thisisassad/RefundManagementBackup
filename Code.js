@@ -2916,21 +2916,36 @@ function setupBISheet(sheet) {
 }
 
 // Function to get data for BI dashboard
-function getBIDashboardData() {
+function getBIDashboardData(timestamp, forceRefresh) {
   try {
-    console.log('Starting getBIDashboardData function');
+    // Convert parameters to proper types
+    timestamp = timestamp ? Number(timestamp) : new Date().getTime();
+    forceRefresh = forceRefresh === true || forceRefresh === 'true';
     
-    // Try to get from cache first
+    console.log('Starting getBIDashboardData function', { 
+      timestamp: timestamp,
+      timestampDate: new Date(timestamp).toISOString(),
+      forceRefresh: forceRefresh 
+    });
+    
+    // Try to get from cache first (unless force refresh is requested)
     const cache = CacheService.getUserCache();
     const cacheKey = 'bi_dashboard_' + Session.getActiveUser().getEmail();
-    const cachedData = cache.get(cacheKey);
     
-    if (cachedData) {
-      console.log('Returning cached dashboard data');
-      return JSON.parse(cachedData);
+    if (!forceRefresh) {
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData) {
+        console.log('Returning cached dashboard data');
+        return JSON.parse(cachedData);
+      }
+    } else {
+      console.log('Force refresh requested, bypassing cache');
+      // Explicitly remove any cached data when force refreshing
+      cache.remove(cacheKey);
     }
     
-    console.log('No cached data found, fetching from sheets');
+    console.log('Fetching fresh data from sheets');
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     if (!ss) {
       throw new Error('Could not access spreadsheet');
@@ -2952,7 +2967,7 @@ function getBIDashboardData() {
     
     // Get product completion statuses - ONLY COMPLETED REQUESTS
     const productData = productSheet ? productSheet.getDataRange().getValues() : [];
-    const productHeaders = productData[1] || [];
+    const productHeaders = productData.length > 1 ? productData[1] : [];
     const productRequestIdCol = findColumnIndex(productHeaders, 'Request ID');
     const productStatusCol = findColumnIndex(productHeaders, 'Access Revoke Status');
     
@@ -2992,7 +3007,7 @@ function getBIDashboardData() {
     
     // Get BI status updates with validation
     const biData = biSheet ? biSheet.getDataRange().getValues() : [];
-    const biHeaders = biData[1] || [];
+    const biHeaders = biData.length > 1 ? biData[1] : [];
     const biRequestIdCol = findColumnIndex(biHeaders, 'Request ID');
     const biStatusCol = findColumnIndex(biHeaders, 'Status');
     const biTimestampCol = findColumnIndex(biHeaders, 'Timestamp');
@@ -3042,7 +3057,7 @@ function getBIDashboardData() {
     // Process requests with validation
     const requests = [];
     const data = requestSheet.getDataRange().getValues();
-    const headers = data[1];
+    const headers = data.length > 1 ? data[1] : [];
     
     // Map column indices with validation
     const columnMap = {
@@ -3092,15 +3107,14 @@ function getBIDashboardData() {
           case BI_STATUS.REJECTED: rejected++; break;
         }
         
-        // Create request object with safe value access
+        // Create request object with safe value access - ensure all values are serializable
         requests.push({
-          request_id: requestId,
-          timestamp: new Date(row[columnMap.timestamp] || new Date()),
+          request_id: String(requestId),
           timestamp_string: formatDateTime(row[columnMap.timestamp]),
-          course_name: row[columnMap.courseName] || '',
-          refund_type: row[columnMap.refundType] || '',
-          refund_amount: parseFloat(row[columnMap.refundAmount]) || 0,
-          current_bi_status: biStatus
+          course_name: String(row[columnMap.courseName] || ''),
+          refund_type: String(row[columnMap.refundType] || ''),
+          refund_amount: Number(row[columnMap.refundAmount] || 0),
+          current_bi_status: String(biStatus)
         });
       } catch (rowError) {
         console.error(`Error processing row ${i}:`, rowError);
@@ -3117,23 +3131,36 @@ function getBIDashboardData() {
       }
     });
     
-    // Prepare and validate final result
+    // Prepare and validate final result - ensure all values are serializable
     const result = {
       requests: requests,
       statusCounts: {
-        pending,
-        inProgress,
-        completed,
-        rejected
+        pending: Number(pending),
+        inProgress: Number(inProgress),
+        completed: Number(completed),
+        rejected: Number(rejected)
       }
     };
     
-    // Cache results for 15 minutes
+    // Test serialization to catch any issues
     try {
-      cache.put(cacheKey, JSON.stringify(result), 900);
-      console.log('Dashboard data cached successfully');
-    } catch (cacheError) {
-      console.warn('Failed to cache dashboard data:', cacheError);
+      const serialized = JSON.stringify(result);
+      console.log(`Successfully serialized result (${serialized.length} bytes)`);
+    } catch (serializeError) {
+      console.error('Error serializing result:', serializeError);
+      throw new Error('Failed to serialize dashboard data: ' + serializeError.message);
+    }
+    
+    // Cache results for 15 minutes (only if not a force refresh)
+    if (!forceRefresh) {
+      try {
+        cache.put(cacheKey, JSON.stringify(result), 900);
+        console.log('Dashboard data cached successfully');
+      } catch (cacheError) {
+        console.warn('Failed to cache dashboard data:', cacheError);
+      }
+    } else {
+      console.log('Skipping cache storage for force refresh');
     }
     
     console.log('Dashboard data prepared successfully');
@@ -3142,7 +3169,18 @@ function getBIDashboardData() {
   } catch (error) {
     console.error('Error in getBIDashboardData:', error);
     console.error('Error stack:', error.stack);
-    throw new Error(`Failed to load dashboard data: ${error.message}`);
+    
+    // Return a valid but empty result structure instead of throwing
+    return {
+      requests: [],
+      statusCounts: {
+        pending: 0,
+        inProgress: 0,
+        completed: 0,
+        rejected: 0
+      },
+      error: error.message
+    };
   }
 }
 

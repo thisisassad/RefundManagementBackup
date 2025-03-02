@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-top: 56px; /* Reduced padding for navbar */
+      padding-bottom: 2rem;
+    }
+
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      height: 100%;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .stats-label {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+
+    .filter-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      white-space: nowrap;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #6c757d;
+      text-decoration: none;
+      margin-bottom: 1rem;
+    }
+
+    .back-link:hover {
+      color: #0d6efd;
+    }
+
+    .back-arrow {
+      margin-right: 8px;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-approved {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .section-title {
+      color: #495057;
+      font-size: 1rem;
+    }
+    .form-label {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin-bottom: 0.2rem;
+    }
+    .card p {
+      color: #212529;
+      font-size: 0.95rem;
+    }
+
+    .timeline {
+      position: relative;
+      padding: 0.75rem;
+      overflow-y: auto;
+    }
+
+    .timeline-date {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0.75rem;
+      margin-bottom: 0.875rem;
+      border-radius: 0.375rem;
+      background-color: #ffffff;
+      border-left: 3px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #94a3b8;
+      border: 2px solid #fff;
+    }
+
+    .timeline-item.success::before {
+      background: #22c55e;
+    }
+
+    .timeline-item.danger::before {
+      background: #ef4444;
+    }
+
+    .timeline-item.info::before {
+      background: #3b82f6;
+    }
+
+    .timeline-item.warning::before {
+      background: #f59e0b;
+    }
+
+    .timeline-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .timeline-content {
+      flex: 1;
+    }
+
+    .timeline-user {
+      font-size: 0.75rem;
+      color: #4b5563;
+      margin-top: 0.25rem;
+    }
+
+    .timeline-remarks {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background-color: #f9fafb;
+      border-radius: 0.25rem;
+      font-style: italic;
+    }
+
+    .timeline-connector {
+      position: absolute;
+      left: -2px;
+      bottom: -0.875rem;
+      height: 0.875rem;
+      width: 3px;
+      background-color: #e5e7eb;
+    }
+
+    .modal-header, .modal-footer {
+      padding: 0.75rem 1.25rem;
+      background-color: #f9fafb;
+      border-color: #e5e7eb;
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .modal-dialog {
+      max-width: 90%;
+      margin: 1.75rem auto;
+    }
+
+    @media (min-width: 576px) {
+      .modal-dialog {
+        max-width: 650px;
+      }
+    }
+
+    .card {
+      margin-bottom: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-color: #e5e7eb;
+      border-radius: 0.5rem;
+    }
+
+    .card-header {
+      padding: 0.75rem 1rem;
+      background-color: #f9fafb;
+      border-bottom-color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .form-control, .form-select, textarea.form-control {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      border-color: #d1d5db;
+      border-radius: 0.375rem;
+    }
+
+    .form-control-sm, .form-select-sm {
+      padding: 0.375rem 0.625rem;
+      font-size: 0.875rem;
+    }
+
+    .toast {
+      opacity: 1 !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border-radius: 0.5rem;
+      border: none;
+    }
+
+    .btn {
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.625rem;
+      font-size: 0.875rem;
+    }
+
+    .btn-primary {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .btn-secondary {
+      background-color: #6b7280;
+      border-color: #6b7280;
+    }
+
+    .btn-secondary:hover {
+      background-color: #4b5563;
+      border-color: #4b5563;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+    }
+
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+    }
+
+    /* Additional Tailwind-like utility classes for the UI */
+    .bg-purple-100 {
+      background-color: #ede9fe;
+    }
+    
+    .text-purple-700 {
+      color: #7e22ce;
+    }
+    
+    .bg-yellow-100 {
+      background-color: #fef9c3;
+    }
+    
+    .text-yellow-700 {
+      color: #a16207;
+    }
+    
+    .bg-green-100 {
+      background-color: #dcfce7;
+    }
+    
+    .text-green-700 {
+      color: #15803d;
+    }
+    
+    .bg-blue-100 {
+      background-color: #dbeafe;
+    }
+    
+    .text-blue-700 {
+      color: #1d4ed8;
+    }
+    
+    .bg-red-100 {
+      background-color: #fee2e2;
+    }
+    
+    .text-red-700 {
+      color: #b91c1c;
+    }
+    
+    .text-gray-600 {
+      color: #4b5563;
+    }
+    
+    .text-gray-500 {
+      color: #6b7280;
+    }
+    
+    /* Custom style for the field values */
+    .field-value {
+      background-color: #f9fafb;
+      border-radius: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      color: #374151;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation Bar Partial -->
+  <?!= include('NavBarPartial', {sessionToken: userAccess.sessionToken, userAccess: userAccess, currentPage: 'approver'}) ?>
+
+  <div class="container" style="margin-top: 1.5rem;">
+    <div class="dashboard-header">
+      <h2 class="mb-4">Refund Approver Portal</h2>
+      
+      <!-- Stats Cards -->
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Pending Approvals</div>
+            <div class="stats-value text-warning" id="pendingCount">0</div>
+            <div class="stats-trend">Awaiting review</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Approved Today</div>
+            <div class="stats-value text-success" id="approvedToday">0</div>
+            <div class="stats-trend">Today's progress</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Total Approved Amount</div>
+            <div class="stats-value text-primary" id="totalAmount">৳0.00</div>
+            <div class="stats-trend">All time</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Average Approved Amount</div>
+            <div class="stats-value text-info" id="avgAmount">৳0.00</div>
+            <div class="stats-trend">Per request</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <input type="text" class="form-control" placeholder="Search by ID or Name" id="searchInput" oninput="applyFilters()">
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="statusFilter" onchange="applyFilters()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" id="refundTypeFilter" onchange="applyFilters()">
+            <option value="">All Types</option>
+            <!-- Will be populated dynamically -->
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input type="date" class="form-control" id="dateFilter" onchange="applyFilters()">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2" onclick="resetFilters()">
+            <i class="fas fa-undo-alt"></i>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+      <h5 class="mb-4">Refund Requests</h5>
+      <div class="table-responsive">
+        <table class="table" id="refundTable">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Request Date</th>
+              <th>Requester Name</th>
+              <th>Customer Name</th>
+              <th>Refund Type</th>
+              <th>Refund Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="refundTableBody">
+            <!-- Will be populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted" id="itemCount">
+          Showing 0 to 0 of 0 entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-0" id="pagination">
+            <!-- Will be populated dynamically -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Add Modal with updated width and softer colors -->
+    <div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-lg shadow-md border-0">
+          <div class="modal-header py-3 bg-gray-50">
+            <h5 class="modal-title fs-6 text-gray-700">
+              <i class="fas fa-clipboard-check me-2 text-blue-600"></i>Request Details
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-3 bg-white">
+            <div class="row g-3">
+              <!-- Request Information Section - Tailwind-like UI -->
+              <div class="col-12">
+                <div class="card border border-gray-200 rounded-lg shadow-sm">
+                  <div class="card-header bg-gray-50 py-3">
+                    <h6 class="mb-0 fs-6 text-gray-700">
+                      <i class="fas fa-info-circle me-2 text-blue-600"></i>Request Information
+                    </h6>
+                  </div>
+                  <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Basic Info -->
+                    <div class="section mb-3">
+                      <h6 class="section-title border-bottom pb-2 mb-3 text-gray-700">Basic Information</h6>
+                      <div id="basicInfo" class="row g-2">
+                        <!-- Will be populated dynamically -->
+                      </div>
+                    </div>
+
+                    <!-- Course Details -->
+                    <div class="section mb-3">
+                      <h6 class="section-title border-bottom pb-2 mb-3 text-gray-700">Course Details</h6>
+                      <div id="courseDetails" class="row g-2">
+                        <!-- Will be populated dynamically -->
+                      </div>
+                    </div>
+
+                    <!-- Phone Exchange Details -->
+                    <div id="phoneExchangeSection" class="section mb-3" style="display: none;">
+                      <h6 class="section-title border-bottom pb-2 mb-3 text-gray-700">Phone Exchange Details</h6>
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Wrong Phone</label>
+                          <p id="modal-wrongPhone" class="mb-1 ps-2 py-2 bg-gray-50 rounded-md"></p>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Correct Phone</label>
+                          <p id="modal-correctPhone" class="mb-1 ps-2 py-2 bg-gray-50 rounded-md"></p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Mistaken Payment Details -->
+                    <div id="mistakenPaymentSection" class="section mb-3" style="display: none;">
+                      <h6 class="section-title border-bottom pb-2 mb-3 text-gray-700">Mistaken Payment Details</h6>
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Sender bKash</label>
+                          <p id="modal-senderBkash" class="mb-1 ps-2 py-2 bg-gray-50 rounded-md"></p>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Transaction Time</label>
+                          <p id="modal-transactionTime" class="mb-1 ps-2 py-2 bg-gray-50 rounded-md"></p>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Sent Amount</label>
+                          <p id="modal-sentAmount" class="mb-1 ps-2 py-2 bg-gray-50 rounded-md"></p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Final Details -->
+                    <div class="section mb-3">
+                      <h6 class="section-title border-bottom pb-2 mb-3 text-gray-700">Final Details</h6>
+                      <div id="finalDetails" class="row g-2">
+                        <!-- Will be populated dynamically -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Refund Approval Section - Action Panel Style with softer colors -->
+              <div class="col-12">
+                <div class="card border border-blue-200 rounded-lg shadow-sm">
+                  <div class="card-header bg-blue-50 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fs-6 text-blue-700">
+                      <i class="fas fa-check-circle me-2"></i>Refund Approval Action
+                    </h6>
+                    <span class="badge bg-blue-100 text-blue-700 rounded-pill px-3 py-1">Action Required</span>
+                  </div>
+                  <div class="card-body p-3 bg-white">
+                    <form id="approvalForm" onsubmit="return false;" class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label text-gray-600">Approval Status</label>
+                        <select class="form-select rounded-md" id="modal-approvalStatus" required>
+                          <option value="">Select Status</option>
+                          <option value="Approved">Approve</option>
+                          <option value="Rejected">Reject</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary rounded-md w-100" onclick="submitApproval()">
+                          <i class="fas fa-save me-2"></i>Update Status
+                        </button>
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label text-gray-600">Remarks</label>
+                        <textarea class="form-control rounded-md" id="modal-remarks" rows="2" placeholder="Enter your remarks here..." required></textarea>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Section - Updated with Tailwind-like UI -->
+              <div class="col-12">
+                <div class="card border border-gray-200 rounded-lg shadow-sm">
+                  <div class="card-header bg-gray-50 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fs-6 text-gray-700">
+                      <i class="fas fa-history me-2 text-blue-600"></i>Complete Journey
+                    </h6>
+                    <span class="badge bg-gray-100 text-gray-700 rounded-pill px-3 py-1">Timeline of all updates</span>
+                  </div>
+                  <div class="card-body p-3 bg-white">
+                    <div id="modal-updates" class="timeline" style="max-height: 200px; overflow-y: auto;">
+                      <!-- Will be populated dynamically -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer py-2 bg-gray-50">
+            <button type="button" class="btn btn-secondary rounded-md" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast for notifications - Updated with Tailwind-like styling -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="approvalToast" class="toast align-items-center bg-green-700 text-white border-0 rounded-lg" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="d-flex">
+          <div class="toast-body py-3">
+            <i class="fas fa-check-circle me-2"></i>Request status updated successfully!
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Pass server-side data to client-side JavaScript -->
+  <script id="auth-data" 
+    data-authenticated="true"
+    data-session-token="<?= userAccess.sessionToken ?>"
+    data-script-url="<?= getScriptUrl() ?>"
+    data-current-page="approver"
+  ></script>
+  
+  <script>
+    let currentData = null;
+    const ITEMS_PER_PAGE = 10;
+    let currentPage = 1;
+    let currentRequestId = null;
+
+    // Initialize dashboard
+    function initializeDashboard() {
+      fetchDashboardData();
+      
+      // Initialize Bootstrap toasts
+      const toastElement = document.getElementById('approvalToast');
+      if (toastElement) {
+        const toastOptions = {
+          animation: true,
+          autohide: true,
+          delay: 3000
+        };
+        // Make sure toast is initialized
+        const toast = new bootstrap.Toast(toastElement, toastOptions);
+      }
+    }
+
+    function fetchDashboardData() {
+      google.script.run
+        .withSuccessHandler(updateDashboard)
+        .withFailureHandler(handleError)
+        .getRefundApproverData();
+    }
+
+    function updateDashboard(data) {
+      currentData = data;
+      
+      // Update stats
+      document.getElementById('pendingCount').textContent = data.stats.pending;
+      document.getElementById('approvedToday').textContent = data.stats.approvedToday;
+      document.getElementById('totalAmount').textContent = `৳${data.stats.totalAmount}`;
+      document.getElementById('avgAmount').textContent = `৳${data.stats.averageAmount}`;
+
+      // Populate refund type filter
+      const refundTypeFilter = document.getElementById('refundTypeFilter');
+      refundTypeFilter.innerHTML = '<option value="">All Types</option>';
+      data.refundTypes.forEach(type => {
+        refundTypeFilter.innerHTML += `<option value="${type}">${type}</option>`;
+      });
+
+      // Update table
+      updateTable(data.requests);
+    }
+
+    function updateTable(requests) {
+      const tbody = document.getElementById('refundTableBody');
+      tbody.innerHTML = '';
+
+      // Calculate pagination
+      const totalPages = Math.ceil(requests.length / ITEMS_PER_PAGE);
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, requests.length);
+      const pageRequests = requests.slice(startIndex, endIndex);
+
+      // Update item count display
+      const itemCount = document.getElementById('itemCount');
+      if (requests.length === 0) {
+        itemCount.textContent = 'No entries to show';
+      } else {
+        itemCount.textContent = `Showing ${startIndex + 1} to ${endIndex} of ${requests.length} entries`;
+      }
+
+      // Populate table
+      pageRequests.forEach(request => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${request.requestId}</td>
+          <td>${request.requestDate}</td>
+          <td>${request.requesterName}</td>
+          <td>${request.customerName}</td>
+          <td>${request.refundType}</td>
+          <td>৳${request.refundAmount}</td>
+          <td><span class="status-badge status-${request.status.toLowerCase()}">${request.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="viewDetails('${request.requestId}')">View</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Update pagination
+      updatePagination(totalPages);
+    }
+
+    function updatePagination(totalPages) {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+
+      // Previous button
+      pagination.innerHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="javascript:void(0)" onclick="event.preventDefault(); changePage(${currentPage - 1})">Previous</a>
+        </li>
+      `;
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += `
+          <li class="page-item ${currentPage === i ? 'active' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="event.preventDefault(); changePage(${i})">${i}</a>
+          </li>
+        `;
+      }
+
+      // Next button
+      pagination.innerHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="javascript:void(0)" onclick="event.preventDefault(); changePage(${currentPage + 1})">Next</a>
+        </li>
+      `;
+    }
+
+    function changePage(page) {
+      if (page < 1 || !currentData || page > Math.ceil(currentData.requests.length / ITEMS_PER_PAGE)) return;
+      
+      // Update current page
+      currentPage = page;
+      
+      // Get currently filtered data or use all data
+      const filteredData = applyCurrentFilters();
+      
+      // Update table with current filters applied
+      updateTable(filteredData);
+    }
+
+    function applyCurrentFilters() {
+      if (!currentData) return [];
+
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+      const typeFilter = document.getElementById('refundTypeFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+
+      return currentData.requests.filter(request => {
+        // Search filter
+        const searchMatch = !searchTerm || 
+          Object.values(request).some(value => 
+            String(value).toLowerCase().includes(searchTerm)
+          );
+
+        // Status filter
+        const statusMatch = !statusFilter || 
+          request.status.toLowerCase() === statusFilter;
+
+        // Type filter
+        const typeMatch = !typeFilter || 
+          request.refundType === typeFilter;
+
+        // Date filter
+        let dateMatch = true;
+        if (dateFilter) {
+          const requestDate = new Date(request.requestDate);
+          const filterDate = new Date(dateFilter);
+          dateMatch = requestDate.toDateString() === filterDate.toDateString();
+        }
+
+        return searchMatch && statusMatch && typeMatch && dateMatch;
+      });
+    }
+
+    function applyFilters() {
+      if (!currentData) return;
+
+      // Reset to first page when applying new filters
+      currentPage = 1;
+      
+      // Get filtered data
+      const filteredRequests = applyCurrentFilters();
+      
+      // Update table with filtered data
+      updateTable(filteredRequests);
+      
+      // Update stat cards based on filtered data
+      updateStatCardsFromFilteredData(filteredRequests);
+    }
+
+    // New function to update stat cards based on filtered data
+    function updateStatCardsFromFilteredData(filteredRequests) {
+      // Initialize counters
+      let pendingCount = 0;
+      let approvedToday = 0;
+      let totalAmount = 0;
+      let approvedCount = 0;
+      
+      // Get today's date for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Count statuses from filtered requests
+      filteredRequests.forEach(request => {
+        const status = request.status.toLowerCase();
+        
+        if (status === 'pending') {
+          pendingCount++;
+        } else if (status === 'approved') {
+          approvedCount++;
+          
+          // Check if approved today
+          const requestDate = new Date(request.requestDate);
+          requestDate.setHours(0, 0, 0, 0);
+          if (requestDate.getTime() === today.getTime()) {
+            approvedToday++;
+          }
+          
+          // Add to total amount
+          totalAmount += parseFloat(request.refundAmount) || 0;
+        }
+      });
+      
+      // Calculate average amount
+      const averageAmount = approvedCount > 0 ? totalAmount / approvedCount : 0;
+      
+      // Update the stat cards
+      document.getElementById('pendingCount').textContent = pendingCount;
+      document.getElementById('approvedToday').textContent = approvedToday;
+      document.getElementById('totalAmount').textContent = `৳${totalAmount.toFixed(2)}`;
+      document.getElementById('avgAmount').textContent = `৳${averageAmount.toFixed(2)}`;
+    }
+
+    const requestModal = new bootstrap.Modal(document.getElementById('requestDetailsModal'));
+
+    function viewDetails(requestId) {
+      currentRequestId = requestId;
+      
+      // Reset form
+      document.getElementById('approvalForm').reset();
+
+      // Show loading state in modal
+      const updatesContainer = document.getElementById('modal-updates');
+      updatesContainer.innerHTML = `
+        <div class="d-flex justify-content-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      `;
+      
+      // Display modal with loading state
+      const modal = new bootstrap.Modal(document.getElementById('requestDetailsModal'));
+      modal.show();
+      
+      // Fetch request details
+      google.script.run
+        .withSuccessHandler(displayRequestDetails)
+        .withFailureHandler(error => {
+          handleError(error);
+          updatesContainer.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+              Failed to load details: ${error.message || 'Unknown error'}
+            </div>
+          `;
+        })
+        .getRequestDetails(requestId);
+    }
+
+    function displayRequestDetails(data) {
+      // Clear existing content
+      document.getElementById('basicInfo').innerHTML = '';
+      document.getElementById('courseDetails').innerHTML = '';
+      document.getElementById('finalDetails').innerHTML = '';
+      
+      // Define the order and labels for all possible fields
+      const fieldGroups = {
+        basicInfo: [
+          ['requestId', 'Request ID'],
+          ['requestDate', 'Request Date'],
+          ['requester', 'Requester'],
+          ['requesterEmail', 'Requester Email'],
+          ['vertical', 'Vertical'],
+          ['enrollmentNumber', 'Enrollment Number'],
+          ['customerContact', 'Customer Name']
+        ],
+        courseDetails: [
+          ['purchaseDate', 'Purchase Date'],
+          ['paymentId', 'Payment ID'],
+          ['purchasedAmount', 'Purchased Amount'],
+          ['refundAmount', 'Refund Amount'],
+          ['mistakenCourse', 'Mistaken Course'],
+          ['mistakenPhase', 'Mistaken Phase'],
+          ['intendedCourse', 'Intended Course'],
+          ['intendedPhase', 'Intended Phase']
+        ],
+        phoneExchange: [
+          ['wrongPhone', 'Wrong Phone'],
+          ['correctPhone', 'Correct Phone']
+        ],
+        mistakenPayment: [
+          ['senderBkash', 'Sender bKash'],
+          ['transactionTime', 'Transaction Time'],
+          ['sentAmount', 'Sent Amount']
+        ],
+        finalDetails: [
+          ['refundType', 'Refund Type'],
+          ['revokeAccess', 'Revoke Access'],
+          ['refundReason', 'Refund Reason']
+        ]
+      };
+
+      // Helper function to create field element with improved appearance
+      function createField(label, value, parentId) {
+        if (value !== null && value !== undefined && value !== '-' && value !== 'null' && value !== 'undefined' && value !== '') {
+          let displayValue = value;
+          
+          // Special formatting for specific fields
+          if (label.toLowerCase().includes('amount')) {
+            displayValue = `৳${value}`;
+          } else if (label.toLowerCase().includes('date')) {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+              displayValue = date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              });
+            }
+          }
+
+          const col = document.createElement('div');
+          col.className = 'col-md-6 mb-2';
+          col.innerHTML = `
+            <div>
+              <label class="form-label text-gray-600">${label}</label>
+              <p class="mb-1 ps-2 py-2 bg-gray-50 rounded-md">${displayValue}</p>
+            </div>
+          `;
+          document.getElementById(parentId).appendChild(col);
+          return true; // Field was created
+        }
+        return false; // Field was not created
+      }
+
+      // Function to check if a section has any data
+      function sectionHasData(fields) {
+        return fields.some(([key]) => {
+          const value = data[key];
+          return value !== null && value !== undefined && value !== '-' && value !== 'null' && value !== 'undefined' && value !== '';
+        });
+      }
+
+      // Populate Basic Information
+      if (sectionHasData(fieldGroups.basicInfo)) {
+        document.getElementById('basicInfo').closest('.section').style.display = 'block';
+        fieldGroups.basicInfo.forEach(([key, label]) => createField(label, data[key], 'basicInfo'));
+      } else {
+        document.getElementById('basicInfo').closest('.section').style.display = 'none';
+      }
+
+      // Populate Course Details
+      if (sectionHasData(fieldGroups.courseDetails)) {
+        document.getElementById('courseDetails').closest('.section').style.display = 'block';
+        fieldGroups.courseDetails.forEach(([key, label]) => createField(label, data[key], 'courseDetails'));
+      } else {
+        document.getElementById('courseDetails').closest('.section').style.display = 'none';
+      }
+
+      // Handle Phone Exchange Details
+      const phoneExchangeSection = document.getElementById('phoneExchangeSection');
+      if (sectionHasData(fieldGroups.phoneExchange)) {
+        phoneExchangeSection.style.display = 'block';
+        document.getElementById('modal-wrongPhone').textContent = data.wrongPhone || '-';
+        document.getElementById('modal-correctPhone').textContent = data.correctPhone || '-';
+      } else {
+        phoneExchangeSection.style.display = 'none';
+      }
+
+      // Handle Mistaken Payment Details
+      const mistakenPaymentSection = document.getElementById('mistakenPaymentSection');
+      if (sectionHasData(fieldGroups.mistakenPayment)) {
+        mistakenPaymentSection.style.display = 'block';
+        document.getElementById('modal-senderBkash').textContent = data.senderBkash || '-';
+        document.getElementById('modal-transactionTime').textContent = data.transactionTime || '-';
+        document.getElementById('modal-sentAmount').textContent = data.sentAmount ? `৳${data.sentAmount}` : '-';
+      } else {
+        mistakenPaymentSection.style.display = 'none';
+      }
+
+      // Populate Final Details
+      if (sectionHasData(fieldGroups.finalDetails)) {
+        document.getElementById('finalDetails').closest('.section').style.display = 'block';
+        fieldGroups.finalDetails.forEach(([key, label]) => createField(label, data[key], 'finalDetails'));
+        
+        // Add document link if exists
+        if (data.documentFolder) {
+          createField('Documents', `<a href="${data.documentFolder}" target="_blank" class="btn btn-sm btn-outline-primary rounded-md"><i class="fas fa-external-link-alt me-2"></i>View Documents</a>`, 'finalDetails');
+        }
+      } else {
+        document.getElementById('finalDetails').closest('.section').style.display = 'none';
+      }
+
+      // Update history section with improved timeline
+      const updatesContainer = document.getElementById('modal-updates');
+      updatesContainer.innerHTML = '';
+
+      if (data.updates && data.updates.length > 0) {
+        // Process timeline data
+        const processTimelineData = () => {
+          let allUpdates = [...data.updates];
+          
+          // Add request creation as the first event if not already present
+          const hasCreationEvent = allUpdates.some(update => 
+            update.type === 'Creation' && update.status === 'Submitted'
+          );
+          
+          if (!hasCreationEvent && data.requestDate) {
+            allUpdates.unshift({
+              type: 'Creation',
+              status: 'Submitted',
+              timestamp: data.requestDate,
+              updatedBy: data.requester || 'Requester',
+              remarks: 'Request submitted'
+            });
+          }
+          
+          // Sort updates chronologically (newest first for display)
+          return allUpdates.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        };
+        
+        const sortedUpdates = processTimelineData();
+        
+        // Display heading with total number of updates
+        updatesContainer.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="small text-gray-600">Showing complete journey (${sortedUpdates.length} updates)</div>
+            <div class="badge bg-gray-100 text-gray-600 rounded-pill px-3 py-1">Newest first</div>
+          </div>
+        `;
+        
+        // Create timeline elements
+        sortedUpdates.forEach((update, index) => {
+          // Determine status classes and icons
+          let statusClass, statusIcon, statusColor, badgeBgClass, badgeTextClass;
+          switch(update.status.toLowerCase()) {
+            case 'approved':
+              statusClass = 'success';
+              statusIcon = '<i class="fas fa-check-circle"></i>';
+              statusColor = '#22c55e';
+              badgeBgClass = 'bg-green-100';
+              badgeTextClass = 'text-green-700';
+              break;
+            case 'rejected': 
+              statusClass = 'danger';
+              statusIcon = '<i class="fas fa-times-circle"></i>';
+              statusColor = '#ef4444';
+              badgeBgClass = 'bg-red-100';
+              badgeTextClass = 'text-red-700';
+              break;
+            case 'completed':
+              statusClass = 'success';
+              statusIcon = '<i class="fas fa-check-double"></i>';
+              statusColor = '#22c55e';
+              badgeBgClass = 'bg-green-100';
+              badgeTextClass = 'text-green-700';
+              break;
+            case 'submitted':
+              statusClass = 'success';
+              statusIcon = '<i class="fas fa-paper-plane"></i>';
+              statusColor = '#22c55e';
+              badgeBgClass = 'bg-green-100';
+              badgeTextClass = 'text-green-700';
+              break;
+            case 'in progress':
+              statusClass = 'info';
+              statusIcon = '<i class="fas fa-spinner fa-spin"></i>';
+              statusColor = '#3b82f6';
+              badgeBgClass = 'bg-blue-100';
+              badgeTextClass = 'text-blue-700';
+              break;
+            case 'pending':
+              statusClass = 'warning';
+              statusIcon = '<i class="fas fa-clock"></i>';
+              statusColor = '#f59e0b';
+              badgeBgClass = 'bg-yellow-100';
+              badgeTextClass = 'text-yellow-700';
+              break;
+            default:
+              statusClass = 'secondary';
+              statusIcon = '<i class="fas fa-circle"></i>';
+              statusColor = '#94a3b8';
+              badgeBgClass = 'bg-gray-100';
+              badgeTextClass = 'text-gray-700';
+          }
+          
+          // Determine type badge color and icon
+          let typeBadgeClass, typeIcon, typeText;
+          switch(update.type.toLowerCase()) {
+            case 'approval': 
+              typeBadgeClass = 'bg-blue-100 text-blue-700';
+              typeIcon = '<i class="fas fa-check-double me-1"></i>';
+              typeText = 'Approval';
+              break;
+            case 'finance': 
+              typeBadgeClass = 'bg-green-100 text-green-700';
+              typeIcon = '<i class="fas fa-money-bill-wave me-1"></i>';
+              typeText = 'Finance';
+              break;
+            case 'product': 
+              typeBadgeClass = 'bg-purple-100 text-purple-700';
+              typeIcon = '<i class="fas fa-tools me-1"></i>';
+              typeText = 'Product';
+              break;
+            case 'creation':
+              typeBadgeClass = 'bg-yellow-100 text-yellow-700';
+              typeIcon = '<i class="fas fa-file-alt me-1"></i>';
+              typeText = 'Created';
+              break;
+            default: 
+              typeBadgeClass = 'bg-gray-100 text-gray-700';
+              typeIcon = '<i class="fas fa-info-circle me-1"></i>';
+              typeText = update.type;
+          }
+          
+          // Format the date/time
+          const updateDate = new Date(update.timestamp);
+          const formattedDate = updateDate.toLocaleDateString('en-US', {
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric'
+          });
+          
+          const formattedTime = updateDate.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+          
+          // Create timeline item with Tailwind-like styling
+          const updateElement = document.createElement('div');
+          updateElement.className = `timeline-item ${statusClass} mb-3`;
+          updateElement.style.borderLeftColor = statusColor;
+
+          updateElement.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <span class="badge ${typeBadgeClass} rounded-pill px-3 py-1 mb-1">${typeIcon}${typeText}</span>
+                <span class="badge bg-gray-100 text-gray-600 rounded-md">${formattedDate}</span>
+              </div>
+              <span class="badge ${badgeBgClass} ${badgeTextClass} rounded-pill px-3 py-1">${statusIcon} ${update.status}</span>
+            </div>
+            
+            ${update.updatedBy ? 
+              `<div class="d-flex align-items-center mb-1">
+                <i class="fas fa-user-circle text-gray-500 me-2"></i>
+                <span class="timeline-user">${update.updatedBy}</span>
+                <small class="text-gray-500 ms-auto">${formattedTime}</small>
+              </div>` : 
+              `<div class="text-end">
+                <small class="text-gray-500">${formattedTime}</small>
+              </div>`
+            }
+            
+            ${update.remarks ? 
+              `<div class="timeline-remarks mt-2">${update.remarks}</div>` : ''}
+          `;
+          
+          updatesContainer.appendChild(updateElement);
+        });
+      } else {
+        // Show empty state
+        updatesContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-history"></i>
+            <p>No update history available</p>
+            <p class="small text-gray-500">Updates will appear here once the request is processed</p>
+          </div>
+        `;
+      }
+
+      // Reset and prepare approval form
+      document.getElementById('modal-approvalStatus').value = '';
+      document.getElementById('modal-remarks').value = '';
+    }
+
+    function getStatusBadgeColor(status) {
+      switch(status.toLowerCase()) {
+        case 'approved': return 'success';
+        case 'rejected': return 'danger';
+        case 'pending': return 'warning';
+        default: return 'secondary';
+      }
+    }
+
+    function submitApproval() {
+      const form = document.getElementById('approvalForm');
+      const status = document.getElementById('modal-approvalStatus').value;
+      const remarks = document.getElementById('modal-remarks').value;
+      
+      if (!status || !remarks) {
+        alert('Please fill in all required fields');
+        return;
+      }
+
+      // Find the enrollment number from the basicInfo section
+      const enrollmentNumberElement = Array.from(document.getElementById('basicInfo').children)
+        .find(el => el.textContent.includes('Enrollment Number'));
+      const enrollmentNumber = enrollmentNumberElement ? 
+        enrollmentNumberElement.querySelector('p').textContent.trim() : '';
+      
+      const updateData = {
+        requestId: currentRequestId,
+        enrollmentNumber: enrollmentNumber,
+        approvalStatus: status,
+        remarks: remarks,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('Submitting approval with data:', updateData); // Debug log
+      
+      // Disable form while submitting
+      const submitBtn = document.querySelector('#approvalForm .btn-primary');
+      const formElements = form.querySelectorAll('input, select, textarea');
+      formElements.forEach(el => el.disabled = true);
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+      
+      google.script.run
+        .withSuccessHandler(response => {
+          console.log('Received response:', response); // Debug log
+          if (response && response.success) {
+            // Hide modal first
+            const modalElement = document.getElementById('requestDetailsModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+            
+            // Then show success toast
+            const toastElement = document.getElementById('approvalToast');
+            const toast = bootstrap.Toast.getInstance(toastElement) || new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // Refresh dashboard data
+            fetchDashboardData();
+          } else {
+            alert('Error: ' + (response ? response.message : 'Unknown error occurred'));
+          }
+          
+          // Re-enable form
+          formElements.forEach(el => el.disabled = false);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Status';
+        })
+        .withFailureHandler(error => {
+          console.error('Error in approval submission:', error); // Debug log
+          alert('Error: ' + error.toString());
+          
+          // Re-enable form
+          formElements.forEach(el => el.disabled = false);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Status';
+        })
+        .processRefundApproval(updateData);
+    }
+
+    function handleError(error) {
+      console.error('Error:', error);
+      // Implement error notification
+    }
+
+    function resetFilters() {
+      // Reset all filter inputs
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('refundTypeFilter').value = '';
+      document.getElementById('dateFilter').value = ''; 
+      
+      // Reset page number
+      currentPage = 1;
+      
+      // Update table with original data
+      updateTable(currentData.requests);
+      
+      // Reset stat cards to original values
+      document.getElementById('pendingCount').textContent = currentData.stats.pending;
+      document.getElementById('approvedToday').textContent = currentData.stats.approvedToday;
+      document.getElementById('totalAmount').textContent = `৳${currentData.stats.totalAmount}`;
+      document.getElementById('avgAmount').textContent = `৳${currentData.stats.averageAmount}`;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
+  </script>
+</body>
+</html>

@@ -1,0 +1,3355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { 
+      background-color: #f8f9fa;
+      padding-top: 56px; /* Adjusted padding for fixed navbar to match NavBarPartial.html */
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Tailwind-like utility classes */
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-blue-50 { background-color: #eff6ff; }
+    .bg-blue-100 { background-color: #dbeafe; }
+    .bg-green-100 { background-color: #dcfce7; }
+    .bg-red-100 { background-color: #fee2e2; }
+    .bg-yellow-100 { background-color: #fef9c3; }
+    
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-700 { color: #374151; }
+    .text-blue-600 { color: #2563eb; }
+    .text-blue-700 { color: #1d4ed8; }
+    .text-green-600 { color: #16a34a; }
+    .text-red-600 { color: #dc2626; }
+    
+    .rounded-lg { border-radius: 0.5rem; }
+    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-blue-200 { border-color: #bfdbfe; }
+    
+    .fw-medium { font-weight: 500; }
+    .fs-6 { font-size: 1rem; }
+    
+    /* Add status fields styling */
+    .status-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .status-fields.hide-refund-fields .refund-field {
+      display: none;
+    }
+    
+    /* Rest of existing styles */
+    h1, h2, h3, h4, h5, h6, .btn, input, select, textarea {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    /* Timeline styles updated to match RefundApproverPortal */
+    .timeline {
+      position: relative;
+      padding: 0.75rem;
+      overflow-y: auto;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0.75rem;
+      margin-bottom: 0.875rem;
+      border-radius: 0.375rem;
+      background-color: #ffffff;
+      border-left: 3px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 12px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #94a3b8;
+      border: 2px solid #fff;
+    }
+
+    .timeline-item.success::before {
+      background: #22c55e;
+    }
+
+    .timeline-item.danger::before {
+      background: #ef4444;
+    }
+
+    .timeline-item.info::before {
+      background: #3b82f6;
+    }
+
+    .timeline-item.warning::before {
+      background: #f59e0b;
+    }
+
+    .timeline-content {
+      flex: 1;
+    }
+
+    .timeline-user {
+      font-size: 0.75rem;
+      color: #4b5563;
+      margin-top: 0.25rem;
+    }
+
+    .timeline-remarks {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background-color: #f9fafb;
+      border-radius: 0.25rem;
+      font-style: italic;
+    }
+    
+    /* Status modal styles */
+    #statusModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    #statusModal.show {
+      display: flex;
+    }
+    
+    .status-modal-content {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      position: relative;
+    }
+    
+    .status-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 15px;
+    }
+    
+    .status-modal-header h5 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #212529;
+      margin: 0;
+    }
+    
+    .status-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .status-option {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: #fff;
+    }
+    
+    .status-option:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .status-option:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
+    
+    .icon-circle {
+      min-width: 48px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-option svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .status-option.in-progress .icon-circle {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    .status-option.in-progress svg {
+      stroke: #0d6efd;
+    }
+    
+    .status-option.reject .icon-circle {
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+    .status-option.reject svg {
+      stroke: #dc3545;
+    }
+    
+    .status-option.completed .icon-circle {
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+    .status-option.completed svg {
+      stroke: #198754;
+    }
+    
+    .status-text {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+    
+    .status-description {
+      display: block;
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .detail-row {
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-size: 0.875rem;
+      color: #212529;
+      padding: 0.5rem;
+      background-color: #f9fafb;
+      border-radius: 0.375rem;
+    }
+    
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50rem;
+      font-weight: 500;
+    }
+    
+    /* Updated status styles */
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-progress {
+      background-color: #e7f1ff;
+      color: #0a58ca;
+    }
+    
+    .status-reject {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    /* Status button styles */
+    .status-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      border-radius: 0.375rem;
+      transition: all 0.2s;
+    }
+    
+    .status-button:hover {
+      background-color: #e9ecef;
+    }
+    
+    .status-button .status-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #6c757d;
+    }
+    
+    .status-button[data-status="Pending"] .status-circle {
+      background-color: #ffc107;
+    }
+    
+    .status-button[data-status="In Progress"] .status-circle {
+      background-color: #0d6efd;
+    }
+    
+    .status-button[data-status="Completed"] .status-circle {
+      background-color: #198754;
+    }
+    
+    .status-button[data-status="Reject"] .status-circle {
+      background-color: #dc3545;
+    }
+
+    /* Retain existing styles below */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      color: #6c757d;
+      margin-bottom: 20px;
+    }
+    .back-link:hover {
+      color: #0d6efd;
+    }
+    .back-arrow {
+      margin-right: 8px;
+    }
+    .nav-tabs .nav-link {
+      color: #495057;
+      font-weight: 500;
+      padding: 0.75rem 1.25rem;
+    }
+    .nav-tabs .nav-link.active {
+      font-weight: 600;
+      color: #0d6efd;
+    }
+    .tab-content {
+      padding: 1.25rem 0;
+    }
+    .history-container {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .modal-lg {
+      max-width: 800px;
+    }
+    #requestDetails {
+      font-size: 0.95rem;
+    }
+    #requestDetails .row {
+      margin-bottom: 0.5rem;
+    }
+    #requestDetails .label {
+      font-weight: 500;
+      color: #495057;
+    }
+    #requestDetails .value {
+      color: #212529;
+    }
+    .status-badge {
+      font-size: 0.875rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50rem;
+      font-weight: 500;
+    }
+    .edit-history-item {
+      padding: 0.75rem;
+      border-left: 3px solid #e9ecef;
+      margin-bottom: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 0 4px 4px 0;
+    }
+    .edit-history-item:last-child {
+      margin-bottom: 0;
+    }
+    .edit-history-timestamp {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+    .edit-history-details {
+      font-size: 0.95rem;
+    }
+    #updateForm .form-label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+    .btn-primary:disabled {
+      cursor: not-allowed;
+    }
+    .action-btn {
+      cursor: pointer;
+      color: #6c757d;
+      font-size: 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border: none;
+      background: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      color: #0d6efd;
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    .action-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    .modal-xl {
+      max-width: 1000px;
+    }
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .status-progress {
+      background-color: #e7f1ff;
+      color: #0a58ca;
+    }
+    .status-reject {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1060;
+    }
+    .detail-row {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .detail-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .table-controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 0px;
+    }
+    
+    /* Add table cell alignment styles */
+    #refundTable th:not(:nth-child(7)), 
+    #refundTable td:not(:nth-child(7)) {
+      text-align: center;
+    }
+    
+    #refundTable th:nth-child(7), 
+    #refundTable td:nth-child(7) {
+      text-align: left;
+    }
+    
+    .sort-header {
+      cursor: pointer;
+      position: relative;
+      padding-right: 20px !important;
+    }
+    
+    .sort-header:after {
+      content: '↕';
+      position: absolute;
+      right: 8px;
+      color: #999;
+    }
+    
+    .sort-header.sort-asc:after {
+      content: '↑';
+      color: #0d6efd;
+    }
+    
+    .sort-header.sort-desc:after {
+      content: '↓';
+      color: #0d6efd;
+    }
+
+    .text-warning { color: #ffc107 !important; font-weight: 500; }
+    .text-danger { color: #dc3545 !important; font-weight: 500; }
+
+    .search-box {
+      font-size: 1.1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+    }
+    
+    .table-controls {
+      margin-bottom: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    #dateRangeInputs {
+      margin-top: 10px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+
+    .row.g-3.mb-4 {
+      margin-bottom: 1rem !important;
+    }
+
+    .card-body {
+      padding: 0.75rem;
+    }
+
+    .table-controls {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+    }
+
+    /* Table styles - consolidated */
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    
+    .table-responsive {
+      max-height: calc(100vh - 350px);
+      overflow-y: auto;
+      overflow-x: auto;
+      position: relative;
+    }
+    
+    /* Table styling */
+    .table {
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 0;
+    }
+    
+    /* Important: This makes the headers sticky */
+    .table-responsive thead th {
+      position: sticky !important;
+      top: 0 !important;
+      background: white !important;
+      z-index: 10 !important;
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Table cell styling */
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    .table td {
+      vertical-align: middle;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Table content column widths */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 3%; } /* # column */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 7%; } /* Request ID */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 12%; } /* Request Date */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 6%; } /* Time Elapsed */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 8%; } /* Vertical */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 10%; } /* Payment ID */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 15%; } /* Refund Type */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 8%; } /* Refund Amount */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 8%; } /* Status */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 5%; } /* Action */
+    
+    /* Responsive behavior */
+    @media (max-width: 1200px) {
+      .table {
+        table-layout: auto;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        max-width: 100%;
+      }
+    }
+
+    .pagination-container {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pagination-info {
+      color: #6c757d;
+    }
+
+    .pagination {
+      margin-bottom: 0;
+    }
+
+    /* Center align table contents */
+    .table td, .table th {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* Serial number column */
+    .table td:first-child,
+    .table th:first-child {
+      width: 50px;
+    }
+
+    /* Action column */
+    .table td:last-child,
+    .table th:last-child {
+      width: 80px;
+    }
+
+    /* Add styles for edit history */
+    .edit-history {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #dee2e6;
+    }
+    .edit-history-title {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 15px;
+    }
+    .history-container {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .history-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .history-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    .history-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+    .history-container::-webkit-scrollbar-thumb:hover {
+      background: #666;
+    }
+    .history-item {
+      padding: 12px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      background-color: #f8f9fa;
+    }
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+    .history-timestamp {
+      font-size: 0.85em;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    .history-details {
+      font-size: 0.9em;
+    }
+    .history-details .remarks {
+      white-space: pre-line;
+      font-family: inherit;
+      background: #ffffff;
+      padding: 0.75rem;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+      margin-top: 0.75rem;
+      color: #495057;
+    }
+    .history-status {
+      display: inline-block;
+      margin-left: 8px;
+    }
+
+    /* Phone input styles */
+    .iti {
+      width: 100%;
+    }
+    .iti__flag {
+      background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/img/flags.png");
+    }
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .iti__flag {
+        background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/img/flags@2x.png");
+      }
+    }
+    .phone-input-container {
+      position: relative;
+    }
+    .phone-validation-error {
+      color: #dc3545;
+      font-size: 0.875em;
+      margin-top: 0.25rem;
+    }
+
+    /* Add these styles to your existing styles */
+    .details-section, .update-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1rem;
+      height: 100%;
+    }
+
+    .section-title {
+      color: #495057;
+      font-weight: 600;
+      font-size: 1rem;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .detail-row {
+      margin-bottom: 0;
+      padding-bottom: 0.5rem;
+      border: none;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #212529;
+    }
+
+    .compact-form .form-label {
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+      color: #6c757d;
+    }
+
+    .compact-form .form-control,
+    .compact-form .form-select {
+      font-size: 0.875rem;
+      padding: 0.375rem 0.75rem;
+      height: calc(1.5em + 0.75rem + 2px);
+    }
+
+    .compact-form textarea.form-control {
+      height: auto;
+    }
+
+    .edit-history {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .edit-history-title {
+      font-size: 1rem;
+      color: #495057;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .history-container {
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .history-item {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .modal-footer {
+      padding: 1rem;
+      background-color: #f8f9fa;
+    }
+
+    /* Add missing status styles */
+    .status-cell .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .status-cell .status-indicator i {
+      margin-right: 4px;
+      font-size: 14px;
+    }
+
+    /* Update table cell styles */
+    .table td.status-cell {
+      padding: 0.5rem;
+    }
+
+    /* Update modal status dropdown */
+    .form-select[name="status"] option {
+      padding: 8px;
+    }
+
+    .form-select[name="status"] option[value="Pending"] {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .form-select[name="status"] option[value="In Progress"] {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+
+    .form-select[name="status"] option[value="Completed"] {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .form-select[name="status"] option[value="Reject"] {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Add new status circle styles */
+    .status-circle {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-circle.pending {
+      background-color: #ffc107;
+    }
+
+    .status-circle.in-progress {
+      background-color: #0d6efd;
+    }
+
+    .status-circle.completed {
+      background-color: #198754;
+    }
+
+    .status-circle.reject {
+      background-color: #dc3545;
+    }
+
+    /* Add new status modal styles */
+    #statusModal {
+      position: fixed;
+      inset: 0;
+      z-index: 1060;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    #statusModal.show {
+      display: flex;
+    }
+
+    .status-modal-content {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      width: 400px;
+      padding: 1.5rem;
+    }
+
+    .status-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .status-option:hover {
+      background-color: #f8f9fa;
+    }
+
+    .status-option svg {
+      width: 24px;
+      height: 24px;
+      margin-right: 1rem;
+    }
+
+    .status-option.in-progress svg {
+      color: #0d6efd;
+    }
+
+    .status-option.reject svg {
+      color: #dc3545;
+    }
+
+    .status-option.completed svg {
+      color: #198754;
+    }
+
+    .status-option span {
+      color: #495057;
+      font-weight: 500;
+    }
+
+    .status-modal-footer {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Add these styles in the style section */
+    .status-field {
+      position: relative;
+    }
+    
+    .status-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .status-button:hover {
+      background-color: #e9ecef;
+    }
+    
+    .status-button .status-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #6c757d;
+    }
+    
+    .status-button[data-status="Pending"] .status-circle {
+      background-color: #ffc107;
+    }
+    
+    .status-button[data-status="In Progress"] .status-circle {
+      background-color: #0d6efd;
+    }
+    
+    .status-button[data-status="Completed"] .status-circle {
+      background-color: #198754;
+    }
+    
+    .status-button[data-status="Reject"] .status-circle {
+      background-color: #dc3545;
+    }
+
+    .status-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .status-fields.hide-refund-fields .refund-field {
+      display: none;
+    }
+
+    /* Status Scorecard Cards */
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .stats-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.75rem 0;
+      line-height: 1;
+    }
+
+    .stats-label {
+      color: #6c757d;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* Filter Section Styling */
+    .filter-section {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: none;
+      margin-bottom: 1.5rem;
+    }
+    
+    .filter-section .form-control,
+    .filter-section .form-select,
+    .filter-section .btn {
+      height: 38px;
+      font-size: 0.9rem;
+    }
+    
+    /* Table Container */
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    
+    .table-responsive {
+      max-height: calc(100vh - 350px);
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+    
+    .table {
+      width: 100%;
+      table-layout: fixed;
+      margin-bottom: 0;
+    }
+    
+    .table-container thead th {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    .table td {
+      vertical-align: middle;
+      text-align: center;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Table content column widths */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 3%; } /* # column */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 7%; } /* Request ID */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 12%; } /* Request Date */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 6%; } /* Time Elapsed */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 8%; } /* Vertical */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 10%; } /* Payment ID */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 15%; } /* Refund Type */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 8%; } /* Refund Amount */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 8%; } /* Status */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 5%; } /* Action */
+    
+    /* Responsive behavior */
+    @media (max-width: 1200px) {
+      .table {
+        table-layout: auto;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        max-width: 100%;
+      }
+    }
+    
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      white-space: nowrap;
+    }
+    
+    .table td {
+      vertical-align: middle;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-inprogress {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+    
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Status Modal Styling */
+    .status-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1050;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .status-modal-content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      margin: 5vh auto 0;
+      padding: 1.5rem;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .status-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .status-modal-header h5 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    
+    .status-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .status-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .status-option:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-option.in-progress {
+      border-color: #90cdf4;
+    }
+    
+    .status-option.in-progress:hover {
+      background-color: #ebf8ff;
+    }
+    
+    .status-option.reject {
+      border-color: #feb2b2;
+    }
+    
+    .status-option.reject:hover {
+      background-color: #fff5f5;
+    }
+    
+    .status-option.completed {
+      border-color: #9ae6b4;
+    }
+    
+    .status-option.completed:hover {
+      background-color: #f0fff4;
+    }
+    
+    .icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+    }
+    
+    .status-option.in-progress .icon-circle {
+      background-color: #ebf8ff;
+      color: #3182ce;
+    }
+    
+    .status-option.reject .icon-circle {
+      background-color: #fff5f5;
+      color: #e53e3e;
+    }
+    
+    .status-option.completed .icon-circle {
+      background-color: #f0fff4;
+      color: #38a169;
+    }
+    
+    .icon-circle svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .status-text {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.25rem;
+    }
+    
+    .status-description {
+      display: block;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    /* Animation for modal */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Status fields styling remains the same */
+    .status-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    
+    .status-fields.hide-refund-fields .refund-field {
+      display: none;
+    }
+
+    /* Button Styling */
+    .btn {
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: all 0.2s;
+    }
+    
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+      border-color: #0a58ca;
+    }
+    
+    .btn-outline-secondary {
+      color: #6c757d;
+      border-color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: #fff;
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+    }
+    
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+    }
+
+    /* Modal adjustments for better space utilization */
+    .modal-xl {
+      max-width: 1300px;
+      width: 95%;
+    }
+    
+    .modal-lg {
+      max-width: 1000px;
+      width: 90%;
+    }
+    
+    /* Stats card improvements */
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      height: 100%;
+    }
+    
+    .stats-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.75rem 0;
+    }
+
+    /* Large screen optimization */
+    @media (min-width: 1600px) {
+      .container-fluid {
+        padding-left: 2.5rem; 
+        padding-right: 2.5rem;
+        max-width: 99%;
+      }
+      
+      .table-responsive {
+        max-height: calc(100vh - 280px);
+      }
+      
+      .table-container {
+        max-height: none;
+      }
+    }
+
+    /* Responsive behavior for filter section */
+    @media (max-width: 768px) {
+      .filter-section {
+        padding: 0.75rem;
+      }
+      
+      .filter-section .row > div {
+        margin-bottom: 0.5rem;
+      }
+      
+      .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        max-width: 100%;
+      }
+    }
+
+    /* Header and filter controls styling */
+    .filter-controls-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-controls-container .form-control-sm,
+    .filter-controls-container .form-select-sm {
+      height: 31px;
+      font-size: 0.85rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+    
+    .filter-controls-container .btn-sm {
+      font-size: 0.85rem;
+    }
+    
+    /* Table Container */
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+
+    /* Responsive behavior for header and filter controls */
+    @media (max-width: 1200px) {
+      .filter-controls-container {
+        gap: 6px;
+      }
+      
+      .filter-controls-container div[style*="width: 220px"] {
+        width: 180px !important;
+      }
+      
+      .filter-controls-container div[style*="width: 140px"] {
+        width: 120px !important;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .filter-controls-container {
+        gap: 4px;
+      }
+      
+      .filter-controls-container div[style*="width"] {
+        width: auto !important;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+      }
+      
+      .filter-controls-container {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      
+      .filter-controls-container > div {
+        margin-bottom: 0.5rem;
+        flex: 1 1 auto;
+        min-width: 140px;
+      }
+    }
+
+    .filter-controls {
+        display: flex;
+        align-items: center;  /* This ensures vertical center alignment */
+        gap: 1rem;
+    }
+
+    .filter-controls input,
+    .filter-controls select,
+    .filter-controls button {
+        height: 38px;  /* Consistent height for all controls */
+        margin: 0;     /* Remove any default margins */
+        padding: 0.375rem 0.75rem;
+    }
+
+    .filter-controls .search-input {
+        width: 220px;
+    }
+
+    .filter-controls .status-select,
+    .filter-controls .date-select {
+        width: 140px;
+    }
+
+    .filter-controls .btn-reset {
+        padding: 0.375rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation Bar Partial -->
+  <?!= include('NavBarPartial', {sessionToken: sessionToken, userAccess: userAccess, currentPage: 'finance'}) ?>
+
+  <div class="container-fluid" style="margin-top: 1.5rem; padding-left: 2rem; padding-right: 2rem; max-width: 98%;">
+    <!-- Back to menu link removed as its functionality is now in the navbar brand -->
+    
+    <h2 class="mb-4">Finance Refund Portal</h2>
+    
+    <!-- Status Scorecard -->
+    <div class="row g-3 mb-4">
+      <div class="col">
+        <div class="stats-card">
+          <div class="stats-label">Pending</div>
+          <div class="stats-value text-warning" id="pendingCount">0</div>
+          <div class="d-flex align-items-center">
+            <span class="text-muted me-2">Awaiting update</span>
+            <i class="fas fa-clock text-warning"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col">
+        <div class="stats-card">
+          <div class="stats-label">In Progress</div>
+          <div class="stats-value text-primary" id="progressCount">0</div>
+          <div class="d-flex align-items-center">
+            <span class="text-muted me-2">Currently processing</span>
+            <i class="fas fa-spinner text-primary"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col">
+        <div class="stats-card">
+          <div class="stats-label">Completed</div>
+          <div class="stats-value text-success" id="completedCount">0</div>
+          <div class="d-flex align-items-center">
+            <span class="text-muted me-2">Fully processed</span>
+            <i class="fas fa-check-circle text-success"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col">
+        <div class="stats-card">
+          <div class="stats-label">Rejected</div>
+          <div class="stats-value text-danger" id="rejectedCount">0</div>
+          <div class="d-flex align-items-center">
+            <span class="text-muted me-2">Cannot be processed</span>
+            <i class="fas fa-times-circle text-danger"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col">
+        <div class="stats-card">
+          <div class="stats-label">Avg. Processing Time</div>
+          <div class="stats-value text-info" id="averageSLA">0h</div>
+          <div class="d-flex align-items-center">
+            <span class="text-muted me-2">Response time</span>
+            <i class="fas fa-tachometer-alt text-info"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Table -->
+    <div class="table-container">
+      <!-- Header flex container for title and filters -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0 fw-bold">Refund Requests</h5>
+        
+        <!-- Filter controls with adjusted spacing -->
+        <div class="filter-controls-container d-flex align-items-center gap-2">
+          <div style="width: 220px;">
+            <input type="text" class="form-control form-control-sm search-box" placeholder="Search by ID or Payment ID" id="searchInput" oninput="filterTable()">
+          </div>
+          <div style="width: 140px;">
+            <select class="form-select form-select-sm" id="statusFilter" onchange="filterTable()">
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div style="width: 140px;">
+            <select class="form-select form-select-sm" id="dateFilter" onchange="handleDateFilter(this.value)">
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="lastWeek">Last Week</option>
+              <option value="last7Days">Last 7 Days</option>
+              <option value="last30Days">Last 30 Days</option>
+              <option value="lastMonth">Last Month</option>
+              <option value="specific">Specific dates...</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center px-2 py-1" onclick="resetFilters()">
+              <i class="fas fa-undo-alt me-1" style="font-size: 0.8rem;"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table id="refundTable" class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th class="sort-header" onclick="sortTable(0)">Request ID</th>
+              <th class="sort-header" onclick="sortTable(1)">Request Date</th>
+              <th class="sort-header" onclick="sortTable(2)">Time Elapsed</th>
+              <th class="sort-header" onclick="sortTable(3)">Vertical</th>
+              <th class="sort-header" onclick="sortTable(4)">Payment ID</th>
+              <th class="sort-header" onclick="sortTable(5)">Refund Type</th>
+              <th class="sort-header" onclick="sortTable(6)">Refund Amount</th>
+              <th class="sort-header" onclick="sortTable(7)">Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted">
+          Showing <span id="startRow">0</span> to <span id="endRow">0</span> of <span id="totalRows">0</span> entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-0" id="paginationControls">
+            <li class="page-item">
+              <button class="page-link" onclick="changePage('prev')" id="prevBtn">Previous</button>
+            </li>
+            <li class="page-item">
+              <button class="page-link" onclick="changePage('next')" id="nextBtn">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="mb-5"></div> <!-- Added extra bottom margin for page spacing -->
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-lg shadow-md border-0">
+          <div class="modal-header py-3 bg-gray-50">
+            <h5 class="modal-title fs-6 text-gray-700">
+              <i class="fas fa-file-invoice-dollar me-2 text-blue-600"></i>Refund Request <span id="requestIdTitle"></span>
+              <span class="status-badge ms-2" id="modalStatusBadge"></span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-3 bg-white">
+            <div class="row g-3">
+              <!-- Request Information Section -->
+              <div class="col-md-6">
+                <div class="card border border-gray-200 rounded-lg shadow-sm h-100">
+                  <div class="card-header bg-gray-50 py-3">
+                    <h6 class="mb-0 fs-6 text-gray-700">
+                      <i class="fas fa-info-circle me-2 text-blue-600"></i>Request Information
+                    </h6>
+                  </div>
+                  <div class="card-body p-3" style="max-height: 400px; overflow-y: auto;">
+                    <div id="requestDetails" class="details-grid">
+                      <!-- Content will be dynamically populated -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Finance Update Section -->
+              <div class="col-md-6">
+                <div class="card border border-blue-200 rounded-lg shadow-sm h-100">
+                  <div class="card-header bg-blue-50 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fs-6 text-blue-700">
+                      <i class="fas fa-money-check-alt me-2"></i>Finance Update
+                    </h6>
+                    <span class="badge bg-blue-100 text-blue-700 rounded-pill px-3 py-1">Action Required</span>
+                  </div>
+                  <div class="card-body p-3 bg-white">
+                    <form id="updateForm" class="compact-form">
+                      <input type="hidden" name="requestId">
+                      <input type="hidden" name="enrollmentNumber">
+                      <div class="row g-3">
+                        <div class="col-md-12">
+                          <label class="form-label text-gray-600">Status</label>
+                          <div class="status-field">
+                            <button type="button" class="form-control text-start status-button" onclick="openStatusModal()">
+                              <span class="status-circle"></span>
+                              <span class="status-text">Select Status</span>
+                            </button>
+                            <input type="hidden" name="status" required>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label text-gray-600">Payment ID</label>
+                          <input type="text" class="form-control rounded-md" name="paymentId">
+                        </div>
+                        <div class="col-md-6 refund-field">
+                          <label class="form-label text-gray-600">Refund Method</label>
+                          <select class="form-select rounded-md" name="refundMethod">
+                            <option value="">Select Method</option>
+                            <option value="bKash">bKash</option>
+                            <option value="Nagad">Nagad</option>
+                            <option value="Rocket">Rocket</option>
+                            <option value="Upay">Upay</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="Bank Account">Bank Account</option>
+                          </select>
+                        </div>
+                        <div class="col-md-6 refund-field">
+                          <label class="form-label text-gray-600">Refunded Amount</label>
+                          <input type="number" class="form-control rounded-md" name="refundedAmount">
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label text-gray-600">Finance Remarks</label>
+                          <textarea class="form-control rounded-md" name="remarks" rows="3" placeholder="Enter your remarks here..."></textarea>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                          <button type="button" class="btn btn-primary rounded-md" onclick="handleUpdate()">
+                            <i class="fas fa-save me-2"></i>Update Status
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+                
+            <!-- Edit History Section -->
+            <div class="col-12 mt-3">
+              <div class="card border border-gray-200 rounded-lg shadow-sm">
+                <div class="card-header bg-gray-50 py-3 d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0 fs-6 text-gray-700">
+                    <i class="fas fa-history me-2 text-blue-600"></i>Update History
+                  </h6>
+                  <span class="badge bg-gray-100 text-gray-700 rounded-pill px-3 py-1">Timeline of all updates</span>
+                </div>
+                <div class="card-body p-3 bg-white">
+                  <div id="editHistory" class="timeline" style="max-height: 200px; overflow-y: auto;">
+                    <!-- Will be populated dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer py-2 bg-gray-50">
+            <button type="button" class="btn btn-secondary rounded-md" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Modal (improved) -->
+    <div id="statusModal">
+      <div class="status-modal-content">
+        <div class="status-modal-header">
+          <h5>Update Status</h5>
+          <button type="button" class="btn-close" onclick="closeStatusModal()"></button>
+        </div>
+        
+        <!-- Status Options -->
+        <div class="status-options">
+          <!-- In-Progress -->
+          <div class="status-option in-progress" data-status="In Progress" onclick="updateStatus('In Progress')" tabindex="0">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: translateX(0.5px) translateY(0.5px);">
+                <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <span class="status-text">In Progress</span>
+              <span class="status-description">Processing the refund request</span>
+            </div>
+          </div>
+
+          <!-- Reject -->
+          <div class="status-option reject" data-status="Reject" onclick="updateStatus('Reject')" tabindex="0">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <span class="status-text">Reject</span>
+              <span class="status-description">Decline this refund request</span>
+            </div>
+          </div>
+
+          <!-- Completed -->
+          <div class="status-option completed" data-status="Completed" onclick="updateStatus('Completed')" tabindex="0">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 11.0857V12.0057C21.9988 14.1621 21.3005 16.2604 20.0093 17.9875C18.7182 19.7147 16.9033 20.9782 14.8354 21.5896C12.7674 22.201 10.5573 22.1276 8.53447 21.3803C6.51168 20.633 4.78465 19.2518 3.61096 17.4428C2.43727 15.6338 1.87979 13.4938 2.02168 11.342C2.16356 9.19029 2.99721 7.14205 4.39828 5.5028C5.79935 3.86354 7.69279 2.72111 9.79619 2.24587C11.8996 1.77063 14.1003 1.98806 16.07 2.86572" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <span class="status-text">Completed</span>
+              <span class="status-description">Refund has been processed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast for notifications -->
+    <div class="toast align-items-center text-white bg-success border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+
+    <!-- Date Range Modal -->
+    <div class="modal fade" id="dateRangeModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="dateRangeModalTitle">Select Date Range</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3" id="specificDateContainer">
+              <label class="form-label">Select Date</label>
+              <input type="date" class="form-control" id="modalSpecificDate">
+            </div>
+            <div id="dateRangeContainer" class="d-none">
+              <div class="mb-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="modalStartDate">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="modalEndDate">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="applyDateRange()">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pass server-side data to client-side JavaScript -->
+  <script id="auth-data" 
+    data-authenticated="true"
+    data-session-token="<?= sessionToken ?>"
+    data-script-url="<?= getScriptUrl() ?>"
+    data-current-page="finance"
+  ></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"></script>
+
+  <script>
+    const authData = document.getElementById('auth-data').dataset;
+    const scriptUrl = authData.scriptUrl || '';
+    const sessionToken = authData.sessionToken || '';
+    let currentData;
+    let modal, toast;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Bootstrap components
+      modal = new bootstrap.Modal(document.getElementById('detailModal'));
+      toast = new bootstrap.Toast(document.querySelector('.toast'));
+
+      // Load initial data
+      loadRefundRequests();
+    });
+
+    // Function to load refund requests
+    function loadRefundRequests() {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          console.log("Response from getRefundRequests:", response);
+          
+          // Check if the problematic fields exist in the first request
+          if (response.requests && response.requests.length > 0) {
+            const firstRequest = response.requests[0];
+            console.log("Checking problematic fields in first request:");
+            console.log("- senderBkash:", firstRequest.senderBkash);
+            console.log("- transactionTime:", firstRequest.transactionTime);
+            console.log("- sentAmount:", firstRequest.sentAmount);
+          }
+          
+          currentData = response.requests;
+          renderTable(currentData);
+          updateStatusCounts(currentData);
+          updateAverageSLA(response.averageSLA);
+        })
+        .withFailureHandler(function(error) {
+          console.error('Failed to load refund requests:', error);
+          showToast(error.message || 'Failed to load refund requests', 'danger');
+        })
+        .getRefundRequests();
+    }
+
+    // Initialize Table with sorting and filtering
+    function initializeTable(data) {
+      currentData = data;  // Store the data globally
+      renderTable(data);   // Initial render
+      updateStatusCounts(data); // Update the status counts
+    }
+
+    // Render table with current data
+    function renderTable(data) {
+      const tableBody = document.querySelector('#refundTable tbody');
+      tableBody.innerHTML = '';
+      
+      // Calculate pagination
+      totalPages = Math.ceil(data.length / rowsPerPage);
+      
+      // Reset current page if data is empty or current page exceeds total pages
+      if (data.length === 0 || currentPage > totalPages) {
+        currentPage = 1;
+      }
+      
+      const start = data.length === 0 ? 0 : (currentPage - 1) * rowsPerPage;
+      const end = Math.min(start + rowsPerPage, data.length);
+      
+      // Update pagination info
+      document.getElementById('startRow').textContent = data.length ? start + 1 : 0;
+      document.getElementById('endRow').textContent = end;
+      document.getElementById('totalRows').textContent = data.length;
+      
+      // Show/hide pagination controls based on data length
+      const paginationControls = document.getElementById('paginationControls');
+      if (data.length <= rowsPerPage) {
+        paginationControls.style.display = 'none';
+      } else {
+        paginationControls.style.display = 'flex';
+        // Update button states
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+      }
+      
+      // If no data, show a message
+      if (data.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="10" class="text-center py-4">
+            <div class="text-muted">No matching records found</div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+        return;
+      }
+      
+      // Render current page
+      data.slice(start, end).forEach((row, index) => {
+        const tr = document.createElement('tr');
+        const requestId = row.requestId ? String(row.requestId).replace(/'/g, '&apos;') : '';
+        tr.innerHTML = `
+          <td>${start + index + 1}</td>
+          <td>${row.requestId || ''}</td>
+          <td>${formatDateTime(row.timestampString) || ''}</td>
+          <td>${getTimeElapsed(row.timestampString, row.status, row.statusUpdateTime) || ''}</td>
+          <td>${row.vertical || ''}</td>
+          <td>${row.paymentId || ''}</td>
+          <td>${row.refundType || ''}</td>
+          <td>${row.refundAmount || ''}</td>
+          <td class="status-cell">
+            <span class="status-indicator ${getStatusClass(row.status)}">
+              ${getStatusIcon(row.status)} ${row.status || 'Pending'}
+            </span>
+          </td>
+          <td>
+            <button class="action-btn" onclick="showDetails('${requestId}')">
+              <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 9.5V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H9.5M17.3862 17.7113L15.6879 20.8653C15.4103 21.3808 15.2715 21.6386 15.1023 21.7059C14.9555 21.7643 14.7896 21.7498 14.6551 21.6668C14.5001 21.5712 14.4081 21.2933 14.2241 20.7375L11.5004 12.5113C11.3392 12.0245 11.2586 11.7812 11.3166 11.6191C11.367 11.478 11.478 11.367 11.6191 11.3166C11.7812 11.2586 12.0245 11.3392 12.5113 11.5004L20.7374 14.2241C21.2933 14.4082 21.5712 14.5002 21.6668 14.6551C21.7498 14.7897 21.7642 14.9555 21.7058 15.1024C21.6386 15.2715 21.3808 15.4103 20.8652 15.6879L17.7113 17.3862C17.6328 17.4285 17.5935 17.4497 17.5591 17.4768C17.5286 17.501 17.501 17.5286 17.4768 17.5591C17.4497 17.5935 17.4285 17.6328 17.3862 17.7113Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      
+      // Add event listeners after rendering
+      document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const requestId = this.getAttribute('data-request-id');
+          showDetails(requestId);
+        });
+      });
+    }
+
+    function showDetails(requestId) {
+      try {
+        console.log('Opening details for:', requestId);
+        const request = currentData.find(r => String(r.requestId) === String(requestId));
+        if (!request) {
+          console.log('Request not found');
+          return;
+        }
+        
+        // Add debugging to check if these fields exist
+        console.log('Request data:', request);
+        console.log('Checking problematic fields:');
+        console.log('- senderBkash:', request.senderBkash);
+        console.log('- transactionTime:', request.transactionTime);
+        console.log('- sentAmount:', request.sentAmount);
+        
+        // Update modal title with status and Request ID
+        const modalStatusBadge = document.getElementById('modalStatusBadge');
+        modalStatusBadge.className = `status-badge ${getStatusClass(request.status)}`;
+        modalStatusBadge.textContent = request.status || 'Pending';
+        
+        // Update Request ID in section title
+        document.getElementById('requestIdTitle').textContent = request.requestId || '';
+        
+        // Define the order and labels for request details
+        const fieldOrder = [
+          ['requestId', 'Request ID'],
+          ['timestampString', 'Request Date'],
+          ['requester', 'Requester'],
+          ['requesterEmail', 'Requester Email'],
+          ['vertical', 'Vertical'],
+          ['enrollmentNumber', 'Enrollment Number'],
+          ['customerContact', 'Customer Name'],
+          ['purchaseDateString', 'Purchase Date'],
+          ['paymentId', 'Payment ID'],
+          ['refundType', 'Refund Type'],
+          ['mistakenCourse', 'Mistaken Course'],
+          ['mistakenPhase', 'Mistaken Phase'],
+          ['intendedCourse', 'Intended Course'],
+          ['intendedPhase', 'Intended Phase'],
+          ['wrongPhone', 'Wrong Phone'],
+          ['correctPhone', 'Correct Phone'],
+          ['senderBkash', 'Sender bKash'],
+          ['transactionTime', 'Transaction Time'],
+          ['sentAmount', 'Sent Amount'],
+          ['refundAmount', 'Refund Amount'],
+          ['refundReason', 'Refund Reason'],
+          ['documentFolder', 'Documents']
+        ];
+        
+        // Create HTML with ordered fields
+        const detailsHtml = fieldOrder
+          .map(([key, label]) => {
+            const value = request[key];
+            if (value !== undefined && value !== null && value !== '') {
+              let displayValue = String(value);
+              
+              // Special formatting for specific fields
+              if (key === 'documentFolder') {
+                displayValue = `<a href="${value}" target="_blank">View Documents</a>`;
+              } else if (key === 'refundAmount' || key === 'sentAmount') {
+                displayValue = `${value} BDT`;
+              } else if (key === 'timestampString' || key === 'purchaseDateString' || key === 'transactionTime') {
+                // Format date strings consistently
+                const date = new Date(value);
+                if (!isNaN(date.getTime())) {
+                  displayValue = date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  });
+                }
+              }
+
+              // Special handling for refund reason to span full width
+              const fullWidth = key === 'refundReason' ? ' style="grid-column: 1 / -1;"' : '';
+              
+              return `
+                <div class="detail-row"${fullWidth}>
+                  <div class="detail-label">${label}</div>
+                  <div class="detail-value">${displayValue}</div>
+                </div>
+              `;
+            }
+            return '';
+          })
+          .join('');
+        
+        document.getElementById('requestDetails').innerHTML = detailsHtml;
+        
+        // Set form values and enable all fields for editing
+        const form = document.getElementById('updateForm');
+        form.querySelector('[name="requestId"]').value = request.requestId || '';
+        form.querySelector('[name="enrollmentNumber"]').value = request.enrollmentNumber || '';
+        form.querySelector('[name="paymentId"]').value = request.paymentId || '';
+        form.querySelector('[name="refundedAmount"]').value = '';
+        form.querySelector('[name="status"]').value = '';
+        form.querySelector('[name="refundMethod"]').value = '';
+        form.querySelector('[name="remarks"]').value = '';
+        
+        // Enable all fields for editing
+        form.querySelector('[name="paymentId"]').disabled = false;
+        form.querySelector('[name="refundMethod"]').disabled = false;
+        form.querySelector('[name="refundedAmount"]').disabled = false;
+        form.querySelector('[name="remarks"]').disabled = false;
+        
+        // Update status button display
+        const statusButton = form.querySelector('.status-button');
+        statusButton.dataset.status = '';
+        statusButton.querySelector('.status-text').textContent = 'Select Status';
+        statusButton.querySelector('.status-circle').className = 'status-circle';
+        
+        // Update button is initially disabled until status is selected
+        const updateBtn = document.querySelector('.modal-footer .btn-primary');
+        updateBtn.disabled = true;
+        
+        // Load edit history
+        loadEditHistory(request.requestId);
+        
+        // Show modal
+        modal.show();
+        
+        // Add event listener for refund method changes
+        const refundMethodSelect = form.querySelector('[name="refundMethod"]');
+        refundMethodSelect.addEventListener('change', function() {
+          const status = form.querySelector('[name="status"]').value;
+          if (status === 'Completed') {
+            updateRemarksTemplate();
+          }
+        });
+      } catch (error) {
+        console.error('Error in showDetails:', error);
+        showToast('Error loading details', 'danger');
+      }
+    }
+
+    // Add these new functions for form validation and history
+    let initialFormValues = {};
+
+    function storeInitialFormValues() {
+      const form = document.getElementById('updateForm');
+      const formData = new FormData(form);
+      initialFormValues = {};
+      for (let [key, value] of formData.entries()) {
+        initialFormValues[key] = value;
+      }
+      validateForm();  // Initial validation
+    }
+
+    function validateForm() {
+      const form = document.getElementById('updateForm');
+      const updateBtn = document.querySelector('.modal-footer .btn-primary');
+      const status = form.querySelector('[name="status"]').value;
+      
+      // Only require a status to be selected
+      if (status) {
+        updateBtn.disabled = false;
+        updateBtn.classList.remove('btn-secondary');
+        updateBtn.classList.add('btn-primary');
+        updateBtn.removeAttribute('title');
+      } else {
+        updateBtn.disabled = true;
+        updateBtn.classList.remove('btn-primary');
+        updateBtn.classList.add('btn-secondary');
+        updateBtn.setAttribute('title', 'Please select a status');
+      }
+    }
+
+    // Add function to update remarks template based on refund method
+    function updateRemarksTemplate() {
+      const form = document.getElementById('updateForm');
+      const refundMethod = form.querySelector('[name="refundMethod"]').value;
+      const remarksField = form.querySelector('[name="remarks"]');
+      const status = form.querySelector('[name="status"]').value;
+      
+      // Only add template if status is Completed and refund method is selected
+      if (status === 'Completed' && refundMethod) {
+        let template = '';
+        
+        // Generate template based on refund method
+        if (['bKash', 'Nagad', 'Rocket', 'Upay'].includes(refundMethod)) {
+          template = `Transaction Time:
+Transaction ID/Payment ID:
+Refunded by: [your name]`;
+        } else if (refundMethod === 'Bank Account') {
+          template = `Transaction Time:
+Transaction ID/Payment ID:
+Bank Name:
+Bank Account Name:
+Bank Account Number:
+Refunded by: [your name]`;
+        } else if (['Credit Card', 'Debit Card'].includes(refundMethod)) {
+          template = `Transaction Time:
+Transaction ID/Payment ID: [if sharable]
+Card Holder Name: [If sharable]
+Card Number: [last 4 digits]
+Refunded by: [your name]`;
+        }
+        
+        // Only update if the current remarks is empty or is a template
+        const currentRemarks = remarksField.value.trim();
+        if (!currentRemarks || isTemplateFormat(currentRemarks)) {
+          remarksField.value = template;
+        }
+      }
+      
+      validateForm();
+    }
+
+    // Helper function to check if current remarks is a template
+    function isTemplateFormat(text) {
+      // Check for common template patterns
+      const templatePatterns = [
+        'Transaction Time:',
+        'Transaction ID/Payment ID:',
+        'Refunded by:',
+        'Bank Name:',
+        'Card Number:'
+      ];
+      
+      return templatePatterns.some(pattern => text.includes(pattern));
+    }
+
+    // Add event listeners to form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('updateForm');
+      const inputs = form.querySelectorAll('input, select, textarea');
+      inputs.forEach(input => {
+        input.addEventListener('change', validateForm);
+        input.addEventListener('input', validateForm);
+      });
+    });
+
+    function loadEditHistory(requestId) {
+      google.script.run
+        .withSuccessHandler(function(history) {
+          const historyContainer = document.getElementById('editHistory');
+          if (!history || history.length === 0) {
+            historyContainer.innerHTML = `
+              <div class="empty-state text-center py-4">
+                <i class="fas fa-history d-block mb-3 text-gray-400" style="font-size: 2rem;"></i>
+                <p class="text-gray-500 mb-1">No update history available</p>
+                <p class="small text-gray-400">Updates will appear here once the request is processed</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Process and group timeline data
+          let timelineHtml = `
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="small text-gray-600">Showing financial updates (${history.length})</div>
+              <div class="badge bg-gray-100 text-gray-600 rounded-pill px-3 py-1">Newest first</div>
+            </div>
+          `;
+
+          // Create timeline elements
+          history.forEach((entry, index) => {
+            // Determine status classes and icons
+            let statusClass, statusIcon, badgeBgClass, badgeTextClass;
+            switch((entry.status || '').toLowerCase()) {
+              case 'completed':
+                statusClass = 'success';
+                statusIcon = '<i class="fas fa-check-circle"></i>';
+                badgeBgClass = 'bg-green-100';
+                badgeTextClass = 'text-green-600';
+                break;
+              case 'in progress':
+                statusClass = 'info';
+                statusIcon = '<i class="fas fa-spinner"></i>';
+                badgeBgClass = 'bg-blue-100';
+                badgeTextClass = 'text-blue-600';
+                break;
+              case 'reject':
+              case 'rejected':
+                statusClass = 'danger';
+                statusIcon = '<i class="fas fa-times-circle"></i>';
+                badgeBgClass = 'bg-red-100';
+                badgeTextClass = 'text-red-600';
+                break;
+              default:
+                statusClass = 'secondary';
+                statusIcon = '<i class="fas fa-circle"></i>';
+                badgeBgClass = 'bg-gray-100';
+                badgeTextClass = 'text-gray-600';
+                break;
+            }
+            
+            // Format the date time
+            const entryDate = new Date(entry.timestamp);
+            const formattedDate = entryDate.toLocaleDateString('en-US', {
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric'
+            });
+            
+            const formattedTime = entryDate.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            });
+
+            // Create timeline item HTML
+            timelineHtml += `
+              <div class="timeline-item ${statusClass} mb-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <span class="badge bg-blue-100 text-blue-700 rounded-pill px-3 py-1 mb-1">
+                      <i class="fas fa-money-bill-wave me-1"></i>Finance
+                    </span>
+                    <span class="badge bg-gray-100 text-gray-600 rounded-md">${formattedDate}</span>
+                  </div>
+                  <span class="badge ${badgeBgClass} ${badgeTextClass} rounded-pill px-3 py-1">
+                    ${statusIcon} ${entry.status || 'Unknown'}
+                  </span>
+                </div>
+                
+                <div class="d-flex align-items-center mb-1">
+                  <i class="fas fa-user-circle text-gray-500 me-2"></i>
+                  <span class="timeline-user">Finance Team</span>
+                  <small class="text-gray-500 ms-auto">${formattedTime}</small>
+                </div>
+                
+                <div class="mt-2 mb-1">
+                  <div class="small text-gray-600 mb-1">
+                    <i class="fas fa-money-check-alt me-1"></i>
+                    <strong>Amount:</strong> ${entry.refundedAmount || 'N/A'}
+                    <span class="ms-3"><strong>Method:</strong> ${entry.refundMethod || 'N/A'}</span>
+                  </div>
+                </div>
+                
+                ${entry.remarks ? `<div class="timeline-remarks">${entry.remarks}</div>` : ''}
+              </div>
+            `;
+          });
+          
+          historyContainer.innerHTML = timelineHtml;
+        })
+        .withFailureHandler(function(error) {
+          console.error('Error loading history:', error);
+          document.getElementById('editHistory').innerHTML = 
+            '<div class="alert alert-danger" role="alert">Failed to load update history</div>';
+        })
+        .getUpdateHistory(requestId);
+    }
+
+    // Update handleUpdate function
+    function handleUpdate() {
+      const form = document.getElementById('updateForm');
+      const formData = new FormData(form);
+      const data = {};
+      
+      // Convert FormData to object
+      for (let [key, value] of formData.entries()) {
+          data[key] = value || '';
+        }
+
+      // Validate based on status
+      const status = data.status;
+      if (status === 'Completed') {
+        // For Completed status, validate required fields
+        if (!data.refundMethod) {
+          showToast('Please select a refund method', 'warning');
+          return;
+        }
+        if (!data.refundedAmount) {
+          showToast('Please enter refund amount', 'warning');
+          return;
+        }
+      } else if (status === 'Reject') {
+        // For Reject status, set default values
+        data.refundMethod = '';
+        data.refundedAmount = '0.00';
+      }
+
+      // Check if any values have changed
+      let hasChanges = false;
+      for (let [key, value] of Object.entries(data)) {
+        if (value !== initialFormValues[key]) {
+          hasChanges = true;
+          break;
+        }
+      }
+
+      if (!hasChanges) {
+        showToast('No changes detected', 'warning');
+        return;
+      }
+      
+      // Get the update button
+      const updateBtn = document.querySelector('.modal-footer .btn-primary');
+      const originalBtnText = updateBtn.innerHTML;
+      
+      // Disable button and show loading state
+      updateBtn.disabled = true;
+      updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          if (response.success) {
+            showToast('Update successful!', 'success');
+            modal.hide();
+            // Refresh data
+            loadRefundRequests();
+          } else {
+            showToast(response.message || 'Update failed', 'danger');
+          }
+          updateBtn.disabled = false;
+          updateBtn.innerHTML = originalBtnText;
+        })
+        .withFailureHandler(function(error) {
+          showToast(error.message || 'Update failed', 'danger');
+          updateBtn.disabled = false;
+          updateBtn.innerHTML = originalBtnText;
+        })
+        .processFinanceUpdate(data);
+    }
+
+    let table;
+    let currentSort = { column: 0, direction: 'asc' };
+
+    // Sort table
+    function sortTable(column) {
+      const headers = document.querySelectorAll('.sort-header');
+      
+      // Update sort direction
+      if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.column = column;
+        currentSort.direction = 'asc';
+      }
+      
+      // Update header classes
+      headers.forEach(header => header.classList.remove('sort-asc', 'sort-desc'));
+      headers[column].classList.add(`sort-${currentSort.direction}`);
+      
+      // Sort data
+      const sortedData = [...currentData].sort((a, b) => {
+        const keys = ['requestId', 'timestampString', 'timestampString', 'vertical', 'paymentId', 'refundType', 'refundAmount', 'refundReason', 'status'];
+        const key = keys[column];
+        
+        let valueA = a[key] || '';
+        let valueB = b[key] || '';
+        
+        // Special handling for dates
+        if (key === 'timestampString') {
+          valueA = new Date(valueA).getTime() || 0;
+          valueB = new Date(valueB).getTime() || 0;
+        }
+        // Handle numeric values
+        else if (key === 'refundAmount') {
+          valueA = parseFloat(valueA) || 0;
+          valueB = parseFloat(valueB) || 0;
+        }
+        
+        if (valueA < valueB) return currentSort.direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return currentSort.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+      
+      renderTable(sortedData);
+    }
+
+    // Filter table
+    function filterTable() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const dateFilterValue = document.getElementById('dateFilter').value;
+      
+      // If all filters are empty/default, show all data
+      if (!searchText && !statusFilter && dateFilterValue === 'all') {
+        renderTable(currentData);
+        updateStatusCounts(currentData);
+        updateAverageSLA(calculateAverageSLA(currentData));
+        return;
+      }
+      
+      // Apply filters
+      let filteredData = currentData.filter(row => {
+        // Search text filter
+        const matchesSearch = !searchText || 
+          Object.values(row).some(value => 
+            value !== null && String(value).toLowerCase().includes(searchText)
+          );
+        
+        // Status filter
+        const normalizedRowStatus = normalizeStatus(row.status || 'Pending');
+        const normalizedFilterStatus = normalizeStatus(statusFilter);
+        const matchesStatus = !statusFilter || normalizedRowStatus === normalizedFilterStatus;
+        
+        return matchesSearch && matchesStatus;
+      });
+      
+      // If date filter is active, reapply it
+      if (dateFilterValue !== 'all' && !['specific', 'between', 'exclude'].includes(dateFilterValue)) {
+        handleDateFilter(dateFilterValue);
+        return;
+      }
+      
+      // Update the display with filtered data
+      renderTable(filteredData);
+      updateStatusCounts(filteredData);
+      updateAverageSLA(calculateAverageSLA(filteredData));
+    }
+    
+    // Add reset filters function
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('dateFilter').value = 'all';
+      
+      // Hide date range inputs if visible
+      document.getElementById('dateRangeInputs').style.display = 'none';
+      
+      // Reset and render all data
+      renderTable(currentData);
+      updateStatusCounts(currentData);
+      updateAverageSLA(calculateAverageSLA(currentData));
+    }
+
+    // Helper functions
+    function formatLabel(key) {
+      return key.replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
+    }
+
+    function showToast(message, type = 'success') {
+      const toastEl = document.querySelector('.toast');
+      toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+      toastEl.querySelector('.toast-body').textContent = message;
+      toast.show();
+      
+      // Auto hide after 5 seconds
+      setTimeout(() => {
+        toast.hide();
+      }, 5000);
+    }
+
+    function goBack() {
+      window.top.location.href = `${scriptUrl}?page=menu&token=${sessionToken}`;
+    }
+
+    // Standardize status handling with consistent status constants
+    const STATUS = {
+      PENDING: 'Pending',
+      IN_PROGRESS: 'In Progress',
+      COMPLETED: 'Completed',
+      REJECTED: 'Reject'
+    };
+
+    function getStatusClass(status) {
+      // Normalize status for consistent handling
+      const normalizedStatus = normalizeStatus(status);
+      
+      const statusMap = {
+        [STATUS.PENDING]: 'status-pending',
+        [STATUS.IN_PROGRESS]: 'status-progress',
+        [STATUS.REJECTED]: 'status-reject',
+        [STATUS.COMPLETED]: 'status-completed'
+      };
+      return statusMap[normalizedStatus] || 'status-pending';
+    }
+
+    function getStatusIcon(status) {
+      // Normalize status for consistent handling
+      const normalizedStatus = normalizeStatus(status);
+      
+      switch(normalizedStatus) {
+        case STATUS.PENDING: return '<i class="fas fa-clock"></i>';
+        case STATUS.IN_PROGRESS: return '<i class="fas fa-spinner"></i>';
+        case STATUS.COMPLETED: return '<i class="fas fa-check"></i>';
+        case STATUS.REJECTED: return '<i class="fas fa-times"></i>';
+        default: return '';
+      }
+    }
+    
+    // Normalize various status strings to consistent values
+    function normalizeStatus(status) {
+      if (!status) return STATUS.PENDING;
+      
+      const statusLower = status.toLowerCase().trim();
+      
+      // Special handling for "Approved" status from the Refund Approver
+      // In Finance Portal, "Approved" requests should be treated as "Pending"
+      if (statusLower === 'approved') return STATUS.PENDING;
+      
+      if (statusLower === 'pending') return STATUS.PENDING;
+      if (statusLower === 'in progress' || statusLower === 'in-progress') return STATUS.IN_PROGRESS;
+      if (statusLower === 'completed') return STATUS.COMPLETED;
+      if (statusLower === 'reject' || statusLower === 'rejected') return STATUS.REJECTED;
+      
+      // If no match found and we're in the Finance context, default to Pending
+      return STATUS.PENDING; // Changed to default to Pending instead of returning original status
+    }
+
+    // Update status counts with normalized status values
+    function updateStatusCounts(data) {
+      const counts = {
+        [STATUS.PENDING]: 0,
+        [STATUS.IN_PROGRESS]: 0,
+        [STATUS.COMPLETED]: 0,
+        [STATUS.REJECTED]: 0
+      };
+      
+      data.forEach(row => {
+        const status = normalizeStatus(row.status || STATUS.PENDING);
+        counts[status] = (counts[status] || 0) + 1;
+      });
+      
+      // Update the count displays
+      document.getElementById('pendingCount').textContent = counts[STATUS.PENDING];
+      document.getElementById('progressCount').textContent = counts[STATUS.IN_PROGRESS];
+      document.getElementById('completedCount').textContent = counts[STATUS.COMPLETED];
+      document.getElementById('rejectedCount').textContent = counts[STATUS.REJECTED];
+    }
+
+    // Add these helper functions at the start of your script section
+    function formatDateTime(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString; // Return original if invalid
+      
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    function getTimeElapsed(dateString, status, statusUpdateTime) {
+      if (!dateString) return '';
+      const requestDate = new Date(dateString);
+      if (isNaN(requestDate.getTime())) return '';
+      
+      // For completed or rejected requests with status update time
+      if ((status === 'Completed' || status === 'Reject') && statusUpdateTime) {
+        try {
+          const completionDate = new Date(statusUpdateTime);
+          if (!isNaN(completionDate.getTime())) {
+            const elapsed = completionDate - requestDate;
+            const seconds = Math.floor(elapsed / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            // Return final time taken without 'ago'
+            if (days > 0) return `${days}d`;
+            if (hours > 0) return `${hours}h`;
+            if (minutes > 0) return `${minutes}m`;
+            return '<1m';
+          }
+        } catch (error) {
+          console.error('Error parsing status update time:', error);
+        }
+      }
+      
+      // For pending, in-progress, or requests without status update time
+      const now = new Date();
+      const elapsed = now - requestDate;
+      const seconds = Math.floor(elapsed / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      
+      // Add warning classes for SLA tracking (only for non-completed/rejected requests)
+      let timeClass = '';
+      if (status !== 'Completed' && status !== 'Reject') {
+        if (days >= 2) timeClass = 'text-danger';  // Red after 48 hours
+        else if (days >= 1) timeClass = 'text-warning';  // Yellow after 24 hours
+      }
+      
+      const timeText = days > 0 ? `${days}d ago` :
+                      hours > 0 ? `${hours}h ago` :
+                      minutes > 0 ? `${minutes}m ago` :
+                      'Just now';
+      
+      return timeClass ? `<span class="${timeClass}">${timeText}</span>` : timeText;
+    }
+
+    // Add auto-refresh for time elapsed
+    setInterval(() => {
+      if (currentData && currentData.length > 0) {
+        renderTable(currentData);
+      }
+    }, 60000); // Update every minute
+
+    // Add function to update average SLA
+    function updateAverageSLA(averageHours) {
+      const slaElement = document.getElementById('averageSLA');
+      if (!slaElement) return;
+
+      let displayText;
+      if (averageHours < 1) {
+        displayText = `${Math.round(averageHours * 60)}m`;
+      } else if (averageHours < 24) {
+        displayText = `${Math.round(averageHours)}h`;
+      } else {
+        const days = Math.floor(averageHours / 24);
+        const hours = Math.round(averageHours % 24);
+        displayText = `${days}d ${hours}h`;
+      }
+
+      slaElement.textContent = displayText;
+      
+      // Add color coding based on SLA performance
+      if (averageHours > 48) {
+        slaElement.classList.add('text-danger');
+      } else if (averageHours > 24) {
+        slaElement.classList.add('text-warning');
+      } else {
+        slaElement.classList.add('text-success');
+      }
+    }
+
+    // Add these new functions for date filtering
+    let dateRangeModal;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      dateRangeModal = new bootstrap.Modal(document.getElementById('dateRangeModal'));
+    });
+
+    function handleDateFilter(value) {
+      const specificDateContainer = document.getElementById('specificDateContainer');
+      const dateRangeContainer = document.getElementById('dateRangeContainer');
+      const modalTitle = document.getElementById('dateRangeModalTitle');
+      
+      if (['specific', 'between', 'exclude'].includes(value)) {
+        // Reset date inputs
+        document.getElementById('modalSpecificDate').value = '';
+        document.getElementById('modalStartDate').value = '';
+        document.getElementById('modalEndDate').value = '';
+        
+        // Show modal with appropriate fields
+        if (value === 'specific') {
+          modalTitle.textContent = 'Select Specific Date';
+          specificDateContainer.classList.remove('d-none');
+          dateRangeContainer.classList.add('d-none');
+        } else {
+          modalTitle.textContent = value === 'between' ? 'Select Date Range' : 'Exclude Date Range';
+          specificDateContainer.classList.add('d-none');
+          dateRangeContainer.classList.remove('d-none');
+        }
+        dateRangeModal.show();
+        return;
+      }
+      
+      let startDate = new Date();
+      let endDate = new Date();
+      
+      switch(value) {
+        case 'today':
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'yesterday':
+          startDate.setDate(startDate.getDate() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(startDate);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'lastWeek':
+          startDate.setDate(startDate.getDate() - 7);
+          startDate.setDate(startDate.getDate() - startDate.getDay());
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + 6);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'last7Days':
+          startDate.setDate(startDate.getDate() - 7);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'last30Days':
+          startDate.setDate(startDate.getDate() - 30);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'lastMonth':
+          startDate.setMonth(startDate.getMonth() - 1);
+          startDate.setDate(1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'last3Months':
+          startDate.setMonth(startDate.getMonth() - 3);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'last12Months':
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'all':
+        default:
+          filterTable();
+          return;
+      }
+      
+      applyDateFilter(startDate, endDate, false);
+    }
+
+    function applyDateRange() {
+      const filterType = document.getElementById('dateFilter').value;
+      let startDate, endDate;
+      
+      if (filterType === 'specific') {
+        const specificDate = document.getElementById('modalSpecificDate').value;
+        if (!specificDate) {
+          showToast('Please select a date', 'warning');
+          return;
+        }
+        startDate = new Date(specificDate);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(specificDate);
+        endDate.setHours(23, 59, 59, 999);
+      } else {
+        const start = document.getElementById('modalStartDate').value;
+        const end = document.getElementById('modalEndDate').value;
+        
+        if (!start || !end) {
+          showToast('Please select both start and end dates', 'warning');
+          return;
+        }
+        
+        startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
+        
+        if (startDate > endDate) {
+          showToast('Start date cannot be after end date', 'warning');
+          return;
+        }
+      }
+      
+      dateRangeModal.hide();
+      applyDateFilter(startDate, endDate, filterType === 'exclude');
+    }
+
+    function applyDateFilter(startDate, endDate, exclude = false) {
+      const searchText = document.querySelector('.search-box').value.toLowerCase();
+      
+      const filteredData = currentData.filter(row => {
+        const rowDate = new Date(row.timestampString);
+        const matchesDate = exclude ? 
+          (rowDate < startDate || rowDate > endDate) :
+          (rowDate >= startDate && rowDate <= endDate);
+        
+        const matchesSearch = !searchText || 
+          Object.values(row).some(value => 
+            String(value).toLowerCase().includes(searchText)
+          );
+        
+        return matchesDate && matchesSearch;
+      });
+
+      // Calculate average SLA for filtered data
+      let totalProcessingTime = 0;
+      let completedRequests = 0;
+      
+      filteredData.forEach(row => {
+        if ((row.status === 'Completed' || row.status === 'Reject') && row.statusUpdateTime) {
+          const requestDate = new Date(row.timestampString);
+          const completionDate = new Date(row.statusUpdateTime);
+          
+          if (!isNaN(requestDate.getTime()) && !isNaN(completionDate.getTime())) {
+            const processingTime = completionDate - requestDate;
+            totalProcessingTime += processingTime;
+            completedRequests++;
+          }
+        }
+      });
+      
+      const averageSLA = completedRequests > 0 ? 
+        (totalProcessingTime / completedRequests) / (1000 * 60 * 60) : 0;
+      
+      // Update the display
+      renderTable(filteredData);
+      updateStatusCounts(filteredData);
+      updateAverageSLA(averageSLA);
+    }
+
+    // Add these variables at the top of your script
+    let currentPage = 1;
+    const rowsPerPage = 100;
+    let totalPages = 1;
+
+    // Add pagination functions
+    function changePage(direction) {
+      if (direction === 'prev' && currentPage > 1) {
+        currentPage--;
+        renderTable(currentData);
+      } else if (direction === 'next' && currentPage < totalPages) {
+        currentPage++;
+        renderTable(currentData);
+      }
+    }
+
+    // Add live notification system
+    let lastRequestId = null;
+
+    function checkForNewRequests() {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          if (!response.requests || !response.requests.length) return;
+          
+          const latestRequest = response.requests[0];
+          if (lastRequestId === null) {
+            lastRequestId = latestRequest.requestId;
+            return;
+          }
+          
+          if (latestRequest.requestId !== lastRequestId) {
+            showToast('New refund request received!', 'info');
+            lastRequestId = latestRequest.requestId;
+            loadRefundRequests(); // Refresh the table
+          }
+        })
+        .getRefundRequests();
+    }
+
+    // Check for new requests every 30 seconds
+    setInterval(checkForNewRequests, 30000);
+
+    // Add helper function to calculate average SLA
+    function calculateAverageSLA(data) {
+      let totalProcessingTime = 0;
+      let completedRequests = 0;
+      
+      data.forEach(row => {
+        if ((row.status === 'Completed' || row.status === 'Reject') && row.statusUpdateTime) {
+          const requestDate = new Date(row.timestampString);
+          const completionDate = new Date(row.statusUpdateTime);
+          
+          if (!isNaN(requestDate.getTime()) && !isNaN(completionDate.getTime())) {
+            const processingTime = completionDate - requestDate;
+            totalProcessingTime += processingTime;
+            completedRequests++;
+          }
+        }
+      });
+      
+      return completedRequests > 0 ? 
+        (totalProcessingTime / completedRequests) / (1000 * 60 * 60) : 0;
+    }
+
+    // Add phone input initialization function
+    function initPhoneInputs() {
+      // Initialize all phone inputs with intl-tel-input
+      const phoneInputs = document.querySelectorAll('input[type="tel"]');
+      const phoneInstances = {};
+      
+      phoneInputs.forEach(input => {
+        const instance = window.intlTelInput(input, {
+          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+          initialCountry: "bd", // Set Bangladesh as default
+          preferredCountries: ["bd", "in", "us", "gb"],
+          separateDialCode: true,
+          formatOnDisplay: true,
+          autoPlaceholder: "aggressive"
+        });
+        
+        // Store instance for later use
+        phoneInstances[input.name] = instance;
+        
+        // Add validation on blur
+        input.addEventListener('blur', function() {
+          const errorDiv = this.parentElement.querySelector('.phone-validation-error');
+          if (errorDiv) {
+            errorDiv.remove();
+          }
+          
+          if (this.value.trim()) {
+            if (!instance.isValidNumber()) {
+              const errorMsg = document.createElement('div');
+              errorMsg.className = 'phone-validation-error';
+              errorMsg.textContent = 'Invalid phone number';
+              this.parentElement.appendChild(errorMsg);
+            }
+          }
+        });
+      });
+      
+      return phoneInstances;
+    }
+    
+    // Add phone number validation to form validation
+    function validatePhoneInputs(phoneInstances) {
+      let isValid = true;
+      Object.values(phoneInstances).forEach(instance => {
+        if (instance.getNumber() && !instance.isValidNumber()) {
+          isValid = false;
+        }
+      });
+      return isValid;
+    }
+    
+    // Fix the recursive showDetails function issue
+    let originalShowDetails;
+    if (typeof originalShowDetails === 'undefined') {
+      originalShowDetails = showDetails;
+      showDetails = function(requestId) {
+        originalShowDetails(requestId);
+        setTimeout(() => {
+          styleDocumentLinks();
+          updateStatusDisplay();
+          
+          // Set initial status in the button
+          const form = document.getElementById('updateForm');
+          const statusInput = form.querySelector('[name="status"]');
+          const statusButton = form.querySelector('.status-button');
+          const currentStatus = statusInput.value;
+          
+          if (currentStatus) {
+            statusButton.dataset.status = currentStatus;
+            statusButton.querySelector('.status-text').textContent = currentStatus;
+          }
+        }, 100);
+      };
+    }
+
+    // Update status display in the table
+    function updateStatusDisplay() {
+      const statusCells = document.querySelectorAll('.status-cell');
+      statusCells.forEach(cell => {
+        const status = cell.textContent.trim();
+        const statusClass = getStatusClass(status);
+        const icon = getStatusIcon(status);
+        
+        if (statusClass) {
+          cell.innerHTML = `
+            <span class="status-indicator ${statusClass}">
+              ${icon} ${status}
+            </span>
+          `;
+        }
+      });
+    }
+
+    // Style document links
+    function styleDocumentLinks() {
+      const docLinks = document.querySelectorAll('a[href*="folder"]');
+      docLinks.forEach(link => {
+        if (!link.classList.contains('doc-button')) {
+          link.className = 'doc-button';
+          link.innerHTML = `
+            <i class="fas fa-folder-open"></i>
+            View Files
+          `;
+        }
+      });
+    }
+
+    // Call these functions when needed
+    document.addEventListener('DOMContentLoaded', function() {
+      updateStatusDisplay();
+      styleDocumentLinks();
+    });
+
+    // Add this function to update status circles
+    function initializeStatusDropdown() {
+      const statusSelect = document.querySelector('select[name="status"]');
+      const options = statusSelect.querySelectorAll('option');
+      
+      options.forEach(option => {
+        if (option.value) {
+          const circle = document.createElement('span');
+          circle.className = `status-circle ${option.value.toLowerCase().replace(' ', '-')}`;
+          option.prepend(circle);
+        }
+      });
+    }
+
+    // Call this function when the modal is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('detailModal');
+      modal.addEventListener('shown.bs.modal', function() {
+        initializeStatusDropdown();
+      });
+    });
+
+    // Add new status modal functions
+    function openStatusModal() {
+      const statusModal = document.getElementById('statusModal');
+      statusModal.classList.add('show');
+      statusModal.style.display = 'flex';
+      
+      // Add keyboard event handler for ESC key
+      document.addEventListener('keydown', handleStatusModalKeydown);
+      
+      // Set focus on the first option for accessibility
+      const firstOption = statusModal.querySelector('.status-option');
+      if (firstOption) {
+        firstOption.focus();
+        firstOption.setAttribute('tabindex', '0');
+      }
+      
+      // Remember the opener to return focus later
+      statusModal.dataset.opener = document.activeElement.id || 'modal-opener';
+      
+      // Prevent body scrolling
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeStatusModal() {
+      const statusModal = document.getElementById('statusModal');
+      statusModal.classList.remove('show');
+      statusModal.style.display = 'none';
+      
+      // Remove keyboard event handler
+      document.removeEventListener('keydown', handleStatusModalKeydown);
+      
+      // Return focus to the element that opened the modal
+      const openerId = statusModal.dataset.opener || 'modal-opener';
+      const opener = document.getElementById(openerId) || document.querySelector('.status-button');
+      if (opener) {
+        opener.focus();
+      }
+      
+      // Restore body scrolling
+      document.body.style.overflow = '';
+    }
+    
+    function handleStatusModalKeydown(e) {
+      if (e.key === 'Escape') {
+        closeStatusModal();
+        e.preventDefault();
+      }
+    }
+
+    // Update the updateStatus function to be simpler and ensure modal closes
+    function updateStatus(status) {
+      try {
+        console.log('Updating status to:', status);
+        
+        const form = document.getElementById('updateForm');
+        const statusInput = form.querySelector('[name="status"]');
+        const statusButton = form.querySelector('.status-button');
+        const refundMethodInput = form.querySelector('[name="refundMethod"]');
+        const refundedAmountInput = form.querySelector('[name="refundedAmount"]');
+        const remarksField = form.querySelector('[name="remarks"]');
+        const paymentIdInput = form.querySelector('[name="paymentId"]');
+        const statusFields = form.querySelector('.status-fields');
+        
+        // Update status
+        statusInput.value = status;
+        statusButton.dataset.status = status;
+        statusButton.querySelector('.status-text').textContent = status;
+        statusButton.querySelector('.status-circle').className = `status-circle ${status.toLowerCase().replace(/\s+/g, '-')}`;
+        
+        // Handle fields based on status
+        if (status === 'Completed') {
+          // Show and enable refund fields
+          statusFields.classList.remove('hide-refund-fields');
+          refundMethodInput.disabled = false;
+          refundedAmountInput.disabled = false;
+          updateRemarksTemplate();
+        } else {
+          // Hide refund fields for other statuses
+          statusFields.classList.add('hide-refund-fields');
+          
+          if (status === 'Reject') {
+            // For Reject, we don't need refund details
+            refundMethodInput.disabled = true;
+            refundedAmountInput.disabled = true;
+            remarksField.value = ''; // Clear for new rejection remarks
+          } else {
+            // For In Progress, we might need values later
+            refundMethodInput.disabled = true;
+            refundedAmountInput.disabled = true;
+          }
+        }
+        
+        // Explicitly close the modal
+        closeStatusModal();
+        
+        // Run validation
+        validateForm();
+        
+        console.log('Status updated successfully');
+      } catch (error) {
+        console.error('Error updating status:', error);
+        
+        // Ensure modal is closed even if there's an error
+        try {
+          closeStatusModal();
+        } catch (e) {
+          console.error('Error closing modal:', e);
+        }
+      }
+    }
+
+    // Enhanced status modal event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Close modal on outside click - this needs to be the statusModal element itself
+      document.getElementById('statusModal').addEventListener('click', function(e) {
+        // Only close if the click was directly on the statusModal (overlay)
+        // and not on any of its children
+        if (e.target === this) {
+          closeStatusModal();
+        }
+      });
+      
+      // Make status options focusable and add keyboard navigation
+      const statusOptions = document.querySelectorAll('.status-option');
+      statusOptions.forEach(option => {
+        option.setAttribute('tabindex', '0');
+        option.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            // Stop propagation to prevent other handlers from interfering
+            e.stopPropagation();
+            
+            const status = this.getAttribute('data-status') || 
+                          this.querySelector('span').textContent.trim();
+            updateStatus(status);
+            e.preventDefault();
+          }
+        });
+        
+        // Add explicit click handler with stopPropagation
+        option.addEventListener('click', function(e) {
+          // Stop propagation to prevent the overlay's click handler from firing
+          e.stopPropagation();
+        });
+      });
+    });
+
+    // Ensure modal closes when clicking outside the content
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'statusModal') {
+        closeStatusModal();
+      }
+    });
+
+    // Setup keyboard navigation for status options
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusOptions = document.querySelectorAll('.status-option');
+      
+      statusOptions.forEach(option => {
+        // Add keyboard support for status options
+        option.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            const status = this.getAttribute('data-status');
+            updateStatus(status);
+          }
+        });
+        
+        // Prevent click event propagation
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+      });
+    });
+  </script>
+</body>
+</html> 

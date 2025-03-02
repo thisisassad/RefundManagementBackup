@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/chart.js" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-top: 56px; /* Reduced padding for navbar */
+      padding-bottom: 2rem;
+    }
+
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      height: 100%;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .stats-label {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-inprogress {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-top: 2rem;
+      height: 300px;
+    }
+
+    .filter-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .date-range-picker {
+      position: relative;
+    }
+
+    .date-range-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      min-width: 200px;
+      display: none;
+    }
+
+    .date-range-menu.show {
+      display: block;
+    }
+
+    .date-option {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .date-option:hover {
+      background: #f8f9fa;
+    }
+
+    .custom-date-inputs {
+      padding: 1rem;
+      border-top: 1px solid #dee2e6;
+      display: none;
+    }
+
+    .custom-date-inputs.show {
+      display: block;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      white-space: nowrap;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    .course-name-cell {
+      max-width: 200px;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .modal-xl {
+      max-width: 1200px;
+    }
+
+    .info-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .info-item {
+      padding: 0.75rem;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+    }
+
+    .info-label {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+      font-weight: 500;
+      color: #212529;
+    }
+
+    .update-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid #dee2e6;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #6c757d;
+      text-decoration: none;
+      margin-bottom: 1rem;
+    }
+
+    .back-link:hover {
+      color: #0d6efd;
+    }
+
+    .back-arrow {
+      margin-right: 8px;
+    }
+
+    .bg-warning-50 {
+      background-color: #fffbeb;
+    }
+    .bg-warning-100 {
+      background-color: #fef3c7;
+    }
+    .text-warning-700 {
+      color: #b45309;
+    }
+    .border-warning-200 {
+      border-color: #fde68a;
+    }
+    
+    .timeline {
+      position: relative;
+      max-height: 350px;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+    
+    .timeline:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: #e9ecef;
+      border-radius: 3px;
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-left: 30px;
+      padding-bottom: 25px;
+    }
+    
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+    
+    .timeline-dot {
+      position: absolute;
+      left: -9px;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 4px white;
+      z-index: 1;
+    }
+    
+    .timeline-dot i {
+      font-size: 10px;
+      color: white;
+    }
+    
+    .timeline-content {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 3px solid #dee2e6;
+    }
+    
+    .timeline-time {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6c757d;
+      margin-bottom: 8px;
+    }
+    
+    .timeline-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .timeline-body {
+      font-size: 14px;
+      color: #495057;
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+    }
+
+    /* Dot colors */
+    .bg-product {
+      background-color: #ffc107;
+    }
+    
+    .bg-finance {
+      background-color: #0d6efd;
+    }
+    
+    .bg-approval {
+      background-color: #6f42c1;
+    }
+    
+    /* Enhanced field value styling */
+    .field-value {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px 16px;
+      height: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e9ecef;
+    }
+    
+    .field-label {
+      font-size: 12px;
+      color: #6c757d;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    
+    .field-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: #212529;
+      overflow-wrap: break-word;
+    }
+    
+    /* Badge enhancements */
+    .badge {
+      padding: 0.5em 0.8em;
+      font-weight: 500;
+    }
+    
+    /* Modal enhancement */
+    .modal-content {
+      overflow: hidden;
+    }
+    
+    .rounded-4 {
+      border-radius: 0.5rem !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation Bar Partial -->
+  <?!= include('NavBarPartial', {sessionToken: sessionToken, userAccess: userAccess, currentPage: 'product'}) ?>
+
+  <div class="container" style="margin-top: 1.5rem;">
+    <div class="dashboard-header">
+      <h2 class="mb-4">Product Team Dashboard</h2>
+      
+      <!-- Stats Cards -->
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Total Pending Revokes</div>
+            <div class="stats-value text-warning" id="pendingCount">0</div>
+            <div class="stats-trend">+5% from last week</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">In Progress</div>
+            <div class="stats-value text-primary" id="inProgressCount">0</div>
+            <div class="stats-trend">Current active</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Completed Today</div>
+            <div class="stats-value text-success" id="completedToday">0</div>
+            <div class="stats-trend">Daily progress</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-label">Average Resolution Time</div>
+            <div class="stats-value text-info" id="avgTime">0h</div>
+            <div class="stats-trend">Last 7 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <input type="text" class="form-control" placeholder="Search by ID, Name, or Course" id="searchInput" oninput="applyFilters()">
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" id="statusFilter" onchange="applyFilters()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" id="courseFilter" onchange="applyFilters()">
+            <option value="">All Courses</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <div class="date-range-picker">
+            <button class="btn btn-outline-secondary w-100 text-start" id="dateRangeBtn" onclick="toggleDateMenu()">
+              <span id="dateRangeText">All Dates</span>
+              <i class="float-end">▼</i>
+            </button>
+            <div class="date-range-menu" id="dateRangeMenu">
+              <div class="date-option" onclick="selectDateRange('all')">All Dates</div>
+              <div class="date-option" onclick="selectDateRange('today')">Today</div>
+              <div class="date-option" onclick="selectDateRange('yesterday')">Yesterday</div>
+              <div class="date-option" onclick="selectDateRange('last7')">Last 7 Days</div>
+              <div class="date-option" onclick="selectDateRange('last30')">Last 30 Days</div>
+              <div class="date-option" onclick="selectDateRange('thisMonth')">This Month</div>
+              <div class="date-option" onclick="selectDateRange('custom')">Custom Range</div>
+              <div class="custom-date-inputs" id="customDateInputs">
+                <div class="mb-2">
+                  <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="mb-2">
+                  <input type="date" class="form-control" id="endDate">
+                </div>
+                <button class="btn btn-primary btn-sm w-100" onclick="applyCustomDateRange()">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="chart-container">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+      <h5 class="mb-4">Access Revoke Requests</h5>
+      <div class="table-responsive">
+        <table class="table" id="requestsTable">
+          <thead>
+            <tr>
+              <th style="width: 120px">Request ID</th>
+              <th style="width: 200px">Course Name</th>
+              <th style="width: 150px">Student Name</th>
+              <th style="width: 150px">Enrollment Number</th>
+              <th style="width: 150px">Request Date</th>
+              <th style="width: 120px">Status</th>
+              <th style="width: 100px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="requestsTableBody">
+            <!-- Table rows will be populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination">
+          <!-- Pagination will be populated dynamically -->
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Request Details Modal -->
+    <div class="modal fade" id="requestDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+          <div class="modal-header py-3 bg-light">
+            <h5 class="modal-title fw-bold text-primary">
+              <i class="fas fa-file-alt me-2"></i>Request Details - <span id="modalRequestId" class="badge bg-primary"></span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4 bg-white">
+            <div class="row g-4">
+              <!-- Request Information Section -->
+              <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                  <div class="card-header bg-light py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                      <i class="fas fa-info-circle me-2"></i>Request Information
+                    </h6>
+                  </div>
+                  <div class="card-body p-4">
+                    <div id="requestInfo" class="row g-3">
+                <!-- Will be populated dynamically -->
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+            <!-- Product Update Section -->
+              <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-gradient">
+                  <div class="card-header py-3 bg-warning bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="mb-0 fw-bold text-warning">
+                        <i class="fas fa-tools me-2"></i>Product Team Update
+                      </h6>
+                      <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Action Required</span>
+                    </div>
+                  </div>
+                  <div class="card-body p-4 bg-white">
+                    <form id="productUpdateForm" onsubmit="return false;" class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-medium">Access Revoke Status</label>
+                        <select class="form-select shadow-sm rounded-3" id="accessRevokeStatus" required>
+                      <option value="">Select Status</option>
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                      <div class="col-md-6 d-flex align-items-end">
+                        <button type="button" class="btn btn-warning rounded-3 w-100 fw-medium" onclick="submitProductUpdate()">
+                          <i class="fas fa-save me-2"></i>Update Status
+                        </button>
+                  </div>
+                      <div class="col-12">
+                        <label class="form-label fw-medium">Remarks</label>
+                        <textarea class="form-control shadow-sm rounded-3" id="remarks" rows="3" placeholder="Enter detailed remarks about the access revoke action..." required></textarea>
+                  </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Section -->
+                  <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden" id="historyCard">
+                  <div class="card-header py-3 bg-light">
+                    <h6 class="mb-0 fw-bold text-primary">
+                      <i class="fas fa-history me-2"></i>Update History
+                    </h6>
+                  </div>
+                  <div class="card-body p-4">
+                    <div id="modal-updates" class="timeline ps-2">
+                      <!-- Will be populated dynamically -->
+                </div>
+            </div>
+          </div>
+              </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="statusToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header bg-success text-white">
+          <i class="fas fa-check-circle me-2"></i>
+          <strong class="me-auto">Success</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Status updated successfully!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Pass server-side data to client-side JavaScript -->
+  <script id="auth-data" 
+    data-authenticated="<?= isAuthenticated ? 'true' : 'false' ?>"
+    data-session-token="<?= isAuthenticated && userAccess.sessionToken ? userAccess.sessionToken : '' ?>"
+    data-script-url="<?= getScriptUrl() ?>"
+    data-user-id="<?= isAuthenticated && userAccess.id ? userAccess.id : '' ?>"
+    data-user-email="<?= isAuthenticated && userAccess.email ? userAccess.email : '' ?>"
+    data-current-page="product"
+  ></script>
+  
+  <!-- Store user information in hidden fields -->
+  <input type="hidden" id="user-email-field" value="<?= isAuthenticated && userAccess.email ? userAccess.email : '' ?>">
+  <input type="hidden" id="user-id-field" value="<?= isAuthenticated && userAccess.id ? userAccess.id : '' ?>">
+
+  <script>
+    let currentData = null;
+    let courseList = [];
+    let dateRangeFilters = {
+      startDate: null,
+      endDate: null,
+      preset: 'all'
+    };
+    let requestDetailsModal = null;
+
+    // Initialize dashboard data
+    function initializeDashboard() {
+      requestDetailsModal = new bootstrap.Modal(document.getElementById('requestDetailsModal'));
+      
+      // DEBUG: Check auth data on page load
+      const authElement = document.getElementById('auth-data');
+      if (authElement) {
+        console.log('Auth Data on page load:');
+        console.log('- data-authenticated:', authElement.getAttribute('data-authenticated'));
+        console.log('- data-session-token:', authElement.getAttribute('data-session-token'));
+        console.log('- data-user-id:', authElement.getAttribute('data-user-id'));
+        console.log('- data-user-email:', authElement.getAttribute('data-user-email'));
+        console.log('- dataset keys:', Object.keys(authElement.dataset).join(', '));
+      } else {
+        console.error('Auth element not found on page load');
+      }
+      
+      // Check hidden fields
+      const userEmailField = document.getElementById('user-email-field');
+      const userIdField = document.getElementById('user-id-field');
+      
+      console.log('Hidden Fields on page load:');
+      console.log('- User Email Field:', userEmailField ? userEmailField.value : 'Not found');
+      console.log('- User ID Field:', userIdField ? userIdField.value : 'Not found');
+      
+      // First get course list
+      google.script.run
+        .withSuccessHandler(initializeCourseFilter)
+        .withFailureHandler(handleError)
+        .getAllCourseNames();
+
+      // Then get dashboard data
+      fetchDashboardData();
+    }
+
+    function initializeCourseFilter(data) {
+      courseList = data.courses;
+      const courseFilter = document.getElementById('courseFilter');
+      courseFilter.innerHTML = '<option value="">All Courses</option>';
+      courseList.forEach(course => {
+        courseFilter.innerHTML += `<option value="${course}">${course}</option>`;
+      });
+    }
+
+    function fetchDashboardData() {
+      google.script.run
+        .withSuccessHandler(updateDashboard)
+        .withFailureHandler(handleError)
+        .getProductDashboardData();
+    }
+
+    // Update dashboard with data
+    function updateDashboard(data) {
+      currentData = data;
+      
+      // Update stats
+      document.getElementById('pendingCount').textContent = data.stats.pending;
+      document.getElementById('inProgressCount').textContent = data.stats.inProgress;
+      document.getElementById('completedToday').textContent = data.stats.completedToday;
+      document.getElementById('avgTime').textContent = data.stats.averageTime;
+
+      // Update table
+      updateTable(data.requests);
+
+      // Update charts
+      updateCharts(data.chartData);
+    }
+
+    // Update table with request data
+    function updateTable(requests) {
+      const tbody = document.getElementById('requestsTableBody');
+      tbody.innerHTML = '';
+
+      requests.forEach(request => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${request.requestId}</td>
+          <td class="course-name-cell">${request.courseName}</td>
+          <td>${request.studentName}</td>
+          <td>${request.enrollmentNumber || '-'}</td>
+          <td>${request.requestDate}</td>
+          <td><span class="status-badge status-${request.status.toLowerCase()}">${request.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" onclick="viewDetails('${request.requestId}')">View</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Update charts
+    function updateCharts(chartData) {
+      // Status Distribution Chart
+      const statusCtx = document.getElementById('statusChart').getContext('2d');
+      new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pending', 'In Progress', 'Completed'],
+          datasets: [{
+            data: [chartData.pending, chartData.inProgress, chartData.completed],
+            backgroundColor: ['#ffc107', '#0d6efd', '#198754']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Access Revoke Status Distribution'
+            }
+          }
+        }
+      });
+
+      // Trend Chart
+      const trendCtx = document.getElementById('trendChart').getContext('2d');
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: chartData.trendLabels,
+          datasets: [{
+            label: 'Requests',
+            data: chartData.trendData,
+            borderColor: '#0d6efd',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Weekly Request Trend'
+            }
+          }
+        }
+      });
+    }
+
+    // Filter functions
+    function applyFilters() {
+      if (!currentData) return;
+
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+      const courseFilter = document.getElementById('courseFilter').value;
+
+      let filteredData = {...currentData};
+      filteredData.requests = currentData.requests.filter(request => {
+        // Search filter
+        const searchMatch = !searchTerm || 
+          Object.values(request).some(value => 
+            String(value).toLowerCase().includes(searchTerm)
+          );
+
+        // Status filter
+        const statusMatch = !statusFilter || 
+          request.status.toLowerCase() === statusFilter;
+
+        // Course filter
+        const courseMatch = !courseFilter || 
+          request.courseName === courseFilter;
+
+        // Date filter
+        let dateMatch = true;
+        if (dateRangeFilters.startDate && dateRangeFilters.endDate) {
+          const requestDate = new Date(request.requestDate);
+          dateMatch = requestDate >= dateRangeFilters.startDate && 
+                     requestDate <= dateRangeFilters.endDate;
+        }
+
+        return searchMatch && statusMatch && courseMatch && dateMatch;
+      });
+
+      updateTable(filteredData.requests);
+      
+      // Update stat cards based on filtered data
+      updateStatCardsFromFilteredData(filteredData.requests);
+    }
+    
+    // New function to update stat cards based on filtered data
+    function updateStatCardsFromFilteredData(filteredRequests) {
+      // Initialize counters
+      let pending = 0;
+      let inProgress = 0;
+      let completedToday = 0;
+      let totalTime = 0;
+      let completedCount = 0;
+      
+      // Get today's date for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Count statuses from filtered requests
+      filteredRequests.forEach(request => {
+        const status = request.status.toLowerCase();
+        const requestDate = new Date(request.requestDate);
+        
+        if (status === 'pending') {
+          pending++;
+        } else if (status === 'inprogress' || status === 'in progress') {
+          inProgress++;
+        } else if (status === 'completed') {
+          // Check if completed today
+          const completionDate = new Date(requestDate);
+          completionDate.setHours(0, 0, 0, 0);
+          if (completionDate.getTime() === today.getTime()) {
+            completedToday++;
+          }
+          
+          // For average time calculation, we'll use the original data's average time
+          // since we don't have the completion timestamp in the filtered data
+          completedCount++;
+        }
+      });
+      
+      // Update the stat cards
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('inProgressCount').textContent = inProgress;
+      document.getElementById('completedToday').textContent = completedToday;
+      
+      // Keep the original average time since we can't recalculate it from the filtered data
+      // document.getElementById('avgTime').textContent = currentData.stats.averageTime;
+    }
+
+    // Date range functions
+    function toggleDateMenu() {
+      const menu = document.getElementById('dateRangeMenu');
+      menu.classList.toggle('show');
+    }
+
+    function selectDateRange(preset) {
+      const now = new Date();
+      const startDate = new Date();
+      const endDate = new Date();
+
+      switch(preset) {
+        case 'today':
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'yesterday':
+          startDate.setDate(startDate.getDate() - 1);
+          endDate.setDate(endDate.getDate() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'last7':
+          startDate.setDate(startDate.getDate() - 7);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'last30':
+          startDate.setDate(startDate.getDate() - 30);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'thisMonth':
+          startDate.setDate(1);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'custom':
+          document.getElementById('customDateInputs').classList.add('show');
+          return;
+        case 'all':
+        default:
+          dateRangeFilters = { startDate: null, endDate: null, preset: 'all' };
+          document.getElementById('dateRangeText').textContent = 'All Dates';
+          document.getElementById('dateRangeMenu').classList.remove('show');
+          applyFilters();
+          return;
+      }
+
+      dateRangeFilters = { startDate, endDate, preset };
+      document.getElementById('dateRangeText').textContent = getDateRangeText(preset);
+      document.getElementById('dateRangeMenu').classList.remove('show');
+      document.getElementById('customDateInputs').classList.remove('show');
+      applyFilters();
+    }
+
+    function applyCustomDateRange() {
+      const startDate = new Date(document.getElementById('startDate').value);
+      const endDate = new Date(document.getElementById('endDate').value);
+      endDate.setHours(23, 59, 59, 999);
+
+      if (startDate && endDate && startDate <= endDate) {
+        dateRangeFilters = { startDate, endDate, preset: 'custom' };
+        document.getElementById('dateRangeText').textContent = 
+          `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+        document.getElementById('dateRangeMenu').classList.remove('show');
+        document.getElementById('customDateInputs').classList.remove('show');
+        applyFilters();
+      }
+    }
+
+    function getDateRangeText(preset) {
+      switch(preset) {
+        case 'today': return 'Today';
+        case 'yesterday': return 'Yesterday';
+        case 'last7': return 'Last 7 Days';
+        case 'last30': return 'Last 30 Days';
+        case 'thisMonth': return 'This Month';
+        default: return 'All Dates';
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('courseFilter').value = '';
+      dateRangeFilters = { startDate: null, endDate: null, preset: 'all' };
+      document.getElementById('dateRangeText').textContent = 'All Dates';
+      document.getElementById('customDateInputs').classList.remove('show');
+      if (currentData) {
+        updateTable(currentData.requests);
+        
+        // Reset stat cards to original values
+        document.getElementById('pendingCount').textContent = currentData.stats.pending;
+        document.getElementById('inProgressCount').textContent = currentData.stats.inProgress;
+        document.getElementById('completedToday').textContent = currentData.stats.completedToday;
+        document.getElementById('avgTime').textContent = currentData.stats.averageTime;
+      }
+    }
+
+    // View request details
+    function viewDetails(requestId) {
+      // Show loading state in the modal
+      document.getElementById('modalRequestId').textContent = requestId;
+      
+      // Show the modal
+      requestDetailsModal.show();
+      
+      // Fetch request details
+      google.script.run
+        .withSuccessHandler(showRequestDetails)
+        .withFailureHandler(handleError)
+        .getRequestDetails(requestId);
+    }
+
+    function showRequestDetails(data) {
+      console.log('Request details:', data);
+      
+      // Store the request data globally for later use
+      window.currentRequestDetails = data;
+      
+      // Display basic information using the displayRequestDetails function
+      displayRequestDetails(data);
+      
+      // Set current status in the form - use the correct property names
+      document.getElementById('accessRevokeStatus').value = data.accessRevokeStatus || '';
+      document.getElementById('remarks').value = data.accessRevokeRemarks || data.remarks || '';
+    }
+
+    function displayRequestDetails(request) {
+      console.log('Request details:', request);
+      
+      // Set request ID in title
+      document.getElementById('modalRequestId').textContent = request.requestId;
+      
+      // Display basic information in a grid
+      const infoContainer = document.getElementById('requestInfo');
+      
+      // Build a comprehensive list of fields to display
+      const fields = [
+        // Common/Required fields first - always show these
+        { label: 'Request ID', value: request.requestId || 'N/A', required: true },
+        { label: 'Request Date', value: request.requestDate || 'N/A', required: true },
+        { label: 'Vertical', value: request.vertical || 'N/A', required: true },
+        { label: 'Student Name', value: request.customerContact || 'N/A', required: true },
+        { label: 'Enrollment Number', value: request.enrollmentNumber || 'N/A', required: true },
+        { label: 'Payment ID', value: request.paymentId || 'N/A', required: true },
+        { label: 'Refund Type', value: request.refundType || 'N/A', required: true },
+        { label: 'Access Revoke Status', value: request.accessRevokeStatus || 'Pending', required: true },
+        
+        // Course Exchange fields
+        { label: 'Mistaken Course', value: request.mistakenCourse || 'N/A', 
+          condition: request.refundType === 'Course Exchange' || request.mistakenCourse },
+        { label: 'Mistaken Phase', value: request.mistakenPhase || 'N/A', 
+          condition: request.refundType === 'Course Exchange' || request.mistakenPhase },
+        { label: 'Intended Course', value: request.intendedCourse || 'N/A', 
+          condition: request.refundType === 'Course Exchange' || request.intendedCourse },
+        { label: 'Intended Phase', value: request.intendedPhase || 'N/A', 
+          condition: request.refundType === 'Course Exchange' || request.intendedPhase },
+          
+        // Phone Exchange fields
+        { label: 'Wrong Phone', value: request.wrongPhone || 'N/A', 
+          condition: request.refundType === 'Phone Number Exchange' || request.wrongPhone },
+        { label: 'Correct Phone', value: request.correctPhone || 'N/A', 
+          condition: request.refundType === 'Phone Number Exchange' || request.correctPhone },
+          
+        // Mistaken Payment fields  
+        { label: 'Sender bKash', value: request.senderBkash || 'N/A', 
+          condition: request.refundType === 'Mistaken Payment' || request.senderBkash },
+        { label: 'Transaction Time', value: request.transactionTime || 'N/A', 
+          condition: request.refundType === 'Mistaken Payment' || request.transactionTime },
+        { label: 'Sent Amount', value: request.sentAmount ? `${request.sentAmount} BDT` : 'N/A', 
+          condition: request.refundType === 'Mistaken Payment' || request.sentAmount },
+          
+        // Financial fields
+        { label: 'Refund Amount', value: request.refundAmount ? `${request.refundAmount} BDT` : 'N/A', required: true },
+        
+        // Additional fields
+        { label: 'Refund Reason', value: request.refundReason || 'N/A', required: true },
+        { label: 'Documents', value: request.documentFolder ? 
+          `<a href="${request.documentFolder}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-folder-open me-2"></i>View Documents</a>` : 'N/A', 
+          required: true, html: true }
+      ];
+      
+      // Create the grid layout
+      let infoHTML = '<div class="row g-3">';
+      
+      // Filter fields based on conditions
+      const visibleFields = fields.filter(field => field.required || field.condition);
+      
+      // Generate HTML for each field
+      visibleFields.forEach(field => {
+        infoHTML += `
+          <div class="col-md-6">
+            <div class="field-value">
+              <div class="field-label">${field.label}</div>
+              <div class="field-text">${field.html ? field.value : field.value}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      infoHTML += '</div>';
+      infoContainer.innerHTML = infoHTML;
+      
+      // Display updates history
+      const updatesContainer = document.getElementById('modal-updates');
+      
+      if (request.updates && request.updates.length > 0) {
+        // Filter for all updates
+        const updates = request.updates;
+        
+        let updatesHTML = '';
+        
+        updates.forEach(update => {
+          let dotColorClass = 'bg-secondary';
+          let iconClass = 'fas fa-circle';
+          
+          // Set appropriate colors and icons based on update type
+          if (update.type === 'Product') {
+            dotColorClass = 'bg-product';
+            iconClass = 'fas fa-tools';
+          } else if (update.type === 'Finance') {
+            dotColorClass = 'bg-finance';
+            iconClass = 'fas fa-money-bill-wave';
+          } else if (update.type === 'Approval') {
+            dotColorClass = 'bg-approval';
+            iconClass = 'fas fa-check-circle';
+          }
+
+          // Use user_id if available, otherwise use the user's display name or a generic fallback
+          const displayUser = update.user_id || update.updatedBy || 'Unknown User';
+          
+          updatesHTML += `
+            <div class="timeline-item">
+              <div class="timeline-dot ${dotColorClass}">
+                <i class="${iconClass}"></i>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-time">
+                  <i class="far fa-clock me-1"></i>${update.timestamp}
+                </div>
+                <div class="timeline-title">
+                  <span class="badge ${getStatusBadgeClass(update.status)} me-2">${update.status}</span>
+                  <span class="text-muted">by ${displayUser}</span>
+                </div>
+                ${update.remarks ? `<div class="timeline-body mt-2">${update.remarks}</div>` : ''}
+              </div>
+            </div>
+          `;
+        });
+        
+        updatesContainer.innerHTML = updatesHTML;
+      } else {
+        updatesContainer.innerHTML = `
+          <div class="text-center py-4 text-muted">
+            <i class="fas fa-history mb-3 opacity-50" style="font-size: 2.5rem;"></i>
+            <p class="mb-0">No update history available</p>
+          </div>
+        `;
+      }
+    }
+
+    // Helper function to get badge class based on status
+    function getStatusBadgeClass(status) {
+      if (!status) return 'bg-secondary';
+      
+      status = status.toLowerCase();
+      
+      switch (status) {
+        case 'pending':
+          return 'bg-warning text-dark';
+        case 'in progress':
+          return 'bg-info text-dark';
+        case 'completed':
+          return 'bg-success';
+        case 'rejected':
+        case 'reject':
+          return 'bg-danger';
+        case 'approved':
+          return 'bg-primary';
+        default:
+          return 'bg-secondary';
+      }
+    }
+
+    function submitProductUpdate() {
+      const requestId = document.getElementById('modalRequestId').textContent;
+      const status = document.getElementById('accessRevokeStatus').value;
+      const remarks = document.getElementById('remarks').value;
+      
+      // Validate form
+      if (!status) {
+        alert('Please select a status');
+        return;
+      }
+      
+      if (!remarks) {
+        alert('Please enter remarks');
+        return;
+      }
+      
+      try {
+        // Get authentication data
+        const authData = document.getElementById('auth-data').dataset;
+        console.log('Auth data attributes:', Object.keys(authData).join(', '));
+        
+        // IMPORTANT: Get the globally accessible request object directly
+        // This is the object displayed in the modal, so it has all the data we need
+        const originalRequest = window.currentRequestDetails;
+        console.log('Original request data:', originalRequest);
+        
+        // 1. Get user email properly - use the user's email from auth data, NOT session token
+        let userEmail = '';
+        
+        // IMPROVED: Get the email directly from the hidden input field
+        const userEmailField = document.getElementById('user-email-field');
+        if (userEmailField && userEmailField.value && userEmailField.value.trim() !== '') {
+          userEmail = userEmailField.value.trim();
+          console.log('Using email from hidden field:', userEmail);
+        }
+        // Fallback to the attribute method if hidden field not available
+        else {
+          // Get the data attribute as a backup approach
+          const authElement = document.getElementById('auth-data');
+          console.log('Auth element exists:', !!authElement);
+          
+          if (authElement) {
+            // Log the actual attribute value
+            const directEmail = authElement.getAttribute('data-user-email');
+            console.log('data-user-email direct attribute value:', directEmail);
+            
+            if (directEmail && directEmail.trim() !== '' && directEmail !== 'undefined' && directEmail !== 'null') {
+              userEmail = directEmail;
+              console.log('Using email from direct attribute:', userEmail);
+            }
+            // Try with dataset property as well
+            else if (authElement.dataset.userEmail && authElement.dataset.userEmail.trim() !== ''
+                    && authElement.dataset.userEmail !== 'undefined' && authElement.dataset.userEmail !== 'null') {
+              userEmail = authElement.dataset.userEmail;
+              console.log('Using email from dataset property:', userEmail);
+            }
+            // Try userId which might be an email
+            else if (authData.userId && authData.userId.includes('@')) {
+              userEmail = authData.userId;
+              console.log('Found email in userId property:', userEmail);
+            }
+            // Check if we have it in request details
+            else if (originalRequest && originalRequest.updatedBy && originalRequest.updatedBy.includes('@')) {
+              userEmail = originalRequest.updatedBy;
+              console.log('Using updatedBy email:', userEmail);
+            }
+            // Final fallback
+            else {
+              console.warn('Could not find valid user email, using fallback');
+              userEmail = 'Product Team User';
+            }
+          } else {
+            console.error('Auth element not found in the DOM');
+            userEmail = 'Product Team User';
+          }
+        }
+        
+        // Get a backup request from cache if needed
+        const cachedRequest = findRequestById(requestId);
+        
+        // 2. Get Mistaken Course Name - use the actual displayed data, not cached data
+        let courseName = '';
+        if (originalRequest && originalRequest.mistakenCourse) {
+          courseName = originalRequest.mistakenCourse;
+          console.log('Using mistakenCourse from original request:', courseName);
+        } else if (cachedRequest && cachedRequest.mistakenCourse) {
+          courseName = cachedRequest.mistakenCourse;
+          console.log('Using mistakenCourse from cached request:', courseName);
+        } else {
+          // Extract from modal as last resort
+          const allFieldValues = document.querySelectorAll('.field-value');
+          for (const fieldValue of allFieldValues) {
+            const label = fieldValue.querySelector('.field-label');
+            if (label && label.textContent.includes('Mistaken Course')) {
+              const text = fieldValue.querySelector('.field-text');
+              if (text) {
+                courseName = text.textContent.trim();
+                if (courseName === 'N/A') courseName = '';
+                console.log('Extracted mistaken course from DOM:', courseName);
+                break;
+              }
+            }
+          }
+        }
+        
+        // 3. Get Student Name
+        let studentName = '';
+        if (originalRequest && originalRequest.customerContact) {
+          studentName = originalRequest.customerContact;
+          console.log('Using customerContact from original request:', studentName);
+        } else if (cachedRequest && (cachedRequest.customerContact || cachedRequest.studentName)) {
+          studentName = cachedRequest.customerContact || cachedRequest.studentName;
+          console.log('Using student name from cached request:', studentName);
+        }
+        
+        // 4. Get Enrollment Number
+        let enrollmentNumber = '';
+        if (originalRequest && originalRequest.enrollmentNumber) {
+          enrollmentNumber = originalRequest.enrollmentNumber;
+          console.log('Using enrollmentNumber from original request:', enrollmentNumber);
+        } else if (cachedRequest && cachedRequest.enrollmentNumber) {
+          enrollmentNumber = cachedRequest.enrollmentNumber;
+          console.log('Using enrollmentNumber from cached request:', enrollmentNumber);
+        }
+        
+        // Prepare update data with all the reliable information we've gathered
+      const updateData = {
+        requestId: requestId,
+          accessRevokeStatus: status,
+          user_id: userEmail,
+          courseName: courseName,
+          studentName: studentName,
+          enrollmentNumber: enrollmentNumber,
+          remarks: remarks,
+          shouldUpdateMainSheet: false
+        };
+
+        console.log('Sending update data:', updateData);
+
+        // Disable form during submission
+        const submitBtn = document.querySelector('#productUpdateForm button[type="button"]');
+        const formElements = document.querySelectorAll('#productUpdateForm select, #productUpdateForm textarea');
+        
+        formElements.forEach(el => el.disabled = true);
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...';
+
+      google.script.run
+          .withSuccessHandler(function(response) {
+            console.log('Server response:', response);
+            
+            if (response.success) {
+              // Hide modal
+              const modalElement = document.getElementById('requestDetailsModal');
+              const modalInstance = bootstrap.Modal.getInstance(modalElement);
+              modalInstance.hide();
+              
+              // Show success toast
+              const toastElement = document.getElementById('statusToast');
+              const toast = new bootstrap.Toast(toastElement);
+              toast.show();
+              
+              // Refresh dashboard data
+              fetchDashboardData();
+            } else {
+              alert('Error: ' + (response.message || 'Failed to update status'));
+              console.error('Server returned error:', response);
+            }
+            
+            // Re-enable form
+            formElements.forEach(el => el.disabled = false);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Status';
+          })
+          .withFailureHandler(function(error) {
+            console.error('Server call failed:', error);
+            alert('Error: ' + error.toString());
+            
+            // Re-enable form
+            formElements.forEach(el => el.disabled = false);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Status';
+          })
+        .updateProductStatus(updateData);
+      } catch (error) {
+        console.error('Error in submitProductUpdate:', error);
+        alert('An error occurred: ' + error.toString());
+        
+        // Re-enable form if error occurs before submission
+        const submitBtn = document.querySelector('#productUpdateForm button[type="button"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Update Status';
+        }
+        
+        const formElements = document.querySelectorAll('#productUpdateForm select, #productUpdateForm textarea');
+        formElements.forEach(el => el.disabled = false);
+      }
+    }
+
+    // Helper function to find a request by ID from our cached data
+    function findRequestById(requestId) {
+      if (!currentData || !currentData.requests) return null;
+      
+      return currentData.requests.find(req => String(req.requestId) === String(requestId));
+    }
+
+    // Error handler
+    function handleError(error) {
+      console.error('Error:', error);
+      alert('An error occurred: ' + error.toString());
+    }
+
+    // Close date range menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('dateRangeMenu');
+      const btn = document.getElementById('dateRangeBtn');
+      if (menu && btn && !menu.contains(event.target) && !btn.contains(event.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    // Initialize dashboard on load
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+    // Add jQuery-like text selector helper function
+    document.querySelectorAll = document.querySelectorAll || function(selector) {
+      if (selector.includes(':contains(')) {
+        const match = selector.match(/:contains\(["']([^"']+)["']\)/);
+        if (match) {
+          const searchText = match[1];
+          const rest = selector.replace(/:contains\(["'][^"']+["']\)/, '');
+          
+          const elements = Array.from(document.querySelectorAll(rest));
+          return elements.filter(el => el.textContent.includes(searchText));
+        }
+      }
+      
+      return document.querySelectorAll(selector);
+    };
+
+    // Helper function to get user data directly from the server
+    function getUserDataFromServer(callback) {
+      // Get session token from auth-data
+      const authElement = document.getElementById('auth-data');
+      const sessionToken = authElement ? authElement.getAttribute('data-session-token') : '';
+      
+      if (!sessionToken) {
+        console.error('No session token available to retrieve user data');
+        callback(null);
+        return;
+      }
+      
+      console.log('Retrieving user data from server with session token:', sessionToken);
+      
+      // Make server call to get user data
+      google.script.run
+        .withSuccessHandler(function(userData) {
+          console.log('Received user data from server:', userData);
+          callback(userData);
+        })
+        .withFailureHandler(function(error) {
+          console.error('Failed to get user data from server:', error);
+          callback(null);
+        })
+        .getUserDataBySessionToken(sessionToken);
+    }
+  </script>
+</body>
+</html> 

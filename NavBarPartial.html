@@ -1,0 +1,483 @@
+<!-- Simple Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+      <!-- Brand Logo -->
+      <a class="navbar-brand" href="<?= getScriptUrl() ?>?page=menu&token=<?= sessionToken ?>" onclick="return goToMenu()">
+        <div class="navbar-logo">
+          <?!= include('Logo'); ?>
+        </div>
+      </a>
+  
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <!-- Navigation Items -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'menu' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=menu&token=<?= sessionToken ?>">
+              Dashboard
+            </a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'sales' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=sales&token=<?= sessionToken ?>">
+              Sales
+            </a>
+          </li>
+              
+              <? if (userAccess.access && userAccess.access.includes('Finance Portal')) { ?>
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'finance' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=finance&token=<?= sessionToken ?>">
+              Finance
+            </a>
+          </li>
+              <? } ?>
+              
+              <? if (userAccess.access && userAccess.access.includes('Product Portal')) { ?>
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'product' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=product&token=<?= sessionToken ?>">
+              Product
+            </a>
+          </li>
+              <? } ?>
+              
+              <? if (userAccess.access && userAccess.access.includes('Approver Portal')) { ?>
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'approver' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=approver&token=<?= sessionToken ?>">
+              Approver
+            </a>
+          </li>
+              <? } ?>
+              
+              <? if (userAccess.access && userAccess.access.includes('BI Portal')) { ?>
+          <li class="nav-item">
+            <a class="nav-link <?= currentPage === 'bi' ? 'active' : '' ?>" 
+               href="<?= getScriptUrl() ?>?page=bi&token=<?= sessionToken ?>">
+              BI
+            </a>
+          </li>
+              <? } ?>
+        </ul>
+        
+        <!-- User Profile -->
+        <div class="ms-auto d-flex align-items-center">
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle p-0 d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="user-avatar me-2">
+                <?= userAccess.name ? userAccess.name.charAt(0).toUpperCase() : 'U' ?>
+              </div>
+              <span class="username d-none d-md-inline"><?= userAccess.name || 'User' ?></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                  <i class="fas fa-key me-2"></i>Change Password
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="logout(); return false;">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Change Password Modal (preserved from original) -->
+  <div class="modal fade password-modal" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger" id="passwordError" style="display: none;"></div>
+          <div class="alert alert-success" id="passwordSuccess" style="display: none;"></div>
+          
+          <form id="changePasswordForm">
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Current Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="currentPassword" required>
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currentPassword')">
+                  <i class="fas fa-eye" id="currentPasswordToggle"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="newPassword" required>
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword')">
+                  <i class="fas fa-eye" id="newPasswordToggle"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Confirm New Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="confirmPassword" required>
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPassword')">
+                  <i class="fas fa-eye" id="confirmPasswordToggle"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="changePasswordBtn" onclick="changePassword()">
+            <i class="fas fa-key me-1"></i> Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Auth Data Script Tag (preserved from original) -->
+  <script id="auth-data" 
+    data-authenticated="true"
+    data-session-token="<?= sessionToken ?>"
+    data-script-url="<?= getScriptUrl() ?>"
+    data-current-page="<?= currentPage ?>"
+  ></script>
+  
+  <!-- Simple CSS for navbar styling -->
+  <style>
+    /* Navbar styling */
+    .navbar {
+      background-color: #f9fafb;
+      border-bottom: 1px solid #eaecef;
+      height: 56px;
+      padding: 0;
+    }
+    
+    .navbar .container {
+      height: 100%;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 16px;
+      padding: 0;
+      margin: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      margin-right: 0;
+      width: 130px; /* Adjusted width for logo only */
+    }
+    
+    .navbar .nav-link {
+      color: #495057;
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    /* Center the navbar items */
+    .navbar-nav.mx-auto {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+    }
+    
+    .navbar .nav-link.active {
+      color: #007bff;
+      font-weight: 600;
+    }
+    
+    .navbar .nav-link:hover {
+      color: #007bff;
+    }
+    
+    /* User avatar styling */
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #f0f4f8;
+      color: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    /* Username styling */
+    .username {
+      font-size: 14px;
+      font-weight: 500;
+      color: #495057;
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Profile dropdown styling */
+    .dropdown-menu {
+      margin-top: 10px;
+      border: none;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    
+    .dropdown-item {
+      padding: 8px 16px;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    /* For mobile */
+    @media (max-width: 991.98px) {
+      .navbar {
+        height: auto;
+        min-height: 56px;
+      }
+      
+      .navbar-collapse {
+        background-color: #f9fafb;
+        padding: 0;
+        border-top: 1px solid #eaecef;
+      }
+      
+      .navbar .nav-link {
+        padding: 12px 16px;
+        height: auto;
+        border-bottom: 1px solid #eaecef;
+      }
+      
+      .navbar .nav-link.active {
+        border-left: 3px solid #007bff;
+        padding-left: 13px;
+      }
+      
+      .navbar-toggler {
+        border: none;
+        padding: 0;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+  
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+      
+      .user-avatar {
+        margin: 12px 16px;
+      }
+      
+      /* Reset the absolute positioning for mobile */
+      .navbar-nav.mx-auto {
+        position: static;
+        transform: none;
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+    
+    .navbar-logo {
+      width: 130px;
+      height: 45px;
+      margin-right: 5px;
+    }
+    
+    .navbar-logo svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+  
+  <!-- Authentication JavaScript Code (preserved from original) -->
+  <script>
+    // Back to menu function
+    function goToMenu() {
+      const authData = document.getElementById('auth-data').dataset;
+      const sessionToken = authData.sessionToken || '';
+      
+      // Use getScriptUrl() directly for more reliable navigation
+      google.script.run
+        .withSuccessHandler(function(url) {
+          window.top.location.href = `${url}?page=menu&token=${sessionToken}`;
+        })
+        .getScriptUrl();
+      
+      return false;
+    }
+  
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      const toggleIcon = document.getElementById(inputId + 'Toggle');
+      
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  
+    // Logout function
+    function logout() {
+      // Get session token from data attribute
+      const authData = document.getElementById('auth-data').dataset;
+      const sessionToken = authData.sessionToken || '';
+      
+      if (!sessionToken) return;
+      
+      // Call the server-side function to invalidate the session first
+      google.script.run
+        .withSuccessHandler(function(response) {
+          if (response.success) {
+            console.log('Logout successful');
+            // Get script URL and redirect to login page
+            google.script.run
+              .withSuccessHandler(function(url) {
+                window.top.location.href = `${url}?page=login&logout=true`;
+              })
+              .getScriptUrl();
+          } else {
+            console.error('Logout error:', response.message);
+            // Force redirect to login page even if there was an error
+            google.script.run
+              .withSuccessHandler(function(url) {
+                window.top.location.href = `${url}?page=login`;
+              })
+              .getScriptUrl();
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error('Logout error:', error);
+          // Get script URL reliably on error too
+          google.script.run
+            .withSuccessHandler(function(url) {
+              window.top.location.href = `${url}?page=login`;
+            })
+            .getScriptUrl();
+        })
+        .logoutUser(sessionToken);
+    }
+  
+    // Change password
+    function changePassword() {
+      // Get session token from data attribute
+      const authData = document.getElementById('auth-data').dataset;
+      const sessionToken = authData.sessionToken || '';
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      // Validate inputs
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showPasswordError('Please fill in all fields');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showPasswordError('New passwords do not match');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        showPasswordError('New password must be at least 6 characters');
+        return;
+      }
+      
+      // Disable button while processing
+      const changeBtn = document.getElementById('changePasswordBtn');
+      changeBtn.disabled = true;
+      changeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+      
+      // Call server-side function to change password
+      google.script.run
+        .withSuccessHandler(function(response) {
+          if (response.success) {
+            showPasswordSuccess(response.message);
+            // Reset form
+            document.getElementById('changePasswordForm').reset();
+            
+            // Re-enable button and restore its text
+            changeBtn.disabled = false;
+            changeBtn.innerHTML = '<i class="fas fa-key me-1"></i> Update Password';
+            
+            // Close the modal after 2 seconds
+            setTimeout(function() {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+              if (modal) {
+                modal.hide();
+              }
+            }, 2000);
+            
+            // Note: We no longer log the user out after password change
+          } else {
+            showPasswordError(response.message);
+            // Re-enable button
+            changeBtn.disabled = false;
+            changeBtn.innerHTML = '<i class="fas fa-key me-1"></i> Update Password';
+          }
+        })
+        .withFailureHandler(function(error) {
+          showPasswordError('Error: ' + (error.message || 'Unknown error occurred'));
+          // Re-enable button
+          changeBtn.disabled = false;
+          changeBtn.innerHTML = '<i class="fas fa-key me-1"></i> Update Password';
+        })
+        .changePassword(sessionToken, currentPassword, newPassword);
+    }
+    
+    // Show password error message
+    function showPasswordError(message) {
+      const errorDiv = document.getElementById('passwordError');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      // Hide success message if shown
+      document.getElementById('passwordSuccess').style.display = 'none';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(function() {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Show password success message
+    function showPasswordSuccess(message) {
+      const successDiv = document.getElementById('passwordSuccess');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      // Hide error message if shown
+      document.getElementById('passwordError').style.display = 'none';
+    }
+  </script> 

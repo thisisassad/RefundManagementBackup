@@ -1,0 +1,4148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  
+  <!-- JavaScript Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js" defer></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js" defer></script>
+  
+  <style>
+    body { 
+      background-color: #f8f9fa;
+      padding-top: 56px;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Tailwind-like utility classes */
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-blue-50 { background-color: #eff6ff; }
+    .bg-blue-100 { background-color: #dbeafe; }
+    .bg-green-100 { background-color: #dcfce7; }
+    .bg-red-100 { background-color: #fee2e2; }
+    .bg-yellow-100 { background-color: #fef9c3; }
+    
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-700 { color: #374151; }
+    .text-blue-600 { color: #2563eb; }
+    .text-blue-700 { color: #1d4ed8; }
+    .text-green-600 { color: #16a34a; }
+    .text-red-600 { color: #dc2626; }
+    
+    .rounded-lg { border-radius: 0.5rem; }
+    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-blue-200 { border-color: #bfdbfe; }
+    
+    /* DataTables pagination and info styling */
+    .dataTables_wrapper .dataTables_info {
+      padding: 0.75rem 1rem;
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate {
+      padding: 0.75rem 1rem;
+    }
+    
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+      padding: 0.75rem 1rem;
+    }
+    
+    .dataTables_wrapper .dataTables_filter input {
+      margin-left: 0.5rem;
+      border-radius: 0.375rem;
+      border: 1px solid #ced4da;
+      padding: 0.375rem 0.75rem;
+    }
+    
+    /* Stats card styling - IMPROVED */
+    .stats-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      height: auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .stats-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.1;
+    }
+    
+    .stats-label {
+      color: #6c757d;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stats-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stats-icon {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      margin-left: 1rem;
+    }
+
+    /* Grid and table styling - IMPROVED */
+    .bi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.25rem;
+      padding: 1rem;
+    }
+
+    .data-card {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .data-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Table styling - IMPROVED */
+    .table {
+      margin-bottom: 0;
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+    
+    /* Box model dimensions based on the provided image */
+    .content-card {
+      margin: 32px;
+    }
+    
+    .card-body {
+      padding: 24px;
+    }
+    
+    .table-container {
+      width: 100%;
+      max-width: 1752.94px;
+      margin: 0 auto;
+    }
+    
+    .table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #495057;
+      border-top: none;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+      height: 42px; /* Reduced header height */
+      padding: 0.4rem 0.75rem;
+      font-size: 0.85rem;
+    }
+    
+    .table td {
+      vertical-align: middle;
+      border-top: 1px solid #e9ecef;
+      padding: 0.5rem 0.75rem; /* Reduced padding */
+      height: 42px; /* Reduced row height */
+      font-size: 0.85rem; /* Smaller font size */
+    }
+    
+    .table tbody tr:hover {
+      background-color: rgba(0,123,255,0.05);
+    }
+    
+    .table-responsive {
+      overflow-y: visible;
+      scrollbar-width: none;
+      display: block;
+      width: 100%;
+      border: none;
+    }
+    
+    .table-responsive::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.05);
+      border-radius: 4px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 4px;
+      border: 2px solid rgba(0,0,0,0.05);
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0,0,0,0.3);
+    }
+
+    /* Modal styling - IMPROVED */
+    .modal-xl {
+      max-width: 1200px;
+      width: 95%;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .detail-item {
+      padding: 0.75rem 1rem;
+      background-color: #f8f9fa;
+      border-radius: 0.5rem;
+      border: 1px solid #e9ecef;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .detail-item:hover {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      background-color: #fff;
+    }
+    
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    
+    .detail-value {
+      font-size: 0.95rem;
+      color: #212529;
+      font-weight: 500;
+    }
+
+    /* Status badge styling - IMPROVED */
+    .status-badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-block;
+      text-align: center;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.pending {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .status-badge.in-progress {
+      background-color: #cfe2ff;
+      color: #084298;
+      border: 1px solid #b6d4fe;
+    }
+
+    .status-badge.completed {
+      background-color: #d1e7dd;
+      color: #0f5132;
+      border: 1px solid #badbcc;
+    }
+
+    .status-badge.rejected {
+      background-color: #f8d7da;
+      color: #842029;
+      border: 1px solid #f5c2c7;
+    }
+
+    /* Action buttons - IMPROVED */
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    
+    .action-buttons .btn {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Bulk actions styling - IMPROVED */
+    .bulk-actions {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .bulk-actions .btn {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Toast notifications - IMPROVED */
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1050;
+    }
+    
+    .toast {
+      min-width: 250px;
+    }
+
+    /* Connection status - IMPROVED POSITION */
+    #connectionStatus {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      z-index: 1070;
+      max-width: 300px;
+    }
+    
+    #connectionStatus .alert {
+      margin-bottom: 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Progress indicator - IMPROVED */
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1060;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .progress-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      min-width: 300px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Filter section - IMPROVED */
+    .filter-section {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-section .form-label {
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+    }
+    
+    .filter-section .btn {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-card {
+        margin-bottom: 1rem;
+      }
+      
+      .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+    }
+
+    /* Enhanced detail item styling */
+    .detail-item {
+      padding: 0.75rem 1rem;
+      background-color: #f8f9fa;
+      border-radius: 0.5rem;
+      border: 1px solid #e9ecef;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .detail-item:hover {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      background-color: #fff;
+    }
+    
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+    
+    .detail-value {
+      font-size: 0.95rem;
+      color: #212529;
+      font-weight: 500;
+    }
+    
+    /* Timeline styling */
+    .timeline {
+      position: relative;
+      padding: 0;
+      margin: 0;
+      max-height: 350px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,0,0,0.2) rgba(0,0,0,0.05);
+    }
+    
+    .timeline::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .timeline::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.05);
+      border-radius: 4px;
+    }
+    
+    .timeline::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 4px;
+      border: 2px solid rgba(0,0,0,0.05);
+    }
+    
+    .timeline::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0,0,0,0.3);
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-left: 40px;
+      margin-bottom: 25px;
+    }
+    
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .timeline-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      z-index: 2;
+    }
+    
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 28px;
+      bottom: -25px;
+      width: 2px;
+      background-color: #e9ecef;
+      z-index: 1;
+    }
+    
+    .timeline-content {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    
+    .timeline-time {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    
+    .timeline-title {
+      font-weight: 500;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    
+    .timeline-body {
+      font-size: 0.95rem;
+      color: #495057;
+      white-space: pre-line;
+    }
+    
+    /* Timeline dot colors */
+    .dot-submitted {
+      background-color: #6c757d;
+    }
+    
+    .dot-pending {
+      background-color: #ffc107;
+    }
+    
+    .dot-in-progress {
+      background-color: #0d6efd;
+    }
+    
+    .dot-completed {
+      background-color: #198754;
+    }
+    
+    .dot-rejected {
+      background-color: #dc3545;
+    }
+    
+    /* Team badge styling */
+    .badge.bg-info {
+      background-color: #0dcaf0 !important;
+    }
+    
+    /* Make the timeline more compact on mobile */
+    @media (max-width: 576px) {
+      .timeline-item {
+        padding-left: 30px;
+        margin-bottom: 20px;
+      }
+      
+      .timeline-dot {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+      }
+      
+      .timeline-item:not(:last-child)::after {
+        left: 12px;
+        top: 24px;
+        bottom: -20px;
+      }
+      
+      .timeline-content {
+        padding: 10px;
+      }
+    }
+
+    /* Detail section styling */
+    .detail-section {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 0.5rem;
+    }
+
+    .detail-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .detail-section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #dee2e6;
+    }
+
+    .details-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .detail-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      color: #6c757d;
+      width: 40%;
+      padding-right: 1rem;
+    }
+
+    .detail-value {
+      color: #212529;
+      width: 60%;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation Bar Partial -->
+  <?!= include('NavBarPartial', {sessionToken: sessionToken || '', userAccess: userAccess || {}, currentPage: 'bi'}) ?>
+
+  <div class="container-fluid" style="margin-top: 1.5rem; padding-left: 1.5rem; padding-right: 1.5rem; max-width: 1600px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-0">BI Team Portal</h2>
+      <div id="headerErrorContainer" class="d-flex align-items-center"></div>
+    </div>
+    
+    <!-- Status Scorecard -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+          <div class="stats-info">
+            <div class="stats-label">Pending</div>
+            <div class="stats-value text-warning" id="pendingCount">1</div>
+          </div>
+          <div class="stats-icon text-warning">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+          <div class="stats-info">
+            <div class="stats-label">In Progress</div>
+            <div class="stats-value text-primary" id="progressCount">1</div>
+          </div>
+          <div class="stats-icon text-primary">
+            <i class="fas fa-spinner"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+          <div class="stats-info">
+            <div class="stats-label">Completed</div>
+            <div class="stats-value text-success" id="completedCount">5</div>
+          </div>
+          <div class="stats-icon text-success">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+          <div class="stats-info">
+            <div class="stats-label">Rejected</div>
+            <div class="stats-value text-danger" id="rejectedCount">0</div>
+          </div>
+          <div class="stats-icon text-danger">
+            <i class="fas fa-times-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Grid -->
+    <div class="card shadow-sm mb-5">
+      <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <select class="form-select form-select-sm" id="statusFilter" style="min-width: 150px;">
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="me-3">
+            <select class="form-select form-select-sm" id="dateFilter" style="min-width: 150px;">
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last7Days">Last 7 Days</option>
+              <option value="last30Days">Last 30 Days</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+          <div class="position-relative" style="min-width: 250px;">
+            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search requests...">
+            <i class="fas fa-search position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); color: #adb5bd;"></i>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary rounded-circle" id="resetFilters" title="Reset Filters">
+            <i class="fas fa-redo-alt"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Bulk Actions Bar - Moved above the table -->
+      <div id="bulkActionsBar" class="card-header bg-light py-2 px-3 border-bottom" style="display: none; transform: translateY(-20px); opacity: 0; transition: all 0.3s ease;">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="me-2"><span id="selectedItemsCount">0</span> selected</span>
+            <button class="btn btn-sm btn-outline-secondary me-2" id="selectAllBtn">Select all</button>
+            <button class="btn btn-sm btn-outline-secondary" id="unselectAllBtn">Unselect all</button>
+          </div>
+          <div class="d-flex align-items-center">
+            <select class="form-select form-select-sm me-2" id="bulkStatus" style="width: auto;">
+              <option value="">Select Action</option>
+              <option value="In Progress">Mark as In Progress</option>
+              <option value="Completed">Mark as Completed</option>
+              <option value="Rejected">Mark as Rejected</option>
+            </select>
+            <button class="btn btn-sm btn-primary" onclick="handleBulkUpdate()">
+              Update Selected
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="requestsTable">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" class="form-check-input" id="selectAll">
+                </th>
+                <th style="width: 100px;">Request ID</th>
+                <th style="width: 150px;">Request Date</th>
+                <th>Course Name</th>
+                <th>Refund Type</th>
+                <th style="width: 100px;">Amount</th>
+                <th style="width: 120px;">Status</th>
+                <th style="width: 150px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-lg shadow-md border-0">
+          <div class="modal-header py-3 bg-gray-50">
+            <h5 class="modal-title fs-6 text-gray-700">
+              <i class="fas fa-file-invoice-dollar me-2 text-blue-600"></i>Refund Request 
+              <span class="badge bg-secondary" id="requestIdTitle"></span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-3 bg-white">
+            <div class="row g-3">
+              <!-- Request Information Section - Full Width -->
+              <div class="col-md-7">
+                <div class="card border border-gray-200 rounded-lg shadow-sm h-100">
+                  <div class="card-header bg-gray-50 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fs-6 text-gray-700">
+                      <i class="fas fa-info-circle me-2 text-blue-600"></i>Request Information
+                    </h6>
+                    <span id="modalStatusBadge"></span>
+                  </div>
+                  <div class="card-body p-3" style="max-height: 600px; overflow-y: auto;">
+                    <div id="requestDetails">
+                      <!-- Content will be dynamically populated -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right Column: BI Update and History Sections -->
+              <div class="col-md-5">
+                <!-- BI Update Section -->
+                <div class="card border border-blue-200 rounded-lg shadow-sm mb-3">
+                  <div class="card-header bg-blue-50 py-3">
+                    <h6 class="mb-0 fs-6 text-blue-700">
+                      <i class="fas fa-edit me-2"></i>BI Update
+                    </h6>
+                  </div>
+                  <div class="card-body p-3">
+                    <form id="updateForm" class="row g-3">
+                      <input type="hidden" name="requestId">
+                      <div class="col-12">
+                        <label class="form-label text-gray-600">Status</label>
+                        <select class="form-select" name="status" required onchange="validateForm()">
+                          <option value="">Select Status</option>
+                          <option value="Pending">Pending</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label text-gray-600">Remarks</label>
+                        <textarea class="form-control" name="remarks" rows="3" required placeholder="Enter your remarks or notes about this update..."></textarea>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                
+                <!-- History Section -->
+                <div class="card border border-gray-200 rounded-lg shadow-sm">
+                  <div class="card-header bg-gray-50 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fs-6 text-gray-700">
+                      <i class="fas fa-history me-2 text-blue-600"></i>Request Journey
+                    </h6>
+                    <span class="badge bg-gray-100 text-gray-700 rounded-pill px-3 py-1">Timeline of all updates</span>
+                  </div>
+                  <div class="card-body p-3">
+                    <div id="updateHistory" class="timeline">
+                      <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading history...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="handleUpdate()">Update Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Range Modal -->
+    <div class="modal fade" id="dateRangeModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Select Date Range</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="startDate">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="endDate">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="applyDateRange()">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Update Modal -->
+    <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Bulk Update</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="bulkUpdateForm">
+              <div class="mb-3">
+                <p>You are about to update <span id="selectedCount" class="fw-bold">0</span> requests to <span id="selectedStatus" class="fw-bold status-badge"></span></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Remarks</label>
+                <textarea class="form-control" name="bulkRemarks" rows="3" required placeholder="Enter remarks for this update"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="confirmBulkUpdate()">Confirm Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="position-fixed bottom-0 start-0 m-3" style="z-index: 1070; display: none;">
+      <div class="alert alert-warning d-flex align-items-center p-2 mb-0" role="alert">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+          <span class="visually-hidden">Checking connection...</span>
+        </div>
+        <div>Checking connection...</div>
+      </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay">
+      <div class="progress-content">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="mb-2" id="progressMessage">Processing Updates...</h5>
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateStatusModalLabel">Update Request Status</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="updateStatusForm">
+              <input type="hidden" id="updateRequestId">
+              
+              <div class="mb-3">
+                <label for="updateStatus" class="form-label">Status</label>
+                <select class="form-select" id="updateStatus" required>
+                  <option value="">Select Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+              
+              <div class="mb-3">
+                <label for="updateRemarks" class="form-label">Remarks</label>
+                <textarea class="form-control" id="updateRemarks" rows="3" placeholder="Enter remarks or comments"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="updateRequestStatus()">Update Status</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pass server-side data to client-side JavaScript -->
+  <script id="auth-data" 
+    data-authenticated="true"
+    data-session-token="<?= sessionToken || '' ?>"
+    data-script-url="<?= typeof getScriptUrl === 'function' ? getScriptUrl() : '' ?>"
+    data-current-page="bi"
+  ></script>
+
+  <!-- Client-side JavaScript -->
+  <script>
+    // Global variables
+    let requestsTable;
+    let selectedRequests = new Set();
+    let lastErrorTime = 0;
+    let errorCount = 0;
+    
+    // Call initialization when script loads
+    window.addEventListener('load', initializePage);
+    
+    // Improved initialization sequence
+    function initializePage() {
+      console.log('Initializing page...');
+      
+      // Wait for page to be fully loaded
+      if (document.readyState !== 'complete') {
+        console.log('Document not ready, waiting...');
+        window.addEventListener('load', initializePage);
+        return;
+      }
+      
+      // Start connection monitoring early
+      monitorConnection();
+      
+      // Check authentication first
+      if (!checkAuthentication()) {
+        console.warn('Authentication check failed, showing error message');
+        showAuthError();
+        return;
+      }
+      
+      // Initialize with robust error handling and dependency chain
+      initializeWithRetry()
+        .then(() => {
+          console.log('Initialization successful, loading data...');
+          return loadDashboardData(0, 5, 2000); // Increase retry attempts for loading
+        })
+        .then(() => {
+          // Setup background refresh after initial data load is complete
+          setupBackgroundRefresh();
+        })
+        .catch(error => {
+          console.error('Initialization or data loading failed:', error);
+          handleError(error, true, () => initializePage());
+        });
+    }
+    
+    // Make initializeWithRetry return a promise for better chaining
+    function initializeWithRetry(retryCount = 0) {
+      return new Promise((resolve, reject) => {
+        console.log(`Attempting initialization (attempt ${retryCount + 1})...`);
+        
+        try {
+          // First make sure jQuery and DataTables are available
+          if (typeof $ === 'undefined') {
+            console.warn('jQuery not loaded!');
+            if (retryCount < 3) {
+              console.log('Attempting to load jQuery dynamically...');
+              const script = document.createElement('script');
+              script.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+              script.onload = function() {
+                console.log('jQuery loaded dynamically, retrying initialization');
+                setTimeout(() => {
+                  initializeWithRetry(retryCount + 1).then(resolve).catch(reject);
+                }, 1000);
+              };
+              script.onerror = function() {
+                console.error('Failed to load jQuery dynamically');
+                if (retryCount < 3) {
+                  setTimeout(() => {
+                    initializeWithRetry(retryCount + 1).then(resolve).catch(reject);
+                  }, 1000);
+                } else {
+                  reject(new Error('Could not load jQuery after multiple attempts'));
+                }
+              };
+              document.head.appendChild(script);
+              return;
+            } else {
+              throw new Error('jQuery could not be loaded after multiple attempts');
+            }
+          }
+          
+          // Check if DataTables is loaded
+          if (typeof $.fn.DataTable === 'undefined') {
+            console.warn('DataTables not loaded!');
+            if (retryCount < 3) {
+              console.log('Attempting to load DataTables dynamically...');
+              const script = document.createElement('script');
+              script.src = 'https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js';
+              script.onload = function() {
+                console.log('DataTables loaded dynamically, retrying initialization');
+                setTimeout(() => {
+                  initializeWithRetry(retryCount + 1).then(resolve).catch(reject);
+                }, 1000);
+              };
+              script.onerror = function() {
+                console.error('Failed to load DataTables dynamically');
+                reject(new Error('Could not load DataTables'));
+              };
+              document.head.appendChild(script);
+              return;
+            } else {
+              throw new Error('DataTables could not be loaded after multiple attempts');
+            }
+          }
+          
+          // Initialize DataTable
+          initializeDataTable();
+          
+          // Set up event listeners
+          setupEventListeners();
+          
+          // Add detail modal event listener to reset form when modal is hidden
+          const detailModal = document.getElementById('detailModal');
+          if (detailModal) {
+            detailModal.addEventListener('hidden.bs.modal', function() {
+              console.log('Detail modal closed, resetting form');
+              const form = document.getElementById('updateForm');
+              if (form) {
+                form.reset();
+              }
+            });
+          }
+          
+          // Initialization successful
+          console.log('Initialization completed successfully');
+          resolve();
+        } catch (error) {
+          console.error('Error during initialization:', error);
+          
+          if (retryCount < 3) {
+            console.log(`Retrying initialization (attempt ${retryCount + 2})...`);
+            setTimeout(() => {
+              initializeWithRetry(retryCount + 1).then(resolve).catch(reject);
+            }, 1000 * Math.pow(1.5, retryCount)); // Exponential backoff
+          } else {
+            console.error('Failed to initialize after multiple attempts');
+            reject(error);
+          }
+        }
+      });
+    }
+
+    // Monitor connection status
+    function monitorConnection() {
+      const connectionStatus = document.getElementById('connectionStatus');
+      let isOnline = navigator.onLine;
+      let pingCount = 0;
+      let failedPings = 0;
+      
+      // Update connection status indicator
+      function updateConnectionStatus(status, message) {
+        if (!connectionStatus) return;
+        
+        if (status === 'checking') {
+          connectionStatus.style.display = 'block';
+          connectionStatus.innerHTML = `
+            <div class="alert alert-warning d-flex align-items-center p-2" role="alert">
+              <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                <span class="visually-hidden">Checking connection...</span>
+              </div>
+              <div>Checking connection...</div>
+            </div>
+          `;
+        } else if (status === 'online') {
+          connectionStatus.style.display = 'none';
+        } else if (status === 'offline') {
+          connectionStatus.style.display = 'block';
+          connectionStatus.innerHTML = `
+            <div class="alert alert-danger d-flex align-items-center p-2" role="alert">
+              <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+              <div>${message || 'Connection lost'}</div>
+            </div>
+          `;
+        }
+      }
+      
+      // Ping server to check connection
+      function pingServer() {
+        pingCount++;
+        updateConnectionStatus('checking');
+        
+        // Use a simple server function to check connection
+        google.script.run
+          .withSuccessHandler(function() {
+            console.log(`Ping successful (${pingCount})`);
+            failedPings = 0;
+            updateConnectionStatus('online');
+            
+            // If we were previously showing an offline message, show reconnected message
+            if (!isOnline) {
+              showToast('Connection restored', 'success');
+              isOnline = true;
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error(`Ping failed (${pingCount}):`, error);
+            failedPings++;
+            
+            if (failedPings >= 2) {
+              isOnline = false;
+              updateConnectionStatus('offline', 'Connection to server lost. Retrying...');
+              
+              // Only show the toast on the first failure
+              if (failedPings === 2) {
+                showToast('Connection to server lost. Please check your internet connection.', 'danger');
+              }
+            }
+          })
+          .getScriptUrl(); // Use a simple function that should always work
+      }
+      
+      // Initial ping
+      pingServer();
+      
+      // Set up periodic pinging
+      const pingInterval = setInterval(pingServer, 30000); // Every 30 seconds
+      
+      // Listen for online/offline events
+      window.addEventListener('online', function() {
+        console.log('Browser reports online status');
+        pingServer(); // Verify connection with server
+      });
+      
+      window.addEventListener('offline', function() {
+        console.log('Browser reports offline status');
+        isOnline = false;
+        updateConnectionStatus('offline', 'Your device is offline');
+        showToast('Your device is offline. Please check your internet connection.', 'warning');
+      });
+      
+      // Clean up on page unload
+      window.addEventListener('beforeunload', function() {
+        clearInterval(pingInterval);
+      });
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Page loaded, initializing DataTable and loading dashboard data');
+      
+      // Start connection monitoring
+      monitorConnection();
+      
+      try {
+        // Check if jQuery is loaded
+        if (typeof $ === 'undefined') {
+          console.error('jQuery is not loaded! Attempting to load it dynamically...');
+          
+          // Create a script element to load jQuery
+          const script = document.createElement('script');
+          script.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+          script.onload = function() {
+            console.log('jQuery loaded dynamically');
+            initializeWithRetry();
+          };
+          script.onerror = function() {
+            console.error('Failed to load jQuery dynamically');
+            showFallbackTable();
+          };
+          document.head.appendChild(script);
+        } else {
+          console.log('jQuery is already loaded');
+          initializeWithRetry();
+        }
+        
+        // Add event listener to reset form when detail modal is hidden
+        const detailModal = document.getElementById('detailModal');
+        if (detailModal) {
+          detailModal.addEventListener('hidden.bs.modal', function() {
+            console.log('Detail modal closed, resetting form');
+            const form = document.getElementById('updateForm');
+            if (form) {
+              form.reset();
+            }
+          });
+        }
+        
+      } catch (error) {
+        console.error('Error during initialization:', error);
+        showToast('Error initializing dashboard: ' + error.message, 'danger');
+        showFallbackTable();
+      }
+    });
+    
+    // Check authentication status
+    function checkAuthentication() {
+      const authData = document.getElementById('auth-data');
+      if (!authData) {
+        console.error('Auth data element not found');
+        return false;
+      }
+      
+      const sessionToken = authData.getAttribute('data-session-token');
+      console.log('Session token found:', !!sessionToken);
+      
+      if (!sessionToken) {
+        console.error('No session token found, user might not be authenticated');
+        showAuthError();
+        return false;
+      }
+      
+      // Validate session token with server
+      google.script.run
+        .withSuccessHandler(function(isValid) {
+          console.log('Session validation result:', isValid);
+          if (!isValid) {
+            showAuthError();
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error('Error validating session:', error);
+          // Continue anyway, we'll let the server-side functions handle auth errors
+        })
+        .validateSession(sessionToken);
+      
+      return true;
+    }
+    
+    // Show authentication error
+    function showAuthError() {
+      // Create auth error alert
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger mt-3';
+      alertDiv.innerHTML = `
+        <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Authentication Error</h4>
+        <p>Your session may have expired or you don't have permission to access this page.</p>
+        <hr>
+        <p class="mb-0">
+          <a href="${document.getElementById('auth-data').getAttribute('data-script-url')}?page=login" 
+             class="btn btn-outline-danger">
+            <i class="fas fa-sign-in-alt"></i> Login Again
+          </a>
+        </p>
+      `;
+      
+      // Insert at the top of the container
+      const container = document.querySelector('.container-fluid');
+      if (container) {
+        container.insertBefore(alertDiv, container.firstChild);
+      }
+    }
+    
+    // Initialize with retry mechanism
+    function initializeWithRetry(retryCount = 0) {
+      // Check authentication first
+      if (!checkAuthentication()) {
+        console.warn('Authentication check failed, but continuing with initialization');
+      }
+      
+      try {
+        initializeDataTable();
+        loadDashboardData();
+        setupEventListeners();
+      } catch (error) {
+        console.error(`Error during initialization (attempt ${retryCount + 1}):`, error);
+        
+        if (retryCount < 2) {
+          console.log(`Retrying initialization (attempt ${retryCount + 2})...`);
+          setTimeout(() => initializeWithRetry(retryCount + 1), 1000);
+        } else {
+          console.error('Failed to initialize after multiple attempts');
+          showToast('Error initializing dashboard: ' + error.message, 'danger');
+          showFallbackTable();
+        }
+      }
+    }
+    
+    // Show fallback table when DataTables fails
+    function showFallbackTable() {
+      console.log('Showing fallback table');
+      
+      // Hide DataTable container
+      const tableContainer = document.querySelector('#requestsTable').closest('.table-responsive');
+      if (tableContainer) {
+        tableContainer.style.display = 'none';
+      }
+      
+      // Create a simple table as fallback
+      const fallbackTable = document.createElement('div');
+      fallbackTable.className = 'alert alert-warning';
+      fallbackTable.innerHTML = `
+        <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Advanced features unavailable</h4>
+        <p>We're experiencing issues loading the interactive table. Basic data will be shown below when available.</p>
+        <div id="fallbackTableContainer" class="mt-3">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Insert fallback table
+      if (tableContainer && tableContainer.parentNode) {
+        tableContainer.parentNode.appendChild(fallbackTable);
+      }
+      
+      // Load data directly without DataTables
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result && result.requests && Array.isArray(result.requests)) {
+            renderFallbackTable(result.requests);
+          } else {
+            document.getElementById('fallbackTableContainer').innerHTML = 
+              '<div class="alert alert-danger">No data available</div>';
+          }
+        })
+        .withFailureHandler(function(error) {
+          document.getElementById('fallbackTableContainer').innerHTML = 
+            `<div class="alert alert-danger">Error loading data: ${error.message || error}</div>`;
+        })
+        .getBIDashboardData();
+    }
+    
+    // Render fallback table with basic data
+    function renderFallbackTable(requests) {
+      const container = document.getElementById('fallbackTableContainer');
+      if (!container) return;
+      
+      if (requests.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No requests found</div>';
+        return;
+      }
+      
+      let html = `
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Request ID</th>
+                <th>Date</th>
+                <th>Course</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      requests.forEach(request => {
+        html += `
+          <tr>
+            <td>${request.request_id || ''}</td>
+            <td>${request.timestamp_string || ''}</td>
+            <td>${request.course_name || 'N/A'}</td>
+            <td>${getStatusBadge(request.current_bi_status || 'Pending')}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="showRequestDetails('${request.request_id}')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    // Initialize DataTable
+    function initializeDataTable() {
+      console.log('Initializing DataTable');
+      try {
+        // Destroy existing DataTable instance if it exists
+        if ($.fn.DataTable.isDataTable('#requestsTable')) {
+          console.log('Destroying existing DataTable instance');
+          $('#requestsTable').DataTable().destroy();
+        }
+        
+        requestsTable = $('#requestsTable').DataTable({
+          pageLength: 25,
+          order: [[1, 'desc']],
+          scrollY: false,
+          scrollCollapse: false,
+          scrollX: false,
+          fixedHeader: false,
+          columnDefs: [{
+            targets: 0,
+            orderable: false
+          }],
+          language: {
+            emptyTable: "No requests found"
+          },
+          searching: true,
+          dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
+          // Hide the default search box since we have a custom search input
+          initComplete: function() {
+            $('.dataTables_filter').hide();
+          }
+        });
+        console.log('DataTable initialized successfully');
+      } catch (error) {
+        console.error('Error initializing DataTable:', error);
+        throw error;
+      }
+    }
+
+    // Load dashboard data
+    function loadDashboardData(retryCount = 0, maxRetries = 3, delay = 3000) {
+      console.log(`Loading dashboard data (attempt ${retryCount + 1}/${maxRetries + 1})`);
+      showProgress('Loading dashboard data...');
+      
+      // Generate cache buster to avoid browser or server caching
+      const cacheBuster = new Date().getTime();
+      console.log('Using cache buster:', cacheBuster);
+      
+      // Add a timeout to detect if the server call takes too long
+      const timeoutId = setTimeout(() => {
+        console.warn('Dashboard data request is taking longer than expected');
+        showToast('Data loading is taking longer than expected. Please wait...', 'warning');
+      }, 10000); // 10 seconds timeout warning
+      
+      // Add network connection check before attempting server call
+      if (!navigator.onLine) {
+        console.warn('Device appears to be offline. Checking connection...');
+        showToast('Your device appears to be offline. Please check your internet connection.', 'warning');
+        
+        // Still try the request as the browser's offline detection isn't always reliable
+        setTimeout(() => {
+          if (!navigator.onLine) {
+            clearTimeout(timeoutId);
+            handleError('Device is offline. Please check your internet connection.', true, 
+                      () => loadDashboardData(0, maxRetries, delay));
+            return;
+          }
+        }, 1000);
+      }
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          clearTimeout(timeoutId);
+          
+          // Better data validation
+          if (!result) {
+            console.error('No data received from server (result is null or undefined)');
+            
+            if (retryCount < maxRetries) {
+              // Automatic retry with exponential backoff
+              const retryDelay = delay * Math.pow(1.5, retryCount);
+              console.log(`Retrying in ${retryDelay/1000} seconds due to empty result...`);
+              
+              // Show retry notification
+              showToast(`No data received. Retrying in ${Math.round(retryDelay/1000)} seconds... (${retryCount + 1}/${maxRetries})`, 'warning', 3000);
+              
+              setTimeout(() => {
+                loadDashboardData(retryCount + 1, maxRetries, delay);
+              }, retryDelay);
+              return;
+            } else {
+              // Max retries reached, show error with retry button
+              handleError('No data received from server after multiple attempts', true, 
+                        () => loadDashboardData(0, maxRetries, delay));
+              return;
+            }
+          }
+          
+          // Validate data structure
+          if (!result.requests || !Array.isArray(result.requests) || 
+              !result.statusCounts || typeof result.statusCounts !== 'object') {
+            console.error('Invalid data structure received:', result);
+            
+            if (retryCount < maxRetries) {
+              // Automatic retry with exponential backoff
+              const retryDelay = delay * Math.pow(1.5, retryCount);
+              console.log(`Retrying in ${retryDelay/1000} seconds due to invalid data structure...`);
+              
+              // Show retry notification
+              showToast(`Invalid data received. Retrying in ${Math.round(retryDelay/1000)} seconds... (${retryCount + 1}/${maxRetries})`, 'warning', 3000);
+              
+              setTimeout(() => {
+                loadDashboardData(retryCount + 1, maxRetries, delay);
+              }, retryDelay);
+              return;
+            } else {
+              // Max retries reached, show error with retry button
+              handleError('Invalid data structure received from server', true, 
+                        () => loadDashboardData(0, maxRetries, delay));
+              return;
+            }
+          }
+          
+          // If we've reached here, data is valid - process it
+          handleDashboardData(result);
+        })
+        .withFailureHandler(function(error) {
+          clearTimeout(timeoutId);
+          console.error(`Server error when loading dashboard data (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+          
+          if (retryCount < maxRetries) {
+            // Automatic retry with exponential backoff
+            const retryDelay = delay * Math.pow(1.5, retryCount);
+            console.log(`Retrying in ${retryDelay/1000} seconds...`);
+            
+            // Show retry notification
+            showToast(`Loading data failed. Retrying in ${Math.round(retryDelay/1000)} seconds... (${retryCount + 1}/${maxRetries})`, 'warning', 3000);
+            
+            setTimeout(() => {
+              loadDashboardData(retryCount + 1, maxRetries, delay);
+            }, retryDelay);
+          } else {
+            // Max retries reached, show error with retry button
+            handleError('Failed to load data after multiple attempts: ' + (error.message || error), true, 
+                      () => loadDashboardData(0, maxRetries, delay));
+          }
+        })
+        .getBIDashboardData(cacheBuster); // Pass cache buster to server
+    }
+
+    // Handle dashboard data
+    function handleDashboardData(result) {
+      console.log('Raw dashboard data received:', result);
+      
+      try {
+        if (!result) {
+          console.error('No data received from server (result is null or undefined)');
+          throw new Error('No data received from server');
+        }
+
+        // Track last successful data load time
+        window.lastSuccessfulDataLoad = new Date().toISOString();
+
+        // Store the data for background refresh comparison
+        window.lastTableData = result;
+
+        // Log the data type and structure for debugging
+        console.log('Result type:', typeof result);
+        console.log('Result has requests property:', result.hasOwnProperty('requests'));
+        console.log('Result has statusCounts property:', result.hasOwnProperty('statusCounts'));
+        
+        if (!result.requests || !Array.isArray(result.requests)) {
+          console.error('Invalid requests data:', result.requests);
+          console.error('Requests type:', typeof result.requests);
+          throw new Error('Invalid requests data structure');
+        }
+
+        if (!result.statusCounts || typeof result.statusCounts !== 'object') {
+          console.error('Invalid status counts:', result.statusCounts);
+          console.error('StatusCounts type:', typeof result.statusCounts);
+          throw new Error('Invalid status counts structure');
+        }
+
+        // Store original status counts for filter reset
+        window.originalStatusCounts = { ...result.statusCounts };
+        console.log('Original status counts stored:', window.originalStatusCounts);
+
+        // Update status counts with validation
+        const counts = result.statusCounts;
+        document.getElementById('pendingCount').textContent = counts.pending || 0;
+        document.getElementById('progressCount').textContent = counts.inProgress || 0;
+        document.getElementById('completedCount').textContent = counts.completed || 0;
+        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
+
+        console.log('Status counts updated successfully');
+
+        // First validate the DataTable is properly initialized
+        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
+          console.warn('DataTable not properly initialized, attempting re-initialization');
+          try {
+            if ($.fn.DataTable.isDataTable('#requestsTable')) {
+              $('#requestsTable').DataTable().destroy();
+            }
+            initializeDataTable();
+          } catch (tableError) {
+            console.error('Failed to re-initialize DataTable:', tableError);
+            // Fall back to basic rendering
+            showFallbackTable();
+            renderFallbackTable(result.requests);
+            return;
+          }
+        }
+
+        // Save current state for restoration
+        let currentPage = 0;
+        let currentSearch = '';
+        let currentOrder = [];
+        
+        try {
+          // Get current state before clearing
+          currentPage = requestsTable.page();
+          currentSearch = requestsTable.search();
+          currentOrder = requestsTable.order();
+          console.log('Saved table state:', { page: currentPage, search: currentSearch, order: currentOrder });
+        } catch (stateError) {
+          console.warn('Error saving table state:', stateError);
+        }
+
+        try {
+          // Clear existing table data - use this safer pattern
+          requestsTable.clear();
+          console.log('Table cleared, adding new data');
+        } catch (clearError) {
+          console.error('Error clearing table:', clearError);
+          
+          // Attempt recovery by destroying and reinitializing
+          try {
+            $('#requestsTable').DataTable().destroy();
+            initializeDataTable();
+            requestsTable = $('#requestsTable').DataTable();
+          } catch (reinitError) {
+            console.error('Failed to recover table:', reinitError);
+            showFallbackTable();
+            renderFallbackTable(result.requests);
+            return;
+          }
+        }
+
+        console.log('Number of requests to process:', result.requests.length);
+        
+        // Perform additional data validation
+        const validRequests = result.requests.filter(request => {
+          if (!request || typeof request !== 'object') {
+            console.warn('Skipping invalid request (not an object):', request);
+            return false;
+          }
+          
+          if (!request.request_id) {
+            console.warn('Skipping request with missing ID:', request);
+            return false;
+          }
+          
+          return true;
+        });
+        
+        console.log(`Validated ${validRequests.length} of ${result.requests.length} requests`);
+
+        // Add data in smaller batches to prevent UI freezing with large datasets
+        const BATCH_SIZE = 50;
+        let processedCount = 0;
+        
+        function addBatch() {
+          const batch = validRequests.slice(processedCount, processedCount + BATCH_SIZE);
+          
+          if (batch.length === 0) {
+            // All batches processed, finalize table
+            finishTableUpdate();
+            return;
+          }
+          
+          // Process this batch
+          batch.forEach((request) => {
+            try {
+              requestsTable.row.add([
+                `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
+                request.request_id,
+                formatDate(request.timestamp_string) || '',
+                request.course_name || '',
+                request.refund_type || '',
+                formatCurrency(request.refund_amount || 0),
+                getStatusBadge(request.current_bi_status || 'Pending'),
+                getActionButtons(request)
+              ]);
+            } catch (rowError) {
+              console.error(`Error adding row for request ${request.request_id}:`, rowError);
+            }
+          });
+          
+          processedCount += batch.length;
+          
+          // Update progress information if many records
+          if (validRequests.length > 100) {
+            const percent = Math.round((processedCount / validRequests.length) * 100);
+            document.getElementById('progressMessage').textContent = 
+              `Loading data... ${processedCount}/${validRequests.length} (${percent}%)`;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+          }
+          
+          // Process next batch or finish
+          if (processedCount < validRequests.length) {
+            setTimeout(addBatch, 0); // Use setTimeout to avoid blocking UI
+          } else {
+            finishTableUpdate();
+          }
+        }
+        
+        // Function to finalize table updates
+        function finishTableUpdate() {
+          try {
+            console.log('Drawing table with new data');
+            
+            // Try to restore previous state
+            try {
+              // Only restore if we have valid values
+              if (currentPage !== undefined && !isNaN(currentPage)) {
+                requestsTable.search(currentSearch || '');
+                if (currentOrder && currentOrder.length > 0) {
+                  requestsTable.order(currentOrder);
+                }
+                // Draw with a simple first-pass
+                requestsTable.draw(false);
+                // Then restore pagination in a separate step
+                requestsTable.page(currentPage).draw('page');
+              } else {
+                requestsTable.draw();
+              }
+            } catch (restoreError) {
+              console.warn('Error restoring table state:', restoreError);
+              // Fall back to simple draw
+              requestsTable.draw();
+            }
+            
+            hideProgress();
+            console.log('Dashboard data load complete');
+            
+            // Remove any existing error notifications since we succeeded
+            const errorNotification = document.getElementById('errorNotification');
+            if (errorNotification) {
+              errorNotification.remove();
+            }
+            
+            showToast('Data loaded successfully', 'success');
+            
+            // Reset error count on successful load
+            errorCount = 0;
+            
+            // Initialize background refresh if not already set up
+            if (!window.backgroundRefreshInitialized) {
+              window.backgroundRefreshInitialized = true;
+              setupBackgroundRefresh();
+            }
+          } catch (finalError) {
+            console.error('Error finalizing table update:', finalError);
+            hideProgress();
+            handleError('Error drawing table: ' + finalError.message);
+          }
+        }
+        
+        // Start processing in batches
+        addBatch();
+      } catch (error) {
+        console.error('Error processing dashboard data:', error);
+        handleLoadError(error);
+      }
+    }
+
+    // Handle load error specifically for dashboard data
+    function handleLoadError(error) {
+      console.error('Error loading dashboard data:', error);
+      hideProgress();
+      
+      // Create a more detailed error message
+      let errorMessage = 'Error loading dashboard data';
+      let errorDetails = '';
+      
+      if (typeof error === 'string') {
+        errorDetails = error;
+      } else if (error && error.message) {
+        errorDetails = error.message;
+      } else if (error && error.toString) {
+        errorDetails = error.toString();
+      } else {
+        errorDetails = 'Unknown error';
+      }
+      
+      // Use the general handleError function with a retry button
+      handleError(`${errorMessage}: ${errorDetails}`, true, () => loadDashboardData(0, 3, 3000));
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Select all checkbox - using event delegation for dynamically added rows
+      document.addEventListener('change', function(e) {
+        if (e.target.id === 'selectAll') {
+          document.querySelectorAll('.request-checkbox').forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+            handleCheckboxChange(checkbox);
+          });
+        } else if (e.target.classList.contains('request-checkbox')) {
+          handleCheckboxChange(e.target);
+        }
+      });
+
+      // Track user interaction with the table
+      const tableContainer = document.querySelector('#requestsTable_wrapper');
+      if (tableContainer) {
+        tableContainer.addEventListener('mousedown', function() {
+          window.userInteracting = true;
+          resetUserInteractionTimer();
+        });
+        
+        tableContainer.addEventListener('keydown', function() {
+          window.userInteracting = true;
+          resetUserInteractionTimer();
+        });
+      }
+
+      // Date filter change
+      document.getElementById('dateFilter').addEventListener('change', function(e) {
+        if (e.target.value === 'custom') {
+          new bootstrap.Modal(document.getElementById('dateRangeModal')).show();
+        } else {
+          applyFilters();
+        }
+      });
+
+      // Status filter change
+      document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+      // Search input
+      document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 300));
+      
+      // Reset filters button
+      document.getElementById('resetFilters').addEventListener('click', function() {
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFilter').value = 'all';
+        document.getElementById('searchInput').value = '';
+        
+        // Reset DataTable search and redraw
+        requestsTable.search('').draw();
+        
+        // Remove any custom filters
+        while ($.fn.dataTable.ext.search.length > 0) {
+          $.fn.dataTable.ext.search.pop();
+        }
+        
+        // Reset stat cards to original values from the initial data load
+        if (window.originalStatusCounts) {
+          document.getElementById('pendingCount').textContent = originalStatusCounts.pending || 0;
+          document.getElementById('progressCount').textContent = originalStatusCounts.inProgress || 0;
+          document.getElementById('completedCount').textContent = originalStatusCounts.completed || 0;
+          document.getElementById('rejectedCount').textContent = originalStatusCounts.rejected || 0;
+        }
+        
+        showToast('Filters reset', 'info');
+      });
+      
+      // Bulk action buttons
+      document.getElementById('selectAllBtn').addEventListener('click', function() {
+        document.getElementById('selectAll').checked = true;
+        document.querySelectorAll('.request-checkbox').forEach(checkbox => {
+          checkbox.checked = true;
+          handleCheckboxChange(checkbox);
+        });
+      });
+      
+      document.getElementById('unselectAllBtn').addEventListener('click', function() {
+        document.getElementById('selectAll').checked = false;
+        document.querySelectorAll('.request-checkbox').forEach(checkbox => {
+          checkbox.checked = false;
+          handleCheckboxChange(checkbox);
+        });
+        updateBulkActionsVisibility();
+      });
+    }
+    
+    // NEW FUNCTION: Setup background refresh mechanism
+    function setupBackgroundRefresh() {
+      console.log('Setting up background refresh mechanism');
+      
+      // Initialize variables to track user interaction
+      window.userInteracting = false;
+      window.lastInteractionTime = new Date().getTime();
+      window.backgroundRefreshInterval = 30000; // 30 seconds between refreshes
+      window.lastTableData = null; // Store last data for comparison
+      
+      // Start the background refresh cycle
+      scheduleNextBackgroundRefresh();
+      
+      // Add global event listeners to track user interaction
+      document.addEventListener('mousemove', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('keydown', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('scroll', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('touchstart', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+    }
+    
+    // Reset user interaction timer
+    function resetUserInteractionTimer() {
+      window.lastInteractionTime = new Date().getTime();
+      
+      // Consider user not interacting after 2 seconds of inactivity
+      setTimeout(function() {
+        const now = new Date().getTime();
+        if (now - window.lastInteractionTime >= 2000) {
+          window.userInteracting = false;
+        }
+      }, 2000);
+    }
+    
+    // Schedule next background refresh
+    function scheduleNextBackgroundRefresh() {
+      setTimeout(function() {
+        performBackgroundRefresh();
+      }, window.backgroundRefreshInterval);
+    }
+    
+    // Perform background refresh
+    function performBackgroundRefresh() {
+      // Skip refresh if user is actively interacting with the page
+      if (window.userInteracting) {
+        console.log('Skipping background refresh - user is interacting with the page');
+        scheduleNextBackgroundRefresh();
+        return;
+      }
+      
+      console.log('Performing background refresh');
+      
+      // Generate a unique timestamp to avoid caching
+      const timestamp = new Date().getTime();
+      
+      // Perform a quiet data fetch without showing loading indicators
+      google.script.run
+        .withSuccessHandler(function(result) {
+          console.log('Background refresh data received');
+          
+          // Validate data
+          if (!result || !result.requests || !Array.isArray(result.requests) || 
+              !result.statusCounts || typeof result.statusCounts !== 'object') {
+            console.error('Invalid data received during background refresh');
+            scheduleNextBackgroundRefresh();
+            return;
+          }
+          
+          // Compare with current data to see if update is needed
+          if (shouldUpdateTable(result)) {
+            console.log('Data has changed, updating table quietly');
+            updateTableQuietly(result);
+          } else {
+            console.log('No data changes detected, skipping update');
+          }
+          
+          // Schedule next refresh regardless of outcome
+          scheduleNextBackgroundRefresh();
+        })
+        .withFailureHandler(function(error) {
+          console.error('Background refresh failed:', error);
+          // Still schedule next attempt
+          scheduleNextBackgroundRefresh();
+        })
+        .getBIDashboardData(timestamp);
+    }
+    
+    // Check if table should be updated based on data comparison
+    function shouldUpdateTable(newData) {
+      // If we don't have previous data, we should update
+      if (!window.lastTableData) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare request counts
+      if (newData.requests.length !== window.lastTableData.requests.length) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare status counts
+      const oldCounts = window.lastTableData.statusCounts;
+      const newCounts = newData.statusCounts;
+      
+      if (oldCounts.pending !== newCounts.pending ||
+          oldCounts.inProgress !== newCounts.inProgress ||
+          oldCounts.completed !== newCounts.completed ||
+          oldCounts.rejected !== newCounts.rejected) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare request statuses (sample a few requests for efficiency)
+      const sampleSize = Math.min(10, newData.requests.length);
+      for (let i = 0; i < sampleSize; i++) {
+        const newRequest = newData.requests[i];
+        const oldRequest = window.lastTableData.requests.find(r => r.request_id === newRequest.request_id);
+        
+        if (!oldRequest || oldRequest.current_bi_status !== newRequest.current_bi_status) {
+          window.lastTableData = newData;
+          return true;
+        }
+      }
+      
+      // No significant changes detected
+      return false;
+    }
+    
+    // Update table without showing loading indicators
+    function updateTableQuietly(result) {
+      try {
+        // Store the new data
+        window.lastTableData = result;
+        
+        // Update status counts
+        const counts = result.statusCounts;
+        document.getElementById('pendingCount').textContent = counts.pending || 0;
+        document.getElementById('progressCount').textContent = counts.inProgress || 0;
+        document.getElementById('completedCount').textContent = counts.completed || 0;
+        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
+        
+        // Make sure DataTable is initialized
+        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
+          console.warn('DataTable not properly initialized during quiet update');
+          return;
+        }
+        
+        // Save current state for restoration
+        let currentPage = requestsTable.page();
+        let currentSearch = requestsTable.search();
+        let currentOrder = requestsTable.order();
+        
+        // Clear and reload data
+        requestsTable.clear();
+        
+        // Process the requests
+        result.requests.forEach((request) => {
+          try {
+            requestsTable.row.add([
+              `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
+              request.request_id,
+              formatDate(request.timestamp_string) || '',
+              request.course_name || '',
+              request.refund_type || '',
+              formatCurrency(request.refund_amount || 0),
+              getStatusBadge(request.current_bi_status || 'Pending'),
+              getActionButtons(request)
+            ]);
+          } catch (rowError) {
+            console.error(`Error adding row for request ${request.request_id}:`, rowError);
+          }
+        });
+        
+        // Redraw with preserved state
+        requestsTable.search(currentSearch).order(currentOrder).draw(false);
+        requestsTable.page(currentPage).draw('page');
+        
+        console.log('Table updated quietly in the background');
+      } catch (error) {
+        console.error('Error during quiet table update:', error);
+      }
+    }
+
+    // Handle checkbox changes
+    function handleCheckboxChange(checkbox) {
+      const requestId = checkbox.dataset.id;
+      if (checkbox.checked) {
+        selectedRequests.add(requestId);
+      } else {
+        selectedRequests.delete(requestId);
+      }
+      updateBulkActionsVisibility();
+    }
+
+    // Update bulk actions panel visibility
+    function updateBulkActionsVisibility() {
+      const bulkActionsBar = document.getElementById('bulkActionsBar');
+      const selectedItemsCount = document.getElementById('selectedItemsCount');
+      
+      if (selectedRequests.size > 0) {
+        bulkActionsBar.style.display = 'block';
+        // Trigger animation after display is set
+        setTimeout(() => {
+          bulkActionsBar.style.opacity = '1';
+          bulkActionsBar.style.transform = 'translateY(0)';
+        }, 10);
+        selectedItemsCount.textContent = selectedRequests.size;
+      } else {
+        // Animate out
+        bulkActionsBar.style.opacity = '0';
+        bulkActionsBar.style.transform = 'translateY(-20px)';
+        // Hide after animation completes
+        setTimeout(() => {
+          bulkActionsBar.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // Handle bulk update
+    function handleBulkUpdate() {
+      const status = document.getElementById('bulkStatus').value;
+      if (!status) {
+        showToast('Please select an action', 'warning');
+        return;
+      }
+
+      // Set the selected status and count in the confirmation modal
+      document.getElementById('selectedCount').textContent = selectedRequests.size;
+      const statusBadge = document.getElementById('selectedStatus');
+      statusBadge.textContent = status;
+      statusBadge.className = 'fw-bold status-badge ' + status.toLowerCase().replace(/\s+/g, '-');
+
+      // Show the confirmation modal
+      const modal = new bootstrap.Modal(document.getElementById('bulkUpdateModal'));
+      modal.show();
+    }
+
+    // Process bulk update
+    function processBulkUpdate(status, remarks, sessionToken) {
+      showProgress('Processing bulk update...');
+      
+      const requests = Array.from(selectedRequests).map(id => ({
+        request_id: id,
+        status: status,
+        remarks: remarks
+      }));
+
+      // Apply optimistic UI updates for all selected requests
+      selectedRequests.forEach(requestId => {
+        updateLocalTableRow(requestId, status);
+      });
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          hideProgress();
+          
+          if (response.success) {
+            showToast('Bulk update completed successfully', 'success');
+            selectedRequests.clear();
+            updateBulkActionsVisibility();
+            
+            // Use forceSynchronization for reliable updates
+            forceSynchronization(null, null);
+          } else {
+            handleError('Some updates failed. Please check the logs.');
+            loadDashboardData();
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideProgress();
+          handleError('Error during bulk update: ' + (error.message || error));
+          loadDashboardData();
+        })
+        .bulkUpdateBIRequests(requests, status, remarks, sessionToken);
+    }
+
+    // Show request details
+    function showRequestDetails(requestId, retryCount = 0, maxRetries = 3, delay = 2000) {
+      console.log(`Loading request details for ${requestId} (attempt ${retryCount + 1}/${maxRetries + 1})`);
+      showProgress('Loading request details...');
+      
+      // First get the request details
+      google.script.run
+        .withSuccessHandler(function(details) {
+          if (!details) {
+            const errorMsg = 'Failed to load request details';
+            console.error(errorMsg);
+            
+            if (retryCount < maxRetries) {
+              // Automatic retry with exponential backoff
+              const retryDelay = delay * Math.pow(1.5, retryCount);
+              console.log(`Retrying request details in ${retryDelay/1000} seconds...`);
+              
+              // Show retry notification
+              showToast(`Loading details failed. Retrying in ${Math.round(retryDelay/1000)} seconds... (${retryCount + 1}/${maxRetries})`, 'warning', 3000);
+              
+              setTimeout(() => {
+                showRequestDetails(requestId, retryCount + 1, maxRetries, delay);
+              }, retryDelay);
+              return;
+            } else {
+              // Max retries reached, show error with retry button
+              handleError(errorMsg, true, () => showRequestDetails(requestId, 0, maxRetries, delay));
+              return;
+            }
+          }
+          
+          // Then get the complete request journey using the existing function
+          loadRequestJourney(requestId, details);
+        })
+        .withFailureHandler(function(error) {
+          console.error(`Error loading request details (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+          
+          if (retryCount < maxRetries) {
+            // Automatic retry with exponential backoff
+            const retryDelay = delay * Math.pow(1.5, retryCount);
+            console.log(`Retrying request details in ${retryDelay/1000} seconds...`);
+            
+            // Show retry notification
+            showToast(`Loading details failed. Retrying in ${Math.round(retryDelay/1000)} seconds... (${retryCount + 1}/${maxRetries})`, 'warning', 3000);
+            
+            setTimeout(() => {
+              showRequestDetails(requestId, retryCount + 1, maxRetries, delay);
+            }, retryDelay);
+          } else {
+            // Max retries reached, show error with retry button
+            handleError(`Failed to load request details: ${error}`, true, () => showRequestDetails(requestId, 0, maxRetries, delay));
+          }
+        })
+        .getBIRequestDetails(requestId);
+    }
+    
+    // Load request journey with retry capability
+    function loadRequestJourney(requestId, details, retryCount = 0, maxRetries = 2, delay = 1500) {
+      google.script.run
+        .withSuccessHandler(function(journey) {
+          // Add the journey to the details object
+          details.completeJourney = journey;
+          handleRequestDetails(details);
+        })
+        .withFailureHandler(function(error) {
+          console.error(`Error loading request journey (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+          
+          if (retryCount < maxRetries) {
+            // Automatic retry with exponential backoff
+            const retryDelay = delay * Math.pow(1.5, retryCount);
+            console.log(`Retrying journey load in ${retryDelay/1000} seconds...`);
+            
+            // Show a toast notification for the retry
+            showToast(`Loading request history failed. Retrying in ${Math.round(retryDelay/1000)} seconds...`, 'warning', 2000);
+            
+            setTimeout(() => {
+              loadRequestJourney(requestId, details, retryCount + 1, maxRetries, delay);
+            }, retryDelay);
+          } else {
+            console.warn('Failed to load journey after multiple attempts, showing details without journey');
+            // Show a warning toast about the journey load failure
+            showToast('Request history could not be loaded after multiple attempts. Some information may be missing.', 'warning');
+            // Still show details even if journey fails to load after retries
+            handleRequestDetails(details);
+          }
+        })
+        .getCompleteRequestJourney(requestId);
+    }
+
+    // Handle request details
+    function handleRequestDetails(details) {
+      if (!details) {
+        handleError('Failed to load request details');
+        return;
+      }
+
+      console.log('Loaded request details:', details);
+
+      document.getElementById('requestIdTitle').textContent = details.request_id;
+      
+      // Set status badge in the card header
+      const modalStatusBadge = document.getElementById('modalStatusBadge');
+      if (modalStatusBadge) {
+        modalStatusBadge.innerHTML = getStatusBadge(details.current_bi_status || 'Pending');
+      }
+
+      // Set request ID in the update form
+      const updateForm = document.getElementById('updateForm');
+      updateForm.elements.requestId.value = details.request_id;
+      
+      // Pre-select current status if available
+      if (details.current_bi_status && updateForm.elements.status) {
+        updateForm.elements.status.value = details.current_bi_status;
+      }
+
+      // Populate request details
+      const detailsContainer = document.getElementById('requestDetails');
+      detailsContainer.innerHTML = generateDetailsHTML(details);
+
+      // Populate update history - use complete journey if available, otherwise fall back to BI history
+      const historyContainer = document.getElementById('updateHistory');
+      if (details.completeJourney && details.completeJourney.length > 0) {
+        historyContainer.innerHTML = generateHistoryHTML(details.completeJourney);
+      } else {
+        // Add initial submission to history if not already present
+        if (details.history && Array.isArray(details.history)) {
+          // Check if there's already a "Submitted" entry
+          const hasSubmittedEntry = details.history.some(entry => 
+            entry.status.toLowerCase() === 'submitted' || entry.remarks.toLowerCase().includes('submitted'));
+          
+          if (!hasSubmittedEntry) {
+            // Add initial submission entry
+            details.history.push({
+              timestamp: details.timestamp,
+              status: 'Submitted',
+              remarks: 'Request submitted',
+              updated_by: details.requester_name || 'Sales Team',
+              team: 'Sales'
+            });
+          }
+        }
+        historyContainer.innerHTML = generateHistoryHTML(details.history);
+      }
+      
+      // Initialize tooltips
+      const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltips.forEach(tooltip => {
+        new bootstrap.Tooltip(tooltip);
+      });
+
+      // Show modal
+      new bootstrap.Modal(document.getElementById('detailModal')).show();
+      hideProgress();
+    }
+
+    // Handle single update
+    function handleUpdate() {
+      const form = document.getElementById('updateForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Get form data
+      const requestId = form.elements.requestId.value;
+      const status = form.elements.status.value;
+      const remarks = form.elements.remarks.value;
+      
+      // Validate required fields
+      if (!requestId || !status) {
+        console.error('Missing required fields for update:', { requestId, status });
+        showToast('Request ID and status are required', 'danger');
+        return;
+      }
+      
+      // Get session token from auth data
+      const authData = document.getElementById('auth-data');
+      const sessionToken = authData ? authData.getAttribute('data-session-token') : '';
+      
+      // Create update object
+      const update = {
+        request_id: requestId,
+        status: status,
+        remarks: remarks || ''
+      };
+      
+      console.log('Sending update from view modal:', update);
+      
+      // Store original modal data for restoration if needed
+      const originalRow = findTableRowByRequestId(requestId);
+      let originalRowData = null;
+      if (originalRow) {
+        console.log('Found original row for optimistic update', originalRow);
+        originalRowData = getRowData(originalRow);
+      }
+      
+      // Perform optimistic UI update before server call
+      updateLocalTableRow(requestId, status);
+      updateStatusCountsForOptimisticUpdate(requestId, status);
+      
+      showProgress('Processing update...');
+      
+      // Apply a small debounce to ensure UI updates are visible before server processing
+      setTimeout(() => {
+        google.script.run
+          .withSuccessHandler(function(result) {
+            hideProgress();
+            console.log('Server response for view modal update:', result);
+            
+            if (result.success) {
+              showToast('Update processed successfully', 'success');
+              bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();
+              
+              // IMPROVED: Use the new forceSynchronization function to ensure complete data refresh
+              forceSynchronization(requestId, status);
+            } else {
+              console.error('Server returned error for view modal update:', result.message);
+              showToast('Error updating status: ' + result.message, 'danger');
+              
+              // Revert optimistic UI update if we have the original data
+              if (originalRowData) {
+                console.log('Reverting optimistic update due to error');
+                revertOptimisticUpdate(requestId, originalRowData);
+              } else {
+                // If we can't revert specifically, refresh the whole table
+                loadDashboardData();
+              }
+            }
+          })
+          .withFailureHandler(function(error) {
+            hideProgress();
+            console.error('Error during view modal update:', error);
+            showToast('Error updating status: ' + (error.message || error), 'danger');
+            
+            // Revert optimistic UI update if we have the original data
+            if (originalRowData) {
+              console.log('Reverting optimistic update due to error');
+              revertOptimisticUpdate(requestId, originalRowData);
+            } else {
+              // If we can't revert specifically, refresh the whole table
+              loadDashboardData();
+            }
+          })
+          .createBIUpdateHistory(update, sessionToken);
+      }, 50); // Small delay to ensure UI updates are processed first
+    }
+    
+    // NEW FUNCTION: Force complete synchronization between server and client
+    function forceSynchronization(requestId, newStatus) {
+      console.log(`Forcing complete synchronization for request ${requestId} with status ${newStatus}`);
+      
+      // First, ensure the local table is updated (redundant but ensures UI consistency)
+      if (requestId && newStatus) {
+        updateLocalTableRow(requestId, newStatus);
+      }
+      
+      // Show a mini-progress indicator
+      showProgress('Synchronizing data...');
+      
+      // If we have a specific request ID, first check its status directly
+      if (requestId) {
+        // First, make a targeted request to check the specific request's status
+        google.script.run
+          .withSuccessHandler(function(requestDetails) {
+            console.log('Direct request status check:', requestDetails);
+            
+            if (requestDetails && requestDetails.current_bi_status) {
+              console.log(`Server reports status for ${requestId} is: ${requestDetails.current_bi_status}`);
+              
+              // If status doesn't match what we expect, log a warning
+              if (newStatus && requestDetails.current_bi_status !== newStatus) {
+                console.warn(`Status mismatch: Expected ${newStatus}, got ${requestDetails.current_bi_status} from server`);
+                
+                // Force the server to update the status if it doesn't match
+                console.log('Forcing server-side status update to match client');
+                
+                // Get session token
+                const authData = document.getElementById('auth-data');
+                const sessionToken = authData ? authData.getAttribute('data-session-token') : '';
+                
+                // Create a special update to force synchronization
+                const syncUpdate = {
+                  request_id: requestId,
+                  status: newStatus,
+                  remarks: 'Forced synchronization - correcting status mismatch',
+                  force_sync: true  // Special flag to force update
+                };
+                
+                // Send the force update
+                google.script.run
+                  .withSuccessHandler(function() {
+                    console.log('Force sync update sent successfully');
+                    // Now do a full refresh
+                    refreshFullTable();
+                  })
+                  .withFailureHandler(function(error) {
+                    console.error('Force sync update failed:', error);
+                    // Still try to refresh the table
+                    refreshFullTable();
+                  })
+                  .createBIUpdateHistory(syncUpdate, sessionToken);
+              } else {
+                // Status matches or we don't care about specific status, refresh the table
+                refreshFullTable();
+              }
+            } else {
+              console.warn('Could not verify request status, proceeding with full refresh');
+              refreshFullTable();
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error checking request status:', error);
+            // Fall back to full refresh
+            refreshFullTable();
+          })
+          .getBIRequestDetails(requestId);
+      } else {
+        // No specific request ID, just do a full refresh
+        refreshFullTable();
+      }
+      
+      // Function to refresh the full table with fresh data
+      function refreshFullTable() {
+        // Generate a unique timestamp to completely avoid caching
+        const timestamp = new Date().getTime();
+        
+        // Force a complete data refresh with no caching
+        google.script.run
+          .withSuccessHandler(function(result) {
+            console.log('Full table refresh successful');
+            
+            // Process the fresh data
+            if (result && result.requests && Array.isArray(result.requests)) {
+              // Update the table with the fresh data
+              handleDashboardData(result);
+            } else {
+              console.error('Invalid data received during table refresh');
+              // Fall back to regular refresh
+              loadDashboardData(0, 3, 1000);
+            }
+            
+            hideProgress();
+          })
+          .withFailureHandler(function(error) {
+            console.error('Table refresh failed:', error);
+            hideProgress();
+            
+            // Fall back to regular refresh
+            loadDashboardData(0, 3, 1000);
+          })
+          .getBIDashboardData(timestamp);
+      }
+    }
+    
+    // Update the updateRequestStatus function to use forceSynchronization
+    function updateRequestStatus() {
+      const requestId = document.getElementById('updateRequestId').value;
+      const newStatus = document.getElementById('updateStatus').value;
+      const remarks = document.getElementById('updateRemarks').value;
+      
+      // Debug logging
+      console.log('Updating request status with data:', {
+        request_id: requestId,
+        status: newStatus,
+        remarks: remarks
+      });
+      
+      if (!requestId || !newStatus) {
+        console.error('Validation failed: Missing required fields');
+        showToast('Request ID and status are required', 'danger');
+        return;
+      }
+      
+      // Get session token from auth data
+      const authData = document.getElementById('auth-data');
+      const sessionToken = authData ? authData.getAttribute('data-session-token') : '';
+      
+      showProgress('Updating request status...');
+      
+      // Create update object
+      const updateData = {
+        request_id: requestId,
+        status: newStatus,
+        remarks: remarks || ''
+      };
+      
+      console.log('Sending update data to server:', updateData);
+      
+      // Perform optimistic UI update
+      updateLocalTableRow(requestId, newStatus);
+      updateStatusCountsForOptimisticUpdate(requestId, newStatus);
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          hideProgress();
+          console.log('Server response:', result);
+          
+          if (result.success) {
+            showToast('Status updated successfully', 'success');
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
+            
+            // IMPROVED: Use forceSynchronization for reliable updates
+            forceSynchronization(requestId, newStatus);
+          } else {
+            console.error('Server returned error:', result.message);
+            showToast('Error updating status: ' + result.message, 'danger');
+            // Refresh data to ensure consistency
+            loadDashboardData();
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideProgress();
+          console.error('Error updating status:', error);
+          showToast('Error updating status: ' + (error.message || error), 'danger');
+          // Refresh data to ensure consistency
+          loadDashboardData();
+        })
+        .createBIUpdateHistory(updateData, sessionToken);
+    }
+    
+    // Also update the confirmBulkUpdate function to use forceSynchronization
+    function confirmBulkUpdate() {
+      const form = document.getElementById('bulkUpdateForm');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const status = document.getElementById('bulkStatus').value;
+      const remarks = form.elements.bulkRemarks.value;
+      
+      // Get session token from auth data
+      const authData = document.getElementById('auth-data');
+      const sessionToken = authData ? authData.getAttribute('data-session-token') : '';
+      
+      bootstrap.Modal.getInstance(document.getElementById('bulkUpdateModal')).hide();
+      
+      // Show progress for bulk update
+      showProgress(`Processing bulk update for ${selectedRequests.size} requests...`);
+      
+      // Apply optimistic UI updates for all selected requests
+      selectedRequests.forEach(requestId => {
+        updateLocalTableRow(requestId, status);
+      });
+      
+      // Process the bulk update
+      const requests = Array.from(selectedRequests).map(id => ({
+        request_id: id,
+        status: status,
+        remarks: remarks || ''
+      }));
+      
+      google.script.run
+        .withSuccessHandler(function(result) {
+          hideProgress();
+          console.log('Bulk update result:', result);
+          
+          if (result.success) {
+            showToast(`Successfully updated ${result.processed} of ${result.total} requests`, 'success');
+            
+            // IMPROVED: Force complete synchronization after bulk update
+            forceSynchronization(null, null); // No specific request ID for bulk updates
+          } else {
+            console.error('Bulk update failed:', result.error);
+            showToast('Error during bulk update: ' + (result.error || 'Unknown error'), 'danger');
+            loadDashboardData();
+          }
+          
+          // Clear selection
+          selectedRequests.clear();
+          updateBulkActionsVisibility();
+        })
+        .withFailureHandler(function(error) {
+          hideProgress();
+          console.error('Error during bulk update:', error);
+          showToast('Error during bulk update: ' + (error.message || error), 'danger');
+          loadDashboardData();
+          
+          // Clear selection
+          selectedRequests.clear();
+          updateBulkActionsVisibility();
+        })
+        .bulkUpdateBIRequests(requests, status, remarks, sessionToken);
+    }
+
+    // Find a table row by request ID
+    function findTableRowByRequestId(requestId) {
+      if (!requestsTable) return null;
+      
+      const rows = requestsTable.rows().nodes().toArray();
+      for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].cells;
+        if (cells.length > 1 && cells[1].textContent === requestId) {
+          return rows[i];
+        }
+      }
+      return null;
+    }
+    
+    // Get row data for possible reversion
+    function getRowData(row) {
+      if (!row || !row.cells) return null;
+      
+      const cells = row.cells;
+      return {
+        requestId: cells[1].textContent,
+        rowIndex: row.rowIndex,
+        status: cells[6].querySelector('.status-badge').textContent,
+        statusHTML: cells[6].innerHTML
+      };
+    }
+    
+    // Revert an optimistic update
+    function revertOptimisticUpdate(requestId, originalData) {
+      const row = findTableRowByRequestId(requestId);
+      if (row && row.cells && row.cells.length > 6) {
+        row.cells[6].innerHTML = originalData.statusHTML;
+        console.log('Optimistic update reverted for request ID:', requestId);
+      }
+    }
+    
+    // Update status counts for optimistic update
+    function updateStatusCountsForOptimisticUpdate(requestId, newStatus) {
+      try {
+        // Find the original status from the table
+        const row = findTableRowByRequestId(requestId);
+        if (!row) return;
+        
+        const statusCell = row.cells[6];
+        if (!statusCell) return;
+        
+        const statusElement = statusCell.querySelector('.status-badge');
+        if (!statusElement) return;
+        
+        const oldStatus = statusElement.textContent;
+        console.log(`Updating status counts: ${oldStatus} -> ${newStatus}`);
+        
+        // Decrement old status count
+        const oldCountElement = document.getElementById(getStatusCountElementId(oldStatus));
+        if (oldCountElement) {
+          const oldCount = parseInt(oldCountElement.textContent) || 0;
+          if (oldCount > 0) {
+            oldCountElement.textContent = (oldCount - 1).toString();
+          }
+        }
+        
+        // Increment new status count
+        const newCountElement = document.getElementById(getStatusCountElementId(newStatus));
+        if (newCountElement) {
+          const newCount = parseInt(newCountElement.textContent) || 0;
+          newCountElement.textContent = (newCount + 1).toString();
+        }
+      } catch (error) {
+        console.error('Error updating status counts:', error);
+      }
+    }
+    
+    // Get status count element ID based on status text
+    function getStatusCountElementId(status) {
+      switch (status) {
+        case 'Pending': return 'pendingCount';
+        case 'In Progress': return 'progressCount';
+        case 'Completed': return 'completedCount';
+        case 'Rejected': return 'rejectedCount';
+        default: return '';
+      }
+    }
+    
+    // Update the table row with new status (optimistic update)
+    function updateLocalTableRow(requestId, newStatus) {
+      try {
+        console.log(`Optimistically updating row for request ${requestId} to status ${newStatus}`);
+        
+        // Try to update using DataTables API first
+        if (requestsTable) {
+          const row = findTableRowByRequestId(requestId);
+          if (row && row.cells && row.cells.length > 6) {
+            row.cells[6].innerHTML = getStatusBadge(newStatus);
+            
+            // Log success of optimistic update
+            console.log(`Optimistic UI update applied to request ${requestId}`);
+            return true;
+          }
+        }
+        
+        // Fallback to traditional DOM update if DataTables method fails
+        const table = document.getElementById('requestsTable');
+        if (!table) {
+          console.warn('Table element not found for optimistic update');
+          return false;
+        }
+        
+        const rows = table.getElementsByTagName('tr');
+        let found = false;
+        
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].getElementsByTagName('td');
+          if (cells.length > 1 && cells[1].textContent === requestId) {
+            // Update the status cell (index 6)
+            if (cells[6]) {
+              cells[6].innerHTML = getStatusBadge(newStatus);
+              found = true;
+              break;
+            }
+          }
+        }
+        
+        if (found) {
+          console.log(`Optimistic UI update applied to request ${requestId} (DOM method)`);
+          return true;
+        } else {
+          console.warn(`Row for request ${requestId} not found for optimistic update`);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error during optimistic update:', error);
+        return false;
+      }
+    }
+
+    // Utility functions
+    function formatCurrency(amount) {
+      return parseFloat(amount || 0).toFixed(2);
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString; // Return original if invalid
+      
+      const day = date.getDate();
+      const month = date.toLocaleString('en-US', { month: 'short' });
+      const year = date.getFullYear();
+      const hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12;
+      
+      return `${day}-${month}-${year} ${formattedHours}:${minutes} ${ampm}`;
+    }
+
+    function getStatusBadge(status) {
+      const statusClasses = {
+        'Pending': 'pending',
+        'In Progress': 'in-progress',
+        'Completed': 'completed',
+        'Rejected': 'rejected'
+      };
+      return `<span class="status-badge ${statusClasses[status] || 'pending'}">${status}</span>`;
+    }
+
+    function getActionButtons(request) {
+      return `
+        <div class="action-buttons">
+          <button class="btn btn-sm btn-primary" onclick="showRequestDetails('${request.request_id}')">
+            <i class="fas fa-eye"></i> View
+          </button>
+        </div>
+      `;
+    }
+
+    // Improved toast notification function
+    function showToast(message, type = 'info', duration = 5000) {
+      const toastContainer = document.querySelector('.toast-container');
+      if (!toastContainer) {
+        // Create toast container if it doesn't exist
+        const newContainer = document.createElement('div');
+        newContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        newContainer.style.zIndex = '1050';
+        document.body.appendChild(newContainer);
+        toastContainer = newContainer;
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = `toast bg-${type} text-white`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      
+      toast.innerHTML = `
+        <div class="toast-header bg-${type} text-white">
+          <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: duration
+      });
+      bsToast.show();
+      
+      // Remove toast from DOM after it's hidden
+      toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+      });
+    }
+
+    function showProgress(message) {
+      console.log('Showing progress overlay:', message);
+      const overlay = document.getElementById('progressOverlay');
+      document.getElementById('progressMessage').textContent = message;
+      overlay.style.display = 'flex';
+      overlay.style.opacity = '1';
+    }
+
+    function hideProgress() {
+      console.log('Hiding progress overlay');
+      const overlay = document.getElementById('progressOverlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 300);
+    }
+
+    function handleError(error, showRetryButton = false, retryFunction = null) {
+      console.error('Error occurred:', error);
+      hideProgress();
+      
+      // Track error frequency
+      const now = Date.now();
+      if (now - lastErrorTime < 10000) { // Within 10 seconds
+        errorCount++;
+      } else {
+        errorCount = 1;
+      }
+      lastErrorTime = now;
+      
+      let errorMessage = 'An error occurred';
+      let errorDetails = '';
+      let errorType = 'unknown';
+      
+      if (typeof error === 'string') {
+        errorMessage = error;
+        // Try to determine error type from string
+        if (error.toLowerCase().includes('network') || 
+            error.toLowerCase().includes('connection') || 
+            error.toLowerCase().includes('offline')) {
+          errorType = 'network';
+        } else if (error.toLowerCase().includes('timeout')) {
+          errorType = 'timeout';
+        }
+      } else if (error && error.message) {
+        errorMessage = error.message;
+        errorDetails = error.stack || '';
+        
+        // Try to determine error type from error object
+        if (error.name === 'NetworkError' || 
+            error.message.toLowerCase().includes('network') || 
+            error.message.toLowerCase().includes('connection')) {
+          errorType = 'network';
+        } else if (error.name === 'TimeoutError' || 
+                  error.message.toLowerCase().includes('timeout')) {
+          errorType = 'timeout';
+        }
+      } else if (error && error.toString) {
+        errorMessage = error.toString();
+      }
+      
+      console.log('Processed error - type:', errorType, 'count:', errorCount);
+      
+      // Try auto-recovery for certain error types or frequency patterns
+      if (errorType === 'network' || errorType === 'timeout') {
+        console.log('Network or timeout error detected, checking connectivity...');
+        
+        // If we have navigator.onLine, use it as a signal
+        if (typeof navigator.onLine !== 'undefined' && !navigator.onLine) {
+          console.log('Browser reports device is offline, showing offline notification');
+          showOfflineNotification();
+          
+          // Set up a listener to retry when we come back online
+          window.addEventListener('online', function onlineHandler() {
+            console.log('Browser reports device is back online, attempting recovery');
+            showToast('Connection restored. Attempting to recover...', 'info');
+            
+            // Remove the listener to avoid duplicate calls
+            window.removeEventListener('online', onlineHandler);
+            
+            // Wait a moment for the connection to stabilize
+            setTimeout(() => {
+              if (typeof retryFunction === 'function') {
+                retryFunction();
+              } else {
+                // Default recovery is to reload dashboard data
+                loadDashboardData(0, 5, 1000);
+              }
+            }, 2000);
+          }, { once: true }); // Use once option to ensure it only fires once
+        } else {
+          // We might be having intermittent connectivity issues
+          console.log('Device appears online but experiencing network issues');
+          
+          if (errorCount <= 3) {
+            // For first few errors, try automatic retry with backoff
+            const retryDelay = 2000 * Math.pow(1.5, errorCount - 1);
+            console.log(`Auto-retry scheduled in ${retryDelay/1000} seconds`);
+            
+            showToast(`Connection issue detected. Will retry automatically in ${Math.round(retryDelay/1000)} seconds...`, 'warning');
+            
+            setTimeout(() => {
+              if (typeof retryFunction === 'function') {
+                retryFunction();
+              } else {
+                // Default recovery is to reload dashboard data
+                loadDashboardData(0, 5, 1000);
+              }
+            }, retryDelay);
+            
+            // Still show error notification, but it will auto-recover
+            showRetryButton = true;
+          }
+        }
+      }
+      
+      // For frequent errors, add diagnostic information and recommend refresh
+      if (errorCount >= 3) {
+        // Collect diagnostic information
+        const diagnostics = {
+          userAgent: navigator.userAgent,
+          viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+          isOnline: navigator.onLine,
+          timeLastSuccess: window.lastSuccessfulDataLoad || 'unknown',
+          tableInitialized: typeof requestsTable !== 'undefined' && requestsTable !== null,
+          errorFrequency: `${errorCount} errors in the last 10 seconds`
+        };
+        
+        console.log('Multiple errors detected, collecting diagnostics:', diagnostics);
+        
+        // Show a more serious error notification recommending page refresh
+        errorMessage = `Multiple errors detected (${errorCount} in quick succession). Try refreshing the page.`;
+        
+        // Add refresh button to error
+        const refreshButton = document.createElement('button');
+        refreshButton.className = 'btn btn-sm btn-danger ms-2';
+        refreshButton.innerHTML = '<i class="fas fa-sync"></i> Refresh Page';
+        refreshButton.onclick = () => window.location.reload();
+        
+        // If retryFunction exists, modify it to refresh the page on critical errors
+        if (typeof retryFunction === 'function') {
+          const originalRetry = retryFunction;
+          retryFunction = function() {
+            errorCount = 0; // Reset error count
+            originalRetry();
+          };
+        } else {
+          // Set a default retry function to refresh the page
+          retryFunction = () => window.location.reload();
+        }
+        
+        showRetryButton = true;
+      }
+      
+      // For critical errors, show a more prominent notification
+      if (showRetryButton && retryFunction) {
+        // Create a fixed error notification at the top of the content area
+        const errorContainer = document.createElement('div');
+        errorContainer.id = 'errorNotification';
+        errorContainer.className = 'alert alert-danger alert-dismissible fade show mb-0';
+        errorContainer.setAttribute('role', 'alert');
+        errorContainer.innerHTML = `
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span><strong>Error:</strong> ${errorMessage}</span>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="errorRetryButton">
+              <i class="fas fa-sync-alt me-1"></i> Retry
+            </button>
+            ${errorCount >= 3 ? '<button type="button" class="btn btn-sm btn-danger ms-2" id="errorRefreshButton"><i class="fas fa-sync"></i> Refresh Page</button>' : ''}
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Remove any existing error notifications
+        const existingError = document.getElementById('errorNotification');
+        if (existingError) {
+          existingError.remove();
+        }
+        
+        // Insert inline with the header
+        const headerErrorContainer = document.getElementById('headerErrorContainer');
+        if (headerErrorContainer) {
+          headerErrorContainer.appendChild(errorContainer);
+        } else {
+          // Fallback to the old method if header container not found
+          const contentArea = document.querySelector('.content-area') || document.querySelector('main');
+          if (contentArea) {
+            contentArea.insertBefore(errorContainer, contentArea.firstChild);
+          } else {
+            // Fallback to body if content area not found
+            document.body.insertBefore(errorContainer, document.body.firstChild);
+          }
+        }
+        
+        // Add retry button event listener
+        document.getElementById('errorRetryButton').addEventListener('click', function() {
+          errorContainer.remove();
+          errorCount = 0; // Reset error count on manual retry
+          if (typeof retryFunction === 'function') {
+            retryFunction();
+          }
+        });
+        
+        // Add refresh button event listener if present
+        const refreshButton = document.getElementById('errorRefreshButton');
+        if (refreshButton) {
+          refreshButton.addEventListener('click', function() {
+            window.location.reload();
+          });
+        }
+      } else {
+        // For non-critical errors, show a toast notification
+        showToast(errorMessage, 'danger', 7000); // Show for longer (7 seconds) to ensure user sees it
+      }
+      
+      // If we have a DataTable instance, make sure it shows "No data available" message
+      if (window.requestsTable) {
+        try {
+          requestsTable.clear().draw();
+        } catch (e) {
+          console.error('Error clearing table:', e);
+        }
+      }
+    }
+    
+    // Show offline notification
+    function showOfflineNotification() {
+      // Create or update the connection status indicator
+      const connectionStatus = document.getElementById('connectionStatus');
+      if (!connectionStatus) return;
+      
+      connectionStatus.style.display = 'block';
+      connectionStatus.innerHTML = `
+        <div class="alert alert-danger d-flex align-items-center p-2 mb-0" role="alert">
+          <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+            <span class="visually-hidden">Checking connection...</span>
+          </div>
+          <div>Checking connection...</div>
+        </div>
+      `;
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    function generateDetailsHTML(details) {
+      // Helper function to check if a section has any data
+      function hasSectionData(sectionFields) {
+        return sectionFields.some(field => {
+          const value = details[field];
+          return value !== undefined && value !== null && value !== '';
+        });
+      }
+      
+      // Define fields for each section
+      const courseFields = ['course_name', 'mistaken_phase', 'intended_course', 'intended_phase'];
+      const paymentFields = ['payment_id', 'purchased_amount', 'purchase_date'];
+      const requesterFields = ['requester', 'requester_email'];
+      const phoneExchangeFields = ['wrong_phone', 'correct_phone'];
+      const mistakenPaymentFields = ['sender_bkash', 'transaction_time', 'sent_amount'];
+      
+      return `
+        <div class="details-grid">
+          <!-- Basic Information -->
+          <div class="detail-section">
+            <h6 class="detail-section-title">Basic Information</h6>
+            <div class="detail-item">
+              <div class="detail-label">Request ID</div>
+              <div class="detail-value">${details.request_id}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Request Date</div>
+              <div class="detail-value">${formatDate(details.timestamp || '')}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Refund Type</div>
+              <div class="detail-value">${details.refund_type || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Refund Amount</div>
+              <div class="detail-value">${formatCurrency(details.refund_amount)} BDT</div>
+            </div>
+            ${details.refund_reason ? `
+            <div class="detail-item">
+              <div class="detail-label">Refund Reason</div>
+              <div class="detail-value">${details.refund_reason}</div>
+            </div>
+            ` : ''}
+            ${details.vertical ? `
+            <div class="detail-item">
+              <div class="detail-label">Vertical</div>
+              <div class="detail-value">${details.vertical}</div>
+            </div>
+            ` : ''}
+          </div>
+
+          <!-- Requester Information - Only show if there's data -->
+          ${hasSectionData(requesterFields) ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Requester Information</h6>
+            ${details.requester ? `
+            <div class="detail-item">
+              <div class="detail-label">Requester</div>
+              <div class="detail-value">${details.requester}</div>
+            </div>
+            ` : ''}
+            ${details.requester_email ? `
+            <div class="detail-item">
+              <div class="detail-label">Requester Email</div>
+              <div class="detail-value">${details.requester_email}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+
+          <!-- Customer Information -->
+          <div class="detail-section">
+            <h6 class="detail-section-title">Customer Information</h6>
+            <div class="detail-item">
+              <div class="detail-label">Customer Name</div>
+              <div class="detail-value">${details.customer_name || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Enrollment Number</div>
+              <div class="detail-value">${details.enrollment_number || 'N/A'}</div>
+            </div>
+          </div>
+
+          <!-- Course Information - Only show if there's data -->
+          ${hasSectionData(courseFields) ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Course Information</h6>
+            ${details.course_name ? `
+            <div class="detail-item">
+              <div class="detail-label">Course Name</div>
+              <div class="detail-value">${details.course_name}</div>
+            </div>
+            ` : ''}
+            ${details.mistaken_phase ? `
+            <div class="detail-item">
+              <div class="detail-label">Mistaken Phase</div>
+              <div class="detail-value">${details.mistaken_phase}</div>
+            </div>
+            ` : ''}
+            ${details.intended_course ? `
+            <div class="detail-item">
+              <div class="detail-label">Intended Course</div>
+              <div class="detail-value">${details.intended_course}</div>
+            </div>
+            ` : ''}
+            ${details.intended_phase ? `
+            <div class="detail-item">
+              <div class="detail-label">Intended Phase</div>
+              <div class="detail-value">${details.intended_phase}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+
+          <!-- Payment Information - Only show if there's data -->
+          ${hasSectionData(paymentFields) ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Payment Information</h6>
+            ${details.payment_id ? `
+            <div class="detail-item">
+              <div class="detail-label">Payment ID</div>
+              <div class="detail-value">${details.payment_id}</div>
+            </div>
+            ` : ''}
+            ${details.purchased_amount ? `
+            <div class="detail-item">
+              <div class="detail-label">Purchased Amount</div>
+              <div class="detail-value">${formatCurrency(details.purchased_amount)} BDT</div>
+            </div>
+            ` : ''}
+            ${details.purchase_date ? `
+            <div class="detail-item">
+              <div class="detail-label">Purchase Date</div>
+              <div class="detail-value">${formatDate(details.purchase_date)}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+          
+          <!-- Phone Exchange Information - Only show if relevant and has data -->
+          ${details.refund_type === 'Phone Number Exchange' && hasSectionData(phoneExchangeFields) ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Phone Exchange Details</h6>
+            ${details.wrong_phone ? `
+            <div class="detail-item">
+              <div class="detail-label">Wrong Phone</div>
+              <div class="detail-value">${details.wrong_phone}</div>
+            </div>
+            ` : ''}
+            ${details.correct_phone ? `
+            <div class="detail-item">
+              <div class="detail-label">Correct Phone</div>
+              <div class="detail-value">${details.correct_phone}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+          
+          <!-- Mistaken Payment Information - Only show if relevant and has data -->
+          ${details.refund_type === 'Mistaken Payment' && hasSectionData(mistakenPaymentFields) ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Mistaken Payment Details</h6>
+            ${details.sender_bkash ? `
+            <div class="detail-item">
+              <div class="detail-label">Sender bKash</div>
+              <div class="detail-value">${details.sender_bkash}</div>
+            </div>
+            ` : ''}
+            ${details.transaction_time ? `
+            <div class="detail-item">
+              <div class="detail-label">Transaction Time</div>
+              <div class="detail-value">${formatDate(details.transaction_time)}</div>
+            </div>
+            ` : ''}
+            ${details.sent_amount ? `
+            <div class="detail-item">
+              <div class="detail-label">Sent Amount</div>
+              <div class="detail-value">${formatCurrency(details.sent_amount)} BDT</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+          
+          <!-- Status Information -->
+          <div class="detail-section">
+            <h6 class="detail-section-title">Status Information</h6>
+            <div class="detail-item">
+              <div class="detail-label">Product Status</div>
+              <div class="detail-value">${details.product_status || 'Pending'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">BI Status</div>
+              <div class="detail-value">${details.current_bi_status || 'Pending'}</div>
+            </div>
+          </div>
+          
+          <!-- Documents - Only show if there's a document folder -->
+          ${details.document_folder ? `
+          <div class="detail-section">
+            <h6 class="detail-section-title">Documents</h6>
+            <div class="detail-item">
+              <div class="detail-value">
+                <a href="${details.document_folder}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-folder-open me-1"></i>View Documents
+                </a>
+              </div>
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function generateHistoryHTML(history) {
+      if (!history || history.length === 0) {
+        return `
+          <div class="text-center py-4 text-muted">
+            <i class="fas fa-history mb-3 opacity-50" style="font-size: 2.5rem;"></i>
+            <p class="mb-0">No update history available</p>
+          </div>
+        `;
+      }
+
+      // Add initial submission as the first history item
+      let historyHTML = '';
+      
+      // Sort history by timestamp (newest first)
+      const sortedHistory = [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      // Add each history item to the timeline
+      sortedHistory.forEach(entry => {
+        // Determine icon and color based on status
+        let statusClass = 'dot-pending';
+        let iconClass = 'fas fa-clock';
+        
+        switch(entry.status.toLowerCase()) {
+          case 'pending':
+          case 'pending approval':
+          case 'pending finance':
+          case 'pending product':
+          case 'pending bi':
+            statusClass = 'dot-pending';
+            iconClass = 'fas fa-clock';
+            break;
+          case 'in progress':
+            statusClass = 'dot-in-progress';
+            iconClass = 'fas fa-spinner';
+            break;
+          case 'completed':
+          case 'approved':
+          case 'refunded':
+          case 'access revoked':
+            statusClass = 'dot-completed';
+            iconClass = 'fas fa-check-circle';
+            break;
+          case 'rejected':
+          case 'denied':
+            statusClass = 'dot-rejected';
+            iconClass = 'fas fa-times-circle';
+            break;
+          case 'submitted':
+            statusClass = 'dot-submitted';
+            iconClass = 'fas fa-file-alt';
+            break;
+          default:
+            statusClass = 'dot-submitted';
+            iconClass = 'fas fa-file-alt';
+        }
+        
+        // Get team badge if available
+        const teamBadge = entry.team ? 
+          `<span class="badge bg-info text-white rounded-pill ms-2">${entry.team}</span>` : '';
+        
+        // Format the user information
+        let displayName = 'System';
+        let userTooltip = '';
+        
+        if (entry.updated_by) {
+          const updatedBy = entry.updated_by.trim();
+          
+          // Check if it's an email address
+          if (updatedBy.includes('@')) {
+            // Use the part before @ as display name, formatted nicely
+            const emailParts = updatedBy.split('@');
+            const namePart = emailParts[0];
+            
+            // Convert to title case and replace dots with spaces
+            displayName = namePart.split('.').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            
+            // Use full email for tooltip
+            userTooltip = `data-bs-toggle="tooltip" title="${updatedBy}"`;
+          } else {
+            // Not an email, use as is
+            displayName = updatedBy;
+          }
+        }
+        
+        historyHTML += `
+          <div class="timeline-item">
+            <div class="timeline-dot ${statusClass}">
+              <i class="${iconClass}"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-time">
+                <i class="far fa-clock me-1"></i>${formatDate(entry.timestamp || entry.timestamp_string)}
+              </div>
+              <div class="timeline-title">
+                <span class="badge ${getStatusBadgeClass(entry.status)} me-2">${entry.status}</span>
+                <span class="text-muted">by 
+                  <span class="user-name" ${userTooltip}>${displayName}</span>
+                </span>
+                ${teamBadge}
+              </div>
+              ${entry.remarks ? `<div class="timeline-body mt-2">${entry.remarks}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      return historyHTML;
+    }
+    
+    // Helper function to get badge class based on status
+    function getStatusBadgeClass(status) {
+      if (!status) return 'bg-secondary';
+      
+      const statusLower = status.toLowerCase();
+      if (statusLower.includes('pending')) return 'bg-warning text-dark';
+      if (statusLower.includes('progress')) return 'bg-primary';
+      if (statusLower.includes('completed')) return 'bg-success';
+      if (statusLower.includes('rejected')) return 'bg-danger';
+      
+      return 'bg-secondary';
+    }
+
+    // Apply filters function
+    function applyFilters() {
+      const statusFilter = document.getElementById('statusFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      // Apply search filter directly to DataTable
+      requestsTable.search(searchTerm).draw();
+      
+      // Custom filtering for status and date
+      $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        let showRow = true;
+        
+        // Status filter
+        if (statusFilter) {
+          const status = $(data[6]).text(); // Extract status from badge HTML
+          showRow = showRow && status === statusFilter;
+        }
+        
+        // Date filter
+        if (dateFilter && dateFilter !== 'all' && dateFilter !== 'custom') {
+          const requestDate = new Date(data[2]);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          switch(dateFilter) {
+            case 'today':
+              showRow = showRow && requestDate >= today;
+              break;
+            case 'yesterday':
+              const yesterday = new Date(today);
+              yesterday.setDate(yesterday.getDate() - 1);
+              showRow = showRow && requestDate >= yesterday && requestDate < today;
+              break;
+            case 'last7Days':
+              const last7Days = new Date(today);
+              last7Days.setDate(last7Days.getDate() - 7);
+              showRow = showRow && requestDate >= last7Days;
+              break;
+            case 'last30Days':
+              const last30Days = new Date(today);
+              last30Days.setDate(last30Days.getDate() - 30);
+              showRow = showRow && requestDate >= last30Days;
+              break;
+          }
+        }
+        
+        return showRow;
+      });
+      
+      // Redraw table with filters applied
+      requestsTable.draw();
+      
+      // Remove the custom filter after drawing
+      $.fn.dataTable.ext.search.pop();
+      
+      // Update stat cards based on filtered data
+      updateStatCardsFromTable();
+    }
+
+    // New function to update stat cards based on filtered table data
+    function updateStatCardsFromTable() {
+      // Get all visible rows after filtering
+      const visibleRows = requestsTable.rows({search: 'applied'}).nodes();
+      
+      // Initialize counters
+      let pendingCount = 0;
+      let inProgressCount = 0;
+      let completedCount = 0;
+      let rejectedCount = 0;
+      
+      // Count statuses from visible rows
+      visibleRows.forEach(row => {
+        const statusCell = row.cells[6]; // Status is in the 7th column (index 6)
+        const statusText = $(statusCell).text().trim();
+        
+        if (statusText === 'Pending') {
+          pendingCount++;
+        } else if (statusText === 'In Progress') {
+          inProgressCount++;
+        } else if (statusText === 'Completed') {
+          completedCount++;
+        } else if (statusText === 'Rejected') {
+          rejectedCount++;
+        }
+      });
+      
+      // Update the stat cards
+      document.getElementById('pendingCount').textContent = pendingCount;
+      document.getElementById('progressCount').textContent = inProgressCount;
+      document.getElementById('completedCount').textContent = completedCount;
+      document.getElementById('rejectedCount').textContent = rejectedCount;
+    }
+
+    // Apply custom date range
+    function applyDateRange() {
+      const startDate = new Date(document.getElementById('startDate').value);
+      const endDate = new Date(document.getElementById('endDate').value);
+      
+      if (!startDate || !endDate) {
+        showToast('Please select both start and end dates', 'warning');
+        return;
+      }
+      
+      if (startDate > endDate) {
+        showToast('Start date cannot be after end date', 'warning');
+        return;
+      }
+      
+      // Set end date to end of day
+      endDate.setHours(23, 59, 59, 999);
+      
+      // Apply custom date filter
+      $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        const requestDate = new Date(data[2]);
+        return requestDate >= startDate && requestDate <= endDate;
+      });
+      
+      // Redraw table with filter applied
+      requestsTable.draw();
+      
+      // Remove the custom filter after drawing
+      $.fn.dataTable.ext.search.pop();
+      
+      // Update stat cards based on filtered data
+      updateStatCardsFromTable();
+      
+      // Update date filter display
+      document.getElementById('dateFilter').value = 'custom';
+      
+      // Hide the modal
+      bootstrap.Modal.getInstance(document.getElementById('dateRangeModal')).hide();
+      
+      // Show confirmation toast
+      showToast(`Date filter applied: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 'success');
+    }
+
+    // Validate form
+    function validateForm() {
+      const form = document.getElementById('updateForm');
+      const status = form.elements.status.value;
+      const remarks = form.elements.remarks.value;
+      
+      // Enable/disable update button based on form validity
+      const updateButton = document.querySelector('.modal-footer .btn-primary');
+      if (updateButton) {
+        updateButton.disabled = !status || !remarks;
+      }
+      
+      return status && remarks;
+    }
+    
+    // Show update status modal
+    function showUpdateModal(requestId) {
+      console.log('Opening update modal for request:', requestId);
+      
+      // Set request ID in hidden field
+      document.getElementById('updateRequestId').value = requestId;
+      
+      // Reset form
+      document.getElementById('updateStatus').value = '';
+      document.getElementById('updateRemarks').value = '';
+      
+      // Show modal
+      new bootstrap.Modal(document.getElementById('updateStatusModal')).show();
+    }
+
+    // NEW FUNCTION: Setup background refresh mechanism
+    function setupBackgroundRefresh() {
+      console.log('Setting up background refresh mechanism');
+      
+      // Initialize variables to track user interaction
+      window.userInteracting = false;
+      window.lastInteractionTime = new Date().getTime();
+      window.backgroundRefreshInterval = 30000; // 30 seconds between refreshes
+      window.lastTableData = null; // Store last data for comparison
+      
+      // Start the background refresh cycle
+      scheduleNextBackgroundRefresh();
+      
+      // Add global event listeners to track user interaction
+      document.addEventListener('mousemove', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('keydown', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('scroll', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+      
+      document.addEventListener('touchstart', function() {
+        window.userInteracting = true;
+        resetUserInteractionTimer();
+      }, { passive: true });
+    }
+    
+    // Reset user interaction timer
+    function resetUserInteractionTimer() {
+      window.lastInteractionTime = new Date().getTime();
+      
+      // Consider user not interacting after 2 seconds of inactivity
+      setTimeout(function() {
+        const now = new Date().getTime();
+        if (now - window.lastInteractionTime >= 2000) {
+          window.userInteracting = false;
+        }
+      }, 2000);
+    }
+    
+    // Schedule next background refresh
+    function scheduleNextBackgroundRefresh() {
+      setTimeout(function() {
+        performBackgroundRefresh();
+      }, window.backgroundRefreshInterval);
+    }
+    
+    // Perform background refresh
+    function performBackgroundRefresh() {
+      // Skip refresh if user is actively interacting with the page
+      if (window.userInteracting) {
+        console.log('Skipping background refresh - user is interacting with the page');
+        scheduleNextBackgroundRefresh();
+        return;
+      }
+      
+      console.log('Performing background refresh');
+      
+      // Generate a unique timestamp to avoid caching
+      const timestamp = new Date().getTime();
+      
+      // Perform a quiet data fetch without showing loading indicators
+      google.script.run
+        .withSuccessHandler(function(result) {
+          console.log('Background refresh data received');
+          
+          // Validate data
+          if (!result || !result.requests || !Array.isArray(result.requests) || 
+              !result.statusCounts || typeof result.statusCounts !== 'object') {
+            console.error('Invalid data received during background refresh');
+            scheduleNextBackgroundRefresh();
+            return;
+          }
+          
+          // Compare with current data to see if update is needed
+          if (shouldUpdateTable(result)) {
+            console.log('Data has changed, updating table quietly');
+            updateTableQuietly(result);
+          } else {
+            console.log('No data changes detected, skipping update');
+          }
+          
+          // Schedule next refresh regardless of outcome
+          scheduleNextBackgroundRefresh();
+        })
+        .withFailureHandler(function(error) {
+          console.error('Background refresh failed:', error);
+          // Still schedule next attempt
+          scheduleNextBackgroundRefresh();
+        })
+        .getBIDashboardData(timestamp);
+    }
+    
+    // Check if table should be updated based on data comparison
+    function shouldUpdateTable(newData) {
+      // If we don't have previous data, we should update
+      if (!window.lastTableData) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare request counts
+      if (newData.requests.length !== window.lastTableData.requests.length) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare status counts
+      const oldCounts = window.lastTableData.statusCounts;
+      const newCounts = newData.statusCounts;
+      
+      if (oldCounts.pending !== newCounts.pending ||
+          oldCounts.inProgress !== newCounts.inProgress ||
+          oldCounts.completed !== newCounts.completed ||
+          oldCounts.rejected !== newCounts.rejected) {
+        window.lastTableData = newData;
+        return true;
+      }
+      
+      // Compare request statuses (sample a few requests for efficiency)
+      const sampleSize = Math.min(10, newData.requests.length);
+      for (let i = 0; i < sampleSize; i++) {
+        const newRequest = newData.requests[i];
+        const oldRequest = window.lastTableData.requests.find(r => r.request_id === newRequest.request_id);
+        
+        if (!oldRequest || oldRequest.current_bi_status !== newRequest.current_bi_status) {
+          window.lastTableData = newData;
+          return true;
+        }
+      }
+      
+      // No significant changes detected
+      return false;
+    }
+    
+    // Update table without showing loading indicators
+    function updateTableQuietly(result) {
+      try {
+        // Store the new data
+        window.lastTableData = result;
+        
+        // Update status counts
+        const counts = result.statusCounts;
+        document.getElementById('pendingCount').textContent = counts.pending || 0;
+        document.getElementById('progressCount').textContent = counts.inProgress || 0;
+        document.getElementById('completedCount').textContent = counts.completed || 0;
+        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
+        
+        // Make sure DataTable is initialized
+        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
+          console.warn('DataTable not properly initialized during quiet update');
+          return;
+        }
+        
+        // Save current state for restoration
+        let currentPage = requestsTable.page();
+        let currentSearch = requestsTable.search();
+        let currentOrder = requestsTable.order();
+        
+        // Clear and reload data
+        requestsTable.clear();
+        
+        // Process the requests
+        result.requests.forEach((request) => {
+          try {
+            requestsTable.row.add([
+              `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
+              request.request_id,
+              formatDate(request.timestamp_string) || '',
+              request.course_name || '',
+              request.refund_type || '',
+              formatCurrency(request.refund_amount || 0),
+              getStatusBadge(request.current_bi_status || 'Pending'),
+              getActionButtons(request)
+            ]);
+          } catch (rowError) {
+            console.error(`Error adding row for request ${request.request_id}:`, rowError);
+          }
+        });
+        
+        // Redraw with preserved state
+        requestsTable.search(currentSearch).order(currentOrder).draw(false);
+        requestsTable.page(currentPage).draw('page');
+        
+        console.log('Table updated quietly in the background');
+      } catch (error) {
+        console.error('Error during quiet table update:', error);
+      }
+    }
+    
+    // Handle dashboard data
+    function handleDashboardData(result) {
+      console.log('Raw dashboard data received:', result);
+      
+      try {
+        if (!result) {
+          console.error('No data received from server (result is null or undefined)');
+          throw new Error('No data received from server');
+        }
+
+        // Track last successful data load time
+        window.lastSuccessfulDataLoad = new Date().toISOString();
+
+        // Store the data for background refresh comparison
+        window.lastTableData = result;
+
+        // Log the data type and structure for debugging
+        console.log('Result type:', typeof result);
+        console.log('Result has requests property:', result.hasOwnProperty('requests'));
+        console.log('Result has statusCounts property:', result.hasOwnProperty('statusCounts'));
+        
+        if (!result.requests || !Array.isArray(result.requests)) {
+          console.error('Invalid requests data:', result.requests);
+          console.error('Requests type:', typeof result.requests);
+          throw new Error('Invalid requests data structure');
+        }
+
+        if (!result.statusCounts || typeof result.statusCounts !== 'object') {
+          console.error('Invalid status counts:', result.statusCounts);
+          console.error('StatusCounts type:', typeof result.statusCounts);
+          throw new Error('Invalid status counts structure');
+        }
+
+        // Store original status counts for filter reset
+        window.originalStatusCounts = { ...result.statusCounts };
+        console.log('Original status counts stored:', window.originalStatusCounts);
+
+        // Update status counts with validation
+        const counts = result.statusCounts;
+        document.getElementById('pendingCount').textContent = counts.pending || 0;
+        document.getElementById('progressCount').textContent = counts.inProgress || 0;
+        document.getElementById('completedCount').textContent = counts.completed || 0;
+        document.getElementById('rejectedCount').textContent = counts.rejected || 0;
+
+        console.log('Status counts updated successfully');
+
+        // First validate the DataTable is properly initialized
+        if (!requestsTable || !$.fn.DataTable.isDataTable('#requestsTable')) {
+          console.warn('DataTable not properly initialized, attempting re-initialization');
+          try {
+            if ($.fn.DataTable.isDataTable('#requestsTable')) {
+              $('#requestsTable').DataTable().destroy();
+            }
+            initializeDataTable();
+          } catch (tableError) {
+            console.error('Failed to re-initialize DataTable:', tableError);
+            // Fall back to basic rendering
+            showFallbackTable();
+            renderFallbackTable(result.requests);
+            return;
+          }
+        }
+
+        // Save current state for restoration
+        let currentPage = 0;
+        let currentSearch = '';
+        let currentOrder = [];
+        
+        try {
+          // Get current state before clearing
+          currentPage = requestsTable.page();
+          currentSearch = requestsTable.search();
+          currentOrder = requestsTable.order();
+          console.log('Saved table state:', { page: currentPage, search: currentSearch, order: currentOrder });
+        } catch (stateError) {
+          console.warn('Error saving table state:', stateError);
+        }
+
+        try {
+          // Clear existing table data - use this safer pattern
+          requestsTable.clear();
+          console.log('Table cleared, adding new data');
+        } catch (clearError) {
+          console.error('Error clearing table:', clearError);
+          
+          // Attempt recovery by destroying and reinitializing
+          try {
+            $('#requestsTable').DataTable().destroy();
+            initializeDataTable();
+            requestsTable = $('#requestsTable').DataTable();
+          } catch (reinitError) {
+            console.error('Failed to recover table:', reinitError);
+            showFallbackTable();
+            renderFallbackTable(result.requests);
+            return;
+          }
+        }
+
+        console.log('Number of requests to process:', result.requests.length);
+        
+        // Perform additional data validation
+        const validRequests = result.requests.filter(request => {
+          if (!request || typeof request !== 'object') {
+            console.warn('Skipping invalid request (not an object):', request);
+            return false;
+          }
+          
+          if (!request.request_id) {
+            console.warn('Skipping request with missing ID:', request);
+            return false;
+          }
+          
+          return true;
+        });
+        
+        console.log(`Validated ${validRequests.length} of ${result.requests.length} requests`);
+
+        // Add data in smaller batches to prevent UI freezing with large datasets
+        const BATCH_SIZE = 50;
+        let processedCount = 0;
+        
+        function addBatch() {
+          const batch = validRequests.slice(processedCount, processedCount + BATCH_SIZE);
+          
+          if (batch.length === 0) {
+            // All batches processed, finalize table
+            finishTableUpdate();
+            return;
+          }
+          
+          // Process this batch
+          batch.forEach((request) => {
+            try {
+              requestsTable.row.add([
+                `<input type="checkbox" class="form-check-input request-checkbox" data-id="${request.request_id}">`,
+                request.request_id,
+                formatDate(request.timestamp_string) || '',
+                request.course_name || '',
+                request.refund_type || '',
+                formatCurrency(request.refund_amount || 0),
+                getStatusBadge(request.current_bi_status || 'Pending'),
+                getActionButtons(request)
+              ]);
+            } catch (rowError) {
+              console.error(`Error adding row for request ${request.request_id}:`, rowError);
+            }
+          });
+          
+          processedCount += batch.length;
+          
+          // Update progress information if many records
+          if (validRequests.length > 100) {
+            const percent = Math.round((processedCount / validRequests.length) * 100);
+            document.getElementById('progressMessage').textContent = 
+              `Loading data... ${processedCount}/${validRequests.length} (${percent}%)`;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+          }
+          
+          // Process next batch or finish
+          if (processedCount < validRequests.length) {
+            setTimeout(addBatch, 0); // Use setTimeout to avoid blocking UI
+          } else {
+            finishTableUpdate();
+          }
+        }
+        
+        // Function to finalize table updates
+        function finishTableUpdate() {
+          try {
+            console.log('Drawing table with new data');
+            
+            // Try to restore previous state
+            try {
+              // Only restore if we have valid values
+              if (currentPage !== undefined && !isNaN(currentPage)) {
+                requestsTable.search(currentSearch || '');
+                if (currentOrder && currentOrder.length > 0) {
+                  requestsTable.order(currentOrder);
+                }
+                // Draw with a simple first-pass
+                requestsTable.draw(false);
+                // Then restore pagination in a separate step
+                requestsTable.page(currentPage).draw('page');
+              } else {
+                requestsTable.draw();
+              }
+            } catch (restoreError) {
+              console.warn('Error restoring table state:', restoreError);
+              // Fall back to simple draw
+              requestsTable.draw();
+            }
+            
+            hideProgress();
+            console.log('Dashboard data load complete');
+            
+            // Remove any existing error notifications since we succeeded
+            const errorNotification = document.getElementById('errorNotification');
+            if (errorNotification) {
+              errorNotification.remove();
+            }
+            
+            showToast('Data loaded successfully', 'success');
+            
+            // Reset error count on successful load
+            errorCount = 0;
+            
+            // Initialize background refresh if not already set up
+            if (!window.backgroundRefreshInitialized) {
+              window.backgroundRefreshInitialized = true;
+              setupBackgroundRefresh();
+            }
+          } catch (finalError) {
+            console.error('Error finalizing table update:', finalError);
+            hideProgress();
+            handleError('Error drawing table: ' + finalError.message);
+          }
+        }
+        
+        // Start processing in batches
+        addBatch();
+      } catch (error) {
+        console.error('Error processing dashboard data:', error);
+        handleLoadError(error);
+      }
+    }
+
+    // Handle load error specifically for dashboard data
+    function handleLoadError(error) {
+      console.error('Error loading dashboard data:', error);
+      hideProgress();
+      
+      // Create a more detailed error message
+      let errorMessage = 'Error loading dashboard data';
+      let errorDetails = '';
+      
+      if (typeof error === 'string') {
+        errorDetails = error;
+      } else if (error && error.message) {
+        errorDetails = error.message;
+      } else if (error && error.toString) {
+        errorDetails = error.toString();
+      } else {
+        errorDetails = 'Unknown error';
+      }
+      
+      // Use the general handleError function with a retry button
+      handleError(`${errorMessage}: ${errorDetails}`, true, () => loadDashboardData(0, 3, 3000));
+    }
+  </script>
+</body>
+</html> 

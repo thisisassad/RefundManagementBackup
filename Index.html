@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body { 
+      background-color: #f8f9fa;
+      padding: 30px 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Add navbar padding only when authenticated */
+    body.authenticated {
+      padding-top: 56px;
+    }
+
+    .section { 
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .section h4 {
+      color: #495057;
+      font-weight: 600;
+      font-size: 1rem;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .mb-3 {
+      margin-bottom: 0.5rem !important;
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      color: #495057;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+
+    .form-control,
+    .form-select {
+      font-size: 1rem;
+      padding: 0.375rem 0.75rem;
+      height: calc(2em + 0.75rem + 2px);
+    }
+
+    textarea.form-control {
+      height: auto;
+    }
+
+    .required-field::after {
+      content: " *";
+      color: #dc3545;
+      font-size: 0.75rem;
+    }
+
+    .file-upload-area {
+      border: 2px dashed #dee2e6;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      margin: 0.75rem 0;
+      background-color: #f8f9fa;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-area.dragover {
+      background-color: #e9ecef;
+      border-color: #0d6efd;
+    }
+
+    .file-upload-area input[type="file"] {
+      display: none;
+    }
+
+    .file-upload-area label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+
+    .file-upload-area span {
+      color: #0d6efd;
+      text-decoration: underline;
+    }
+
+    .file-info {
+      color: #6c757d;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .file-list {
+      margin-top: 15px;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .file-item button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+      min-width: 300px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #86b7fe;
+      box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+    }
+
+    .btn-primary {
+      padding: 10px 24px;
+      font-weight: 500;
+    }
+
+    .btn-primary:disabled {
+      cursor: not-allowed;
+    }
+
+    h2 {
+      color: #212529;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    h4 {
+      color: #495057;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #6c757d;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    .back-link:hover {
+      color: #0d6efd;
+    }
+
+    .back-arrow {
+      margin-right: 8px;
+    }
+
+    /* Phone input styles */
+    .phone-input-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .phone-validation-error {
+      color: #dc3545;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      position: absolute;
+      bottom: -1.25rem;
+      left: 0;
+    }
+
+    .iti {
+      width: 100%;
+      display: block;
+    }
+
+    .iti__flag {
+      background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/img/flags.png");
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .iti__flag {
+        background-image: url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/img/flags@2x.png");
+      }
+    }
+
+    /* Adjust container width for better form layout */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 800px;
+      }
+    }
+
+    /* Make full-width items span both columns */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Add new styles for logical grouping */
+    .field-group {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 1rem;
+    }
+
+    .field-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .field-group-title {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Add style for hidden class that was missing */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Add new styles for status indicators and buttons */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      margin-right: 8px;
+    }
+
+    .status-indicator i {
+      margin-right: 4px;
+      font-size: 14px;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-inprogress {
+      background-color: #cce5ff;
+      color: #004085;
+      border: 1px solid #b8daff;
+    }
+
+    .doc-button {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      background-color: #e9ecef;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      color: #495057;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .doc-button:hover {
+      background-color: #dee2e6;
+      color: #212529;
+      text-decoration: none;
+    }
+
+    .doc-button i {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .success-doc-button {
+      background-color: #28a745;
+      color: white;
+      border-color: #28a745;
+    }
+
+    .success-doc-button:hover {
+      background-color: #218838;
+      color: white;
+      border-color: #1e7e34;
+    }
+
+    /* Email validation styles */
+    .email-validation-error {
+      color: #dc3545;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-valid {
+      border-color: #28a745;
+      padding-right: calc(1.5em + 0.75rem);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    /* Add styles for details grid */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .field-group {
+      background: #f8f9fa;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .field-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-group-title {
+      color: #495057;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    /* Make certain fields span full width */
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Add styles for preview modal */
+    .preview-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e9ecef;
+      transition: all 0.3s ease;
+    }
+
+    /* Add highlight styles for payment section */
+    .preview-section.payment-highlight {
+      background: #fff;
+      border: 2px solid #0d6efd;
+      box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
+      position: relative;
+      animation: gentlePulse 2s infinite;
+    }
+
+    .preview-section.payment-highlight::before {
+      content: '⚠️ Please Review Carefully';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0d6efd;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    @keyframes gentlePulse {
+      0% { box-shadow: 0 0 15px rgba(13, 110, 253, 0.1); }
+      50% { box-shadow: 0 0 20px rgba(13, 110, 253, 0.2); }
+      100% { box-shadow: 0 0 15px rgba(13, 110, 253, 0.1); }
+    }
+
+    #preview-dynamic-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .preview-section h6 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e9ecef;
+      position: relative;
+    }
+
+    .preview-section h6::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background-color: #0d6efd;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .preview-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-item.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .preview-item label {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .preview-item span {
+      font-size: 1rem;
+      color: #2c3e50;
+      font-weight: 500;
+      padding: 0.5rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+    }
+
+    .preview-documents {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .preview-documents .file-item {
+      background: #f8f9fa;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+      font-size: 0.875rem;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+    }
+
+    .preview-documents .file-item::before {
+      content: '📎';
+      margin-right: 0.5rem;
+    }
+
+    .modal-header {
+      background: #f8f9fa;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .modal-title {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      background: #f8f9fa;
+      border-top: 2px solid #e9ecef;
+      padding: 1rem;
+    }
+
+    .preview-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .preview-badge.success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .preview-badge.warning {
+      background-color: #fff3cd;
+      color: #664d03;
+    }
+
+    .preview-badge.danger {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+  </style>
+</head>
+<body <? if (isAuthenticated) { ?>class="authenticated"<? } ?>>
+  <!-- Include Navigation Bar Partial if user is authenticated -->
+  <? if (isAuthenticated) { ?>
+    <?!= include('NavBarPartial', {sessionToken: sessionToken, userAccess: userAccess, currentPage: 'sales'}) ?>
+  <? } ?>
+
+  <div class="container"<? if (isAuthenticated) { ?> style="margin-top: 1.5rem;"<? } ?>>
+    <!-- Only show Back to Menu link if we're not showing the navbar -->
+    <? if (!isAuthenticated) { ?>
+    <div class="text-end mb-4">
+      <a href="<?= getScriptUrl() ?>?page=login" class="btn btn-outline-primary btn-sm">
+        <i class="fas fa-sign-in-alt me-1"></i> Login
+      </a>
+    </div>
+    <? } ?>
+    
+    <div class="text-center mb-5">
+      <h1 class="display-6">Refund Request Form</h1>
+      <p class="text-muted">Submit a new refund request for processing</p>
+    </div>
+
+    <!-- Alert for messages -->
+    <div class="alert" role="alert"></div>
+
+    <!-- Add Confirmation Card -->
+    <div id="confirmationCard" class="section" style="display: none;">
+      <div class="text-center mb-4">
+        <div style="width: 60px; height: 60px; margin: 0 auto 15px; background-color: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <span style="color: white; font-size: 30px;">✓</span>
+        </div>
+        <h3 style="color: #4CAF50;">Request Submitted Successfully</h3>
+      </div>
+      
+      <div class="details-grid">
+        <div class="mb-3">
+          <label class="form-label">Request ID</label>
+          <input type="text" class="form-control" id="confirmRequestId" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Payment ID</label>
+          <input type="text" class="form-control" id="confirmPaymentId" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Enrollment Number</label>
+          <input type="text" class="form-control" id="confirmEnrollmentNumber" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Refund Amount</label>
+          <input type="text" class="form-control" id="confirmRefundAmount" readonly>
+        </div>
+        <div class="mb-3 full-width">
+          <label class="form-label">Documents</label>
+          <a id="confirmDocumentLink" href="#" target="_blank" class="btn btn-primary w-100">
+            <i class="fas fa-folder-open me-2"></i>View Uploaded Documents
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-4 text-center">
+        <!-- Back to Menu button removed as navbar brand now handles this functionality -->
+        <button type="button" class="btn btn-primary" onclick="submitAnotherRequest()">Submit Another Request</button>
+      </div>
+    </div>
+
+    <!-- Update Confirmation Modal Structure -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-clipboard-check me-2"></i>Confirm Request Details
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Requester Information -->
+            <div class="preview-section">
+              <h6>Requester Information</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Requester</label>
+                  <span id="preview-requester"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Email Address</label>
+                  <span id="preview-email"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Vertical</label>
+                  <span id="preview-vertical"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Customer Name</label>
+                  <span id="preview-customer"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="preview-section payment-highlight">
+              <h6>Payment Information</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Payment ID</label>
+                  <span id="preview-payment-id"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Refund Type</label>
+                  <span id="preview-refund-type"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Refund Amount</label>
+                  <span id="preview-refund-amount"></span>
+                </div>
+                <div class="preview-item">
+                  <label>Access Revoke Status</label>
+                  <span id="preview-revoke-access"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Section Preview -->
+            <div id="preview-dynamic-section">
+              <!-- Will be populated based on refund type -->
+            </div>
+
+            <!-- Additional Information -->
+            <div class="preview-section">
+              <h6>Additional Information</h6>
+              <div class="preview-grid">
+                <div class="preview-item full-width">
+                  <label>Refund Reason</label>
+                  <span id="preview-refund-reason"></span>
+                </div>
+                <div class="preview-item full-width">
+                  <label>Supporting Documents</label>
+                  <div id="preview-documents" class="preview-documents"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-edit me-2"></i>Edit Request
+            </button>
+            <button type="button" class="btn btn-primary" id="confirmSubmitBtn">
+              <i class="fas fa-check me-2"></i>Confirm & Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="refundForm" onsubmit="handleSubmit(event)">
+      <!-- Requester Information -->
+      <div class="section">
+        <h4>Requester Information</h4>
+        
+        <div class="field-group">
+          <div class="field-group-title">Requester Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Who is requesting the refund?</label>
+              <select class="form-select" name="requester" required>
+                <option value="">Select option</option>
+                <option value="Dhaka Telesales">Dhaka Telesales</option>
+                <option value="Jessore Telesales">Jessore Telesales</option>
+                <option value="CX Team">CX Team</option>
+                <option value="Customer">Customer</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Requester Mail Address</label>
+              <input type="email" class="form-control" name="requesterEmail" required>
+              <div class="email-validation-error"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Customer Information</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Vertical</label>
+              <select class="form-select" name="vertical" required>
+                <option value="">Select option</option>
+                <option value="Shikho">Shikho</option>
+                <option value="Bohubrihi">Bohubrihi</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Customer Name</label>
+              <input type="text" class="form-control" name="customerContact" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Payment Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Payment ID</label>
+              <input type="text" class="form-control" name="paymentId" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Refund Type</label>
+              <select class="form-select" name="refundType" id="refundType" required>
+                <option value="">Select option</option>
+                <option value="Course Exchange">Course Exchange</option>
+                <option value="Phone Number Exchange">Phone Number Exchange</option>
+                <option value="Full Refund">Full Refund</option>
+                <option value="Partial Refund">Partial Refund</option>
+                <option value="Mistaken Payment">Mistaken Payment to Merchant Number</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Sections -->
+      <div id="courseExchangeSection" class="section hidden">
+        <h4>Course Exchange Details</h4>
+        
+        <div class="field-group">
+          <div class="field-group-title">Course Identification</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Course Enrollment Number</label>
+              <div class="phone-input-container">
+                <input type="tel" class="form-control" name="courseExchangeEnrollmentNumber">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Purchase Information</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Purchase Date</label>
+              <input type="date" class="form-control" name="courseExchangePurchaseDate">
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Purchased Amount</label>
+              <input type="number" class="form-control" name="courseExchangePurchasedAmount">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Course Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Mistaken Course Name</label>
+              <select class="form-select course-select" name="mistakenCourse" data-phase-target="mistakenPhase" required>
+                <option value="">Select Course</option>
+                <? courseData.courses.forEach(function(course) { ?>
+                  <option value="<?= course ?>"><?= course ?></option>
+                <? }); ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Mistaken Phase Name</label>
+              <select class="form-select" name="mistakenPhase" required disabled>
+                <option value="">Select Phase</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Intended Course Name</label>
+              <select class="form-select course-select" name="intendedCourse" data-phase-target="intendedPhase" required>
+                <option value="">Select Course</option>
+                <? courseData.courses.forEach(function(course) { ?>
+                  <option value="<?= course ?>"><?= course ?></option>
+                <? }); ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Intended Phase Name</label>
+              <select class="form-select" name="intendedPhase" required disabled>
+                <option value="">Select Phase</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="phoneExchangeSection" class="section hidden">
+        <h4>Phone Number Exchange Details</h4>
+        <div class="details-grid">
+          <div class="mb-3">
+            <label class="form-label required-field">Purchase Date</label>
+            <input type="date" class="form-control" name="phoneExchangePurchaseDate">
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Purchased Amount</label>
+            <input type="number" class="form-control" name="phoneExchangePurchasedAmount">
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Wrong Phone Number</label>
+            <div class="phone-input-container">
+              <input type="tel" class="form-control" name="wrongPhone">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Correct Phone Number</label>
+            <div class="phone-input-container">
+              <input type="tel" class="form-control" name="correctPhone">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="partialRefundSection" class="section hidden">
+        <h4>Partial Refund Details</h4>
+        
+        <div class="field-group">
+          <div class="field-group-title">Course Identification</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Course Enrollment Number</label>
+              <div class="phone-input-container">
+                <input type="tel" class="form-control" name="partialRefundEnrollmentNumber">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Purchase Information</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Purchase Date</label>
+              <input type="date" class="form-control" name="partialRefundPurchaseDate">
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Purchased Amount</label>
+              <input type="number" class="form-control" name="partialRefundPurchasedAmount">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Mistaken Course Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Mistaken Course Name</label>
+              <select class="form-select course-select" name="partialMistakenCourse" data-phase-target="partialMistakenPhase" required>
+                <option value="">Select Course</option>
+                <? courseData.courses.forEach(function(course) { ?>
+                  <option value="<?= course ?>"><?= course ?></option>
+                <? }); ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Mistaken Phase Name</label>
+              <select class="form-select" name="partialMistakenPhase" required disabled>
+                <option value="">Select Phase</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Intended Course Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Intended Course Name</label>
+              <select class="form-select course-select" name="partialIntendedCourse" data-phase-target="partialIntendedPhase" required>
+                <option value="">Select Course</option>
+                <? courseData.courses.forEach(function(course) { ?>
+                  <option value="<?= course ?>"><?= course ?></option>
+                <? }); ?>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Intended Phase Name</label>
+              <select class="form-select" name="partialIntendedPhase" required disabled>
+                <option value="">Select Phase</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fullRefundSection" class="section hidden">
+        <h4>Full Refund Details</h4>
+        
+        <div class="field-group">
+          <div class="field-group-title">Course Identification</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Course Enrollment Number</label>
+              <div class="phone-input-container">
+                <input type="tel" class="form-control" name="fullRefundEnrollmentNumber">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Purchase Information</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Purchase Date</label>
+              <input type="date" class="form-control" name="fullRefundPurchaseDate">
+            </div>
+            <div class="mb-3">
+              <label class="form-label required-field">Purchased Amount</label>
+              <input type="number" class="form-control" name="fullRefundPurchasedAmount">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-group-title">Course Details</div>
+          <div class="details-grid">
+            <div class="mb-3">
+              <label class="form-label required-field">Mistaken Course Name</label>
+              <select class="form-select" name="fullRefundMistakenCourse" required>
+                <option value="">Select Course</option>
+                <? courseData.courses.forEach(function(course) { ?>
+                  <option value="<?= course ?>"><?= course ?></option>
+                <? }); ?>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mistakenPaymentSection" class="section hidden">
+        <h4>Mistaken Payment Details</h4>
+        <div class="details-grid">
+          <div class="mb-3">
+            <label class="form-label required-field">Sender's bKash Number</label>
+            <div class="phone-input-container">
+              <input type="tel" class="form-control" name="senderBkash">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Transaction Time</label>
+            <input type="datetime-local" class="form-control" name="transactionTime">
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Sent Amount</label>
+            <input type="number" class="form-control" name="sentAmount">
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Details -->
+      <div class="section">
+        <h4>Final Details</h4>
+        <div class="details-grid">
+          <div class="mb-3">
+            <label class="form-label required-field">Refund Amount</label>
+            <input type="number" class="form-control" name="refundAmount" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Do we need to revoke access to the course?</label>
+            <select class="form-select" name="revokeAccess" required>
+              <option value="">Select option</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+              <option value="Need Discussion">Need Discussion</option>
+            </select>
+          </div>
+          <div class="mb-3 full-width">
+            <label class="form-label required-field">Refund Reason</label>
+            <textarea class="form-control" name="refundReason" rows="3" required></textarea>
+          </div>
+          <div class="mb-3 full-width">
+            <label class="form-label required-field">Supporting Documents</label>
+            <div class="file-upload-area" id="fileUploadArea">
+              <label for="documents">
+                Drag & drop files here or <span>click to upload</span>
+              </label>
+              <input type="file" id="documents" name="documents" multiple required>
+              <div class="file-info">
+                Maximum 3 files, 11MB each
+              </div>
+            </div>
+            <div id="fileList" class="file-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"></script>
+
+  <script>
+    // Initialize course data as a global variable
+    window.coursePhaseMap = JSON.parse('<?= JSON.stringify(courseData.coursePhaseMap) ?>');
+
+    // Function to update phase options based on selected course
+    function updatePhaseOptions(courseSelect) {
+      const selectedCourse = courseSelect.value;
+      const phaseSelectName = courseSelect.getAttribute('data-phase-target');
+      const phaseSelect = document.querySelector(`select[name="${phaseSelectName}"]`);
+      
+      if (!phaseSelect) return;
+      
+      // Clear existing options
+      phaseSelect.innerHTML = '<option value="">Select Phase</option>';
+      
+      if (selectedCourse && window.coursePhaseMap[selectedCourse]) {
+        // Enable phase select
+        phaseSelect.disabled = false;
+        
+        // Add phase options
+        window.coursePhaseMap[selectedCourse].forEach(phase => {
+          const option = document.createElement('option');
+          option.value = phase;
+          option.textContent = phase;
+          phaseSelect.appendChild(option);
+        });
+      } else {
+        // Disable and reset phase select if no course is selected
+        phaseSelect.disabled = true;
+        phaseSelect.value = '';
+      }
+      
+      // Trigger validation
+      validateForm();
+    }
+
+    // Show/hide dynamic sections based on refund type
+    document.getElementById('refundType').addEventListener('change', function() {
+      const sections = [
+        'courseExchangeSection',
+        'phoneExchangeSection',
+        'partialRefundSection',
+        'fullRefundSection',
+        'mistakenPaymentSection'
+      ];
+      
+      // Hide all sections first and reset their fields
+      sections.forEach(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          // Hide the section
+          element.classList.add('hidden');
+          
+          // Reset all inputs in the section
+          element.querySelectorAll('input, select, textarea').forEach(input => {
+            input.required = false;
+            
+            // Reset based on input type
+            if (input.type === 'tel' && window.phoneInstances && window.phoneInstances[input.name]) {
+              window.phoneInstances[input.name].setNumber('');
+            } else if (input.type === 'select-one') {
+              input.selectedIndex = 0;
+              // If this is a course select, also reset its corresponding phase select
+              if (input.classList.contains('course-select')) {
+                const phaseSelectName = input.getAttribute('data-phase-target');
+                const phaseSelect = document.querySelector(`select[name="${phaseSelectName}"]`);
+                if (phaseSelect) {
+                  phaseSelect.innerHTML = '<option value="">Select Phase</option>';
+                  phaseSelect.disabled = true;
+                }
+              }
+            } else {
+              input.value = '';
+            }
+            
+            // Remove any validation error messages
+            const errorDiv = input.parentElement.querySelector('.phone-validation-error');
+            if (errorDiv) {
+              errorDiv.remove();
+            }
+          });
+        }
+      });
+
+      // Show selected section and make its inputs required
+      const selectedSection = {
+        'Course Exchange': 'courseExchangeSection',
+        'Phone Number Exchange': 'phoneExchangeSection',
+        'Partial Refund': 'partialRefundSection',
+        'Full Refund': 'fullRefundSection',
+        'Mistaken Payment': 'mistakenPaymentSection'
+      }[this.value];
+
+      if (selectedSection) {
+        const element = document.getElementById(selectedSection);
+        element.classList.remove('hidden');
+        // Make inputs in visible section required
+        element.querySelectorAll('input, select, textarea').forEach(input => {
+          input.required = true;
+        });
+      }
+      
+      // Trigger form validation after reset
+      validateForm();
+    });
+
+    // Show alert message
+    function showMessage(message, type = 'success') {
+      const alert = document.querySelector('.alert');
+      alert.className = `alert alert-${type} fade show`;
+      alert.textContent = message;
+      alert.style.display = 'block';
+
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 5000);
+    }
+
+    // Handle file selection
+    function handleFiles(files) {
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+      const MAX_FILES = 3;
+      const MAX_FILE_SIZE = 11 * 1024 * 1024; // 11MB
+
+      if (files.length > MAX_FILES) {
+        showMessage(`Maximum ${MAX_FILES} files are allowed`, 'danger');
+        document.getElementById('documents').value = '';
+        return;
+      }
+
+      Array.from(files).forEach(file => {
+        if (file.size > MAX_FILE_SIZE) {
+          showMessage(`File ${file.name} exceeds maximum size of 11MB`, 'danger');
+          return;
+        }
+
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <span>${file.name} (${formatFileSize(file.size)})</span>
+          <button type="button" onclick="removeFile(this)" class="btn btn-danger btn-sm">Remove</button>
+        `;
+        fileList.appendChild(fileItem);
+      });
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024)
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Remove file
+    function removeFile(button) {
+      const fileItem = button.parentElement;
+      fileItem.remove();
+      
+      // Clear file input if no files remain
+      if (document.getElementById('fileList').children.length === 0) {
+        document.getElementById('documents').value = '';
+      }
+    }
+
+    // Add email validation
+    function validateEmail(email) {
+      // More strict RFC 5322 compliant email regex that requires both local part and domain
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+      
+      // Check if email is empty
+      if (!email || email.trim() === '') {
+        return { isValid: false, message: 'Email is required' };
+      }
+      
+      // Check if @ is missing
+      if (!email.includes('@')) {
+        return { isValid: false, message: 'Email must contain @' };
+      }
+      
+      // Check if domain is incomplete
+      const parts = email.split('@');
+      if (parts.length === 2) {
+        if (!parts[1]) {
+          return { isValid: false, message: 'Domain is required' };
+        }
+        if (!parts[1].includes('.')) {
+          return { isValid: false, message: 'Invalid domain format' };
+        }
+        const domainParts = parts[1].split('.');
+        if (domainParts[domainParts.length - 1].length < 2) {
+          return { isValid: false, message: 'Invalid domain extension' };
+        }
+      }
+      
+      // Final regex validation
+      if (!emailRegex.test(email)) {
+        return { isValid: false, message: 'Invalid email format' };
+      }
+      
+      return { isValid: true, message: '' };
+    }
+
+    // Add email validation event listener
+    document.querySelector('input[name="requesterEmail"]').addEventListener('input', function() {
+      const emailInput = this;
+      const errorDiv = this.nextElementSibling;
+      const email = this.value.trim();
+      
+      // Remove previous validation classes
+      emailInput.classList.remove('is-valid', 'is-invalid');
+      errorDiv.textContent = '';
+      
+      // Don't show error immediately if field is empty during typing
+      if (email === '') {
+        return;
+      }
+      
+      const validation = validateEmail(email);
+      if (validation.isValid) {
+        emailInput.classList.add('is-valid');
+      } else {
+        emailInput.classList.add('is-invalid');
+        errorDiv.textContent = validation.message;
+      }
+    });
+
+    // Update handleSubmit function
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      // Validate email before submission
+      const emailInput = document.querySelector('input[name="requesterEmail"]');
+      if (emailInput.value && !validateEmail(emailInput.value).isValid) {
+        showMessage('Please enter a valid email address', 'danger');
+        return;
+      }
+      
+      // Validate phone numbers
+      if (!validatePhoneInputs(window.phoneInstances)) {
+        showMessage('Please correct invalid phone numbers', 'danger');
+        return;
+      }
+
+      const formData = new FormData(event.target);
+      const data = {};
+
+      // Process regular form fields
+      for (let [key, value] of formData.entries()) {
+        if (key !== 'documents') {
+          // For phone inputs, get the full international number
+          if (window.phoneInstances && window.phoneInstances[key]) {
+            data[key] = window.phoneInstances[key].getNumber();
+          } else if (key === 'refundType') {
+            // Preserve the exact selected value for refund type
+            data[key] = document.querySelector('select[name="refundType"]').value;
+          } else {
+            data[key] = value;
+          }
+        }
+      }
+
+      // Process files
+      const files = document.getElementById('documents').files;
+      if (files.length === 0) {
+        showMessage('Please attach at least one document', 'danger');
+        return;
+      }
+
+      // Populate preview modal
+      document.getElementById('preview-requester').textContent = data.requester;
+      document.getElementById('preview-email').textContent = data.requesterEmail;
+      document.getElementById('preview-vertical').textContent = data.vertical;
+      document.getElementById('preview-customer').textContent = data.customerContact;
+      document.getElementById('preview-payment-id').textContent = data.paymentId;
+      document.getElementById('preview-refund-type').textContent = data.refundType;
+      document.getElementById('preview-refund-amount').textContent = data.refundAmount + ' BDT';
+      
+      // Update Access Revoke Status with color
+      const revokeAccessElement = document.getElementById('preview-revoke-access');
+      revokeAccessElement.textContent = data.revokeAccess;
+      revokeAccessElement.className = `preview-badge ${data.revokeAccess === 'Yes' ? 'danger' : data.revokeAccess === 'No' ? 'success' : 'warning'}`;
+      
+      document.getElementById('preview-refund-reason').textContent = data.refundReason;
+
+      // Populate dynamic section based on refund type
+      const dynamicSection = document.getElementById('preview-dynamic-section');
+      dynamicSection.innerHTML = '';
+      
+      switch(data.refundType) {
+        case 'Course Exchange':
+          dynamicSection.innerHTML = `
+            <div class="preview-section mb-4">
+              <h6>Course Exchange Details</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Enrollment Number</label>
+                  <span>${data.courseExchangeEnrollmentNumber}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchase Date</label>
+                  <span>${data.courseExchangePurchaseDate}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchased Amount</label>
+                  <span>${data.courseExchangePurchasedAmount} BDT</span>
+                </div>
+                <div class="preview-item full-width">
+                  <label>Mistaken Course Details</label>
+                  <span>${data.mistakenCourse} - ${data.mistakenPhase}</span>
+                </div>
+                <div class="preview-item full-width">
+                  <label>Intended Course Details</label>
+                  <span>${data.intendedCourse} - ${data.intendedPhase}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          break;
+        case 'Phone Number Exchange':
+          dynamicSection.innerHTML = `
+            <div class="preview-section mb-4">
+              <h6>Phone Exchange Details</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Purchase Date</label>
+                  <span>${data.phoneExchangePurchaseDate}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchased Amount</label>
+                  <span>${data.phoneExchangePurchasedAmount} BDT</span>
+                </div>
+                <div class="preview-item">
+                  <label>Wrong Phone Number</label>
+                  <span>${data.wrongPhone}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Correct Phone Number</label>
+                  <span>${data.correctPhone}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          break;
+        case 'Partial Refund':
+          dynamicSection.innerHTML = `
+            <div class="preview-section mb-4">
+              <h6>Partial Refund Details</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Enrollment Number</label>
+                  <span>${data.partialRefundEnrollmentNumber}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchase Date</label>
+                  <span>${data.partialRefundPurchaseDate}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchased Amount</label>
+                  <span>${data.partialRefundPurchasedAmount} BDT</span>
+                </div>
+                <div class="preview-item full-width">
+                  <label>Mistaken Course Details</label>
+                  <span>${data.partialMistakenCourse} - ${data.partialMistakenPhase}</span>
+                </div>
+                <div class="preview-item full-width">
+                  <label>Intended Course Details</label>
+                  <span>${data.partialIntendedCourse} - ${data.partialIntendedPhase}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          break;
+        case 'Full Refund':
+          dynamicSection.innerHTML = `
+            <div class="preview-section mb-4">
+              <h6>Full Refund Details</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Enrollment Number</label>
+                  <span>${data.fullRefundEnrollmentNumber}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchase Date</label>
+                  <span>${data.fullRefundPurchaseDate}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Purchased Amount</label>
+                  <span>${data.fullRefundPurchasedAmount} BDT</span>
+                </div>
+                <div class="preview-item">
+                  <label>Mistaken Course</label>
+                  <span>${data.fullRefundMistakenCourse}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          break;
+        case 'Mistaken Payment to Merchant Number':
+          dynamicSection.innerHTML = `
+            <div class="preview-section mb-4">
+              <h6>Mistaken Payment Details</h6>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <label>Sender's bKash Number</label>
+                  <span>${data.senderBkash}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Transaction Time</label>
+                  <span>${data.transactionTime}</span>
+                </div>
+                <div class="preview-item">
+                  <label>Sent Amount</label>
+                  <span>${data.sentAmount} BDT</span>
+                </div>
+              </div>
+            </div>
+          `;
+          break;
+      }
+
+      // Show attached files
+      const previewDocuments = document.getElementById('preview-documents');
+      previewDocuments.innerHTML = Array.from(files)
+        .map(file => `<div class="file-item">
+          ${file.name} (${formatFileSize(file.size)})
+        </div>`)
+        .join('');
+
+      // Show preview modal
+      const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+      previewModal.show();
+
+      // Handle confirm button click
+      document.getElementById('confirmSubmitBtn').onclick = async function() {
+        const submitBtn = this;
+        const originalBtnText = submitBtn.innerHTML;
+        
+        try {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+          // Process files
+          data.documents = [];
+          for (let file of files) {
+            const reader = new FileReader();
+            await new Promise((resolve, reject) => {
+              reader.onload = () => {
+                data.documents.push({
+                  fileName: file.name,
+                  mimeType: file.type,
+                  data: reader.result.split(',')[1]
+                });
+                resolve();
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          }
+
+          // Hide preview modal
+          previewModal.hide();
+
+          // Submit form data
+          google.script.run
+            .withSuccessHandler(function(response) {
+              if (response.success) {
+                // Hide form and show confirmation
+                document.getElementById('refundForm').style.display = 'none';
+                
+                // Update confirmation details
+                document.getElementById('confirmRequestId').value = response.requestId;
+                document.getElementById('confirmPaymentId').value = data.paymentId;
+                document.getElementById('confirmEnrollmentNumber').value = response.enrollmentNumber;
+                document.getElementById('confirmRefundAmount').value = data.refundAmount + ' BDT';
+                document.getElementById('confirmDocumentLink').href = response.folderUrl;
+                
+                // Show confirmation card
+                document.getElementById('confirmationCard').style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+              } else {
+                showMessage(response.message || 'Submission failed', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+              }
+            })
+            .withFailureHandler(function(error) {
+              showMessage('Error: ' + (error.message || 'Unknown error occurred'), 'danger');
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnText;
+            })
+            .processForm(data);
+
+        } catch (error) {
+          showMessage('Error: ' + (error.message || 'Unknown error occurred'), 'danger');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
+      };
+    }
+
+    // Add function to handle submitting another request
+    function submitAnotherRequest() {
+      google.script.run.withSuccessHandler(function(url) {
+        window.top.location.href = url + '?page=sales';
+      }).getScriptUrl();
+    }
+
+    // Initialize phone inputs
+    function initPhoneInputs() {
+      const phoneInputs = document.querySelectorAll('input[type="tel"]');
+      const phoneInstances = {};
+      
+      phoneInputs.forEach(input => {
+        const instance = window.intlTelInput(input, {
+          utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
+          initialCountry: "bd", // Set Bangladesh as default
+          preferredCountries: ["bd", "in", "us", "gb"],
+          separateDialCode: true,
+          formatOnDisplay: true,
+          autoPlaceholder: "aggressive"
+        });
+        
+        // Store instance for later use
+        phoneInstances[input.name] = instance;
+        
+        // Add validation on blur
+        input.addEventListener('blur', function() {
+          const errorDiv = this.parentElement.querySelector('.phone-validation-error');
+          if (errorDiv) {
+            errorDiv.remove();
+          }
+          
+          if (this.value.trim()) {
+            if (!instance.isValidNumber()) {
+              const errorMsg = document.createElement('div');
+              errorMsg.className = 'phone-validation-error';
+              errorMsg.textContent = 'Invalid phone number';
+              this.parentElement.appendChild(errorMsg);
+            }
+          }
+        });
+      });
+      
+      return phoneInstances;
+    }
+
+    // Add phone number validation to form validation
+    function validatePhoneInputs(phoneInstances) {
+      let isValid = true;
+      Object.values(phoneInstances).forEach(instance => {
+        if (instance.getNumber() && !instance.isValidNumber()) {
+          isValid = false;
+        }
+      });
+      return isValid;
+    }
+
+    // Initialize phone inputs when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      window.phoneInstances = initPhoneInputs();
+      
+      // ... existing DOMContentLoaded code ...
+    });
+
+    // File upload area drag and drop handlers
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('documents');
+
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', () => {
+      fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+      // Update the file input
+      const dt = new DataTransfer();
+      Array.from(e.dataTransfer.files).forEach(file => dt.items.add(file));
+      fileInput.files = dt.files;
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    // Add this to the existing script section
+    document.querySelector('select[name="requester"]').addEventListener('change', function() {
+      const emailField = document.querySelector('input[name="requesterEmail"]').parentElement;
+      
+      if (this.value === 'Customer') {
+        emailField.classList.add('hidden');
+        emailField.querySelector('input').required = false;
+        emailField.querySelector('input').value = 'customer@submission.com'; // Default value for tracking
+      } else {
+        emailField.classList.remove('hidden');
+        emailField.querySelector('input').required = true;
+        emailField.querySelector('input').value = ''; // Clear default value
+      }
+    });
+
+    // Update form validation to include phase validation
+    function validateForm() {
+      console.log('=== Starting Form Validation ===');
+      const submitBtn = document.querySelector('button[type="submit"]');
+      
+      // Include file inputs in required fields, but only those with names
+      const requiredFields = document.querySelectorAll('input[required][name]:not(.hidden), select[required][name]:not(.hidden)');
+      console.log('Required Fields Found:', requiredFields.length);
+      
+      const visibleFields = Array.from(requiredFields).filter(field => {
+        // Check if any parent element has 'hidden' class
+        let currentElement = field;
+        while (currentElement && currentElement !== document) {
+          if (currentElement.classList.contains('hidden')) {
+            console.log('Field:', field.name, 'Hidden by parent:', currentElement);
+            return false;
+          }
+          currentElement = currentElement.parentElement;
+        }
+        console.log('Field:', field.name, 'Visible:', true, 'Value:', field.value);
+        return true;
+      });
+      
+      console.log('Visible Fields:', visibleFields.length);
+      
+      let isValid = true;
+      visibleFields.forEach(field => {
+        if (field.type === 'file') {
+          // Check if files are selected
+          console.log('File input:', field.name, 'Files:', field.files.length);
+          if (field.files.length === 0) {
+            console.log('Invalid: No files selected');
+            isValid = false;
+          }
+        } else if (field.classList.contains('course-select')) {
+          const phaseSelectName = field.getAttribute('data-phase-target');
+          const phaseSelect = document.querySelector(`select[name="${phaseSelectName}"]`);
+          console.log('Course Select:', field.name, 'Phase Select:', phaseSelectName, 'Phase Value:', phaseSelect?.value);
+          if (phaseSelect && !phaseSelect.classList.contains('hidden') && field.value && (!phaseSelect.value || phaseSelect.disabled)) {
+            console.log('Invalid: Phase not selected for course', field.name);
+            isValid = false;
+          }
+        } else if (!field.value) {
+          console.log('Invalid: Empty field', field.name);
+          isValid = false;
+        }
+      });
+      
+      console.log('Form Valid:', isValid);
+      submitBtn.disabled = !isValid;
+      console.log('=== End Form Validation ===');
+    }
+
+    // Add event listeners for form validation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initial validation
+      validateForm();
+
+      // Add form-wide validation triggers
+      const form = document.getElementById('refundForm');
+      form.addEventListener('input', function(e) {
+        validateForm();
+      });
+      form.addEventListener('change', function(e) {
+        validateForm();
+      });
+
+      // Add event listeners to course-select dropdowns
+      document.querySelectorAll('.course-select').forEach(courseSelect => {
+        courseSelect.addEventListener('change', function() {
+          updatePhaseOptions(this);
+          validateForm();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

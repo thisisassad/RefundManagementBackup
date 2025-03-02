@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body { 
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-top: 56px; /* Adjusted padding for fixed navbar to match NavBarPartial.html */
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    h1, h2, h3, h4, h5, h6, .btn, .card-title, .card-text {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .card-option {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      height: 100%;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+    }
+    .card-option:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .icon-container {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .finance-icon {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    .product-icon {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+    .sales-icon {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 40px;
+      font-weight: 600;
+    }
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .card-text {
+      color: #6c757d;
+      margin-bottom: 25px;
+    }
+    .approver-icon {
+      background-color: #f3e5f5;
+      color: #9c27b0;
+    }
+    .btn-purple {
+      background-color: #9c27b0;
+      color: white;
+    }
+    .btn-purple:hover {
+      background-color: #7b1fa2;
+      color: white;
+    }
+    
+    /* BI Icon styling */
+    .bi-icon {
+      background-color: #e8eaf6;
+      color: #3f51b5;
+    }
+    .btn-indigo {
+      background-color: #3f51b5;
+      color: white;
+    }
+    .btn-indigo:hover {
+      background-color: #303f9f;
+      color: white;
+    }
+    
+    .user-menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #f0f4f8;
+      color: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .user-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 200px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 1000;
+    }
+    .user-dropdown.show {
+      display: block;
+    }
+    .user-info {
+      padding: 15px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .user-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .user-role {
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+    .dropdown-item {
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      color: #212529;
+      text-decoration: none;
+    }
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+    }
+    .dropdown-item i {
+      margin-right: 10px;
+    }
+    .login-prompt {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .password-modal .modal-body {
+      padding: 20px;
+    }
+    .bi {
+      display: inline-block;
+      vertical-align: -0.125em;
+    }
+    
+    /* Navbar styling */
+    .navbar {
+      background-color: #f9fafb;
+      border-bottom: 1px solid #eaecef;
+      height: 56px;
+      padding: 0;
+    }
+    
+    .navbar .container {
+      height: 100%;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 16px;
+      padding: 0;
+      margin: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      margin-right: 0;
+      width: 130px; /* Adjusted width for logo only */
+    }
+    
+    /* Center the navbar items */
+    .navbar-nav.mx-auto {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+    }
+    
+    .navbar .nav-link {
+      color: #495057;
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .navbar .nav-link.active {
+      color: #007bff;
+      font-weight: 600;
+    }
+    
+    .navbar .nav-link:hover {
+      color: #007bff;
+    }
+    
+    /* Profile dropdown styling */
+    .dropdown-menu {
+      margin-top: 10px;
+      border: none;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    
+    /* For mobile navbar */
+    @media (max-width: 991.98px) {
+      .navbar {
+        height: auto;
+        min-height: 56px;
+      }
+      
+      .navbar-collapse {
+        background-color: #f9fafb;
+        padding: 0;
+        border-top: 1px solid #eaecef;
+      }
+      
+      .navbar .nav-link {
+        padding: 12px 16px;
+        height: auto;
+        border-bottom: 1px solid #eaecef;
+      }
+      
+      .navbar .nav-link.active {
+        border-left: 3px solid #007bff;
+        padding-left: 13px;
+      }
+      
+      .navbar-toggler {
+        border: none;
+        padding: 0;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+      
+      .user-avatar {
+        margin: 12px 16px;
+      }
+      
+      /* Reset the absolute positioning for mobile */
+      .navbar-nav.mx-auto {
+        position: static;
+        transform: none;
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+    
+    .navbar-logo {
+      width: 130px;
+      height: 45px;
+      margin-right: 5px;
+    }
+    
+    .navbar-logo svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation Bar Partial -->
+  <?!= include('NavBarPartial', {sessionToken: isAuthenticated ? userAccess.sessionToken : '', userAccess: userAccess || {}, currentPage: 'menu'}) ?>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <h1 class="text-center">Refund Management System</h1>
+      
+      <? if (!isAuthenticated) { ?>
+      <div class="alert alert-info text-center mb-4">
+        <i class="fas fa-info-circle me-2"></i>
+        Please log in to access all features of the Refund Management System.
+      </div>
+      <? } ?>
+      
+      <div class="row justify-content-center g-4">
+        <!-- Finance Team Card - Only show if user has access -->
+        <? if (isAuthenticated && userAccess.access && userAccess.access.includes('Finance Portal')) { ?>
+        <div class="col-md-3">
+          <a href="<?= getScriptUrl() ?>?page=finance&token=<?= userAccess.sessionToken ?>" class="text-decoration-none">
+            <div class="card card-option">
+              <div class="card-body text-center p-4">
+                <div class="icon-container finance-icon">
+                  <i class="fas fa-money-bill-wave fa-2x"></i>
+                </div>
+                <h5 class="card-title">Finance Team</h5>
+                <p class="card-text">Update refund status and track financial transactions</p>
+                <button class="btn btn-primary px-4">Access Finance Portal</button>
+              </div>
+            </div>
+          </a>
+        </div>
+        <? } ?>
+
+        <!-- Product Team Card - Only show if user has access -->
+        <? if (isAuthenticated && userAccess.access && userAccess.access.includes('Product Portal')) { ?>
+        <div class="col-md-3">
+          <a href="<?= getScriptUrl() ?>?page=product&token=<?= userAccess.sessionToken ?>" class="text-decoration-none">
+            <div class="card card-option">
+              <div class="card-body text-center p-4">
+                <div class="icon-container product-icon">
+                  <i class="fas fa-tools fa-2x"></i>
+                </div>
+                <h5 class="card-title">Product Team</h5>
+                <p class="card-text">Track and manage access revoke requests</p>
+                <button class="btn btn-warning px-4">Access Product Dashboard</button>
+              </div>
+            </div>
+          </a>
+        </div>
+        <? } ?>
+
+        <!-- Refund Approver Card - Only show if user has access -->
+        <? if (isAuthenticated && userAccess.access && userAccess.access.includes('Approver Portal')) { ?>
+        <div class="col-md-3">
+          <a href="<?= getScriptUrl() ?>?page=approver&token=<?= userAccess.sessionToken ?>" class="text-decoration-none">
+            <div class="card card-option">
+              <div class="card-body text-center p-4">
+                <div class="icon-container approver-icon">
+                  <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+                <h5 class="card-title">Refund Approver</h5>
+                <p class="card-text">Review and approve refund requests</p>
+                <button class="btn btn-purple px-4">Access Approver Portal</button>
+              </div>
+            </div>
+          </a>
+        </div>
+        <? } ?>
+
+        <!-- BI Team Card - Only show if user has access -->
+        <? if (isAuthenticated && userAccess.access && userAccess.access.includes('BI Portal')) { ?>
+        <div class="col-md-3">
+          <a href="<?= getScriptUrl() ?>?page=bi&token=<?= userAccess.sessionToken ?>" class="text-decoration-none">
+            <div class="card card-option">
+              <div class="card-body text-center p-4">
+                <div class="icon-container bi-icon mb-3">
+                  <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+                <h5 class="card-title">BI Team</h5>
+                <p class="card-text">Manage transaction history updates for refund requests.</p>
+                <button class="btn btn-indigo px-4">Access BI Portal</button>
+              </div>
+            </div>
+          </a>
+        </div>
+        <? } ?>
+
+        <!-- Sales OPS Card - Always accessible -->
+        <div class="col-md-3">
+          <a href="<?= getScriptUrl() ?>?page=sales<?= isAuthenticated ? '&token=' + userAccess.sessionToken : '' ?>" class="text-decoration-none">
+            <div class="card card-option">
+              <div class="card-body text-center p-4">
+                <div class="icon-container sales-icon">
+                  <i class="fas fa-user-friends fa-2x"></i>
+                </div>
+                <h5 class="card-title">Sales OPS</h5>
+                <p class="card-text">Submit new refund requests and manage customer cases</p>
+                <button class="btn btn-success px-4">Access Sales Portal</button>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <? if (!isAuthenticated) { ?>
+      <div class="login-prompt mt-5">
+        <a href="<?= getScriptUrl() ?>?page=login" class="btn btn-primary btn-lg">
+          <i class="fas fa-sign-in-alt me-2"></i> Login to Access Portals
+        </a>
+      </div>
+      <? } ?>
+    </div>
+  </div>
+
+  <!-- Pass server-side data to client-side JavaScript -->
+  <script id="auth-data" 
+    data-authenticated="<?= isAuthenticated ? 'true' : 'false' ?>"
+    data-session-token="<?= isAuthenticated && userAccess.sessionToken ? userAccess.sessionToken : '' ?>"
+    data-script-url="<?= getScriptUrl() ?>"
+    data-current-page="menu"
+  ></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Get authentication data from the script element
+    const authData = document.getElementById('auth-data').dataset;
+    const isAuthenticated = authData.authenticated === 'true';
+    const sessionToken = authData.sessionToken || '';
+    const scriptUrl = authData.scriptUrl || '';
+    const currentPage = authData.currentPage || '';
+    
+    // Navigate to different portals
+    function navigateToForm(type) {
+      // If sales portal or authenticated user, proceed
+      if (!isAuthenticated && type !== 'sales') {
+        // Redirect to login page
+        google.script.run
+          .withSuccessHandler(function(url) {
+            window.top.location.href = `${url}?page=login`;
+          })
+          .getScriptUrl();
+        return;
+      }
+      
+      // Get sessionToken from auth data
+      const authData = document.getElementById('auth-data').dataset;
+      const sessionToken = authData.sessionToken || '';
+      
+      // Use getScriptUrl() for reliable navigation
+      google.script.run
+        .withSuccessHandler(function(url) {
+          // Add session token to URL if authenticated
+          let targetUrl = `${url}?page=${type}`;
+          if (isAuthenticated && sessionToken) {
+            targetUrl += `&token=${sessionToken}`;
+          }
+          window.top.location.href = targetUrl;
+        })
+        .getScriptUrl();
+    }
+  </script>
+</body>
+</html> 
